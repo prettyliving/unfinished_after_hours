@@ -11,16 +11,19 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --plum:        #3B1F3A;
-      --plum-mid:    #5C3459;
-      --plum-light:  #7D4D78;
-      --coral:       #E8705A;
-      --coral-hover: #D45C45;
-      --cream:       #FAF7F2;
-      --warm-white:  #FFF9F4;
-      --muted:       #9B8A9A;
-      --text:        #2C1A2B;
-      --text-soft:   #5A4559;
+      --plum:        #2D1B4E;
+      --plum-mid:    #3e2670;
+      --plum-light:  #7B5EA7;
+      --coral:       #E07B6A;
+      --coral-hover: #c9624f;
+      --cream:       #EDE8F7;
+      --warm-white:  #FAF8FF;
+      --muted:       #9e94b8;
+      --text:        #2C2C2C;
+      --text-soft:   #5a5070;
+      --lavender:    #C4B5E8;
+      --blush:       #EDE8F7;
+      --sage:        #7BAE8E;
     }
 
     html { scroll-behavior: smooth; }
@@ -32,6 +35,35 @@
       overflow-x: hidden;
     }
 
+    /* ── GLOBAL GRAIN + RADIAL BG ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 15% 20%, rgba(196,181,232,0.28) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 50% at 85% 75%, rgba(45,27,78,0.09) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 60% 10%, rgba(237,232,247,0.6) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.6;
+    }
+
+    /* ── FLOATING ORBS ── */
+    .orb { position: fixed; border-radius: 50%; pointer-events: none; filter: blur(60px); z-index: 0; }
+    .orb-1 { width: 320px; height: 320px; background: var(--lavender); top: -80px; left: -80px; opacity: .35; animation: drift 12s ease-in-out infinite alternate; }
+    .orb-2 { width: 200px; height: 200px; background: var(--coral); bottom: 5%; right: 8%; opacity: .18; animation: drift 9s ease-in-out 2s infinite alternate-reverse; }
+    .orb-3 { width: 160px; height: 160px; background: var(--sage); top: 50%; left: 5%; opacity: .15; animation: drift 14s ease-in-out 1s infinite alternate; }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, 20px) scale(1.08); }
+    }
+
+    nav, section, footer, .hero { position: relative; z-index: 1; }
+
     /* ── NAV ── */
     nav {
       position: fixed;
@@ -41,7 +73,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.3rem 5vw;
-      background: rgba(255,249,244,.88);
+      background: rgba(250,248,255,.88);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(59,31,58,.06);
       animation: fadeDown .6s ease both;
@@ -177,12 +209,12 @@
       font-size: .72rem;
       letter-spacing: .15em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--lavender);
       margin-bottom: 2rem;
       opacity: 0;
       animation: fadeUp .7s .2s ease forwards;
     }
-    .hero-eyebrow span { display: inline-block; width: 24px; height: 1px; background: var(--muted); }
+    .hero-eyebrow span { display: inline-block; width: 24px; height: 1px; background: var(--lavender); }
 
     .hero-headline {
       font-family: 'Cormorant Garamond', serif;
@@ -198,7 +230,7 @@
 
     .hero-headline em {
       font-style: italic;
-      color: var(--plum-light);
+      color: var(--coral);
     }
 
     .hero-sub {
@@ -247,7 +279,7 @@
     /* ── SECTION 2: THE PROBLEM ── */
     .problem {
       padding: 7rem 5vw;
-      background: var(--cream);
+      background: var(--blush);
     }
 
     .problem-inner {
@@ -368,8 +400,8 @@
 
     .how-step {
       padding: 2.4rem 2.2rem;
-      background: var(--cream);
-      border: 1px solid rgba(59,31,58,.08);
+      background: var(--blush);
+      border: 1px solid rgba(45,27,78,.1);
       border-radius: 16px;
       transition: transform .2s, box-shadow .2s;
     }
@@ -411,8 +443,8 @@
       font-size: .7rem;
       letter-spacing: .1em;
       text-transform: uppercase;
-      color: var(--coral);
-      background: rgba(232,112,90,.08);
+      color: var(--plum);
+      background: rgba(196,181,232,.2);
       padding: .3rem .75rem;
       border-radius: 100px;
     }
@@ -547,16 +579,41 @@
       .hero-ctas { flex-direction: column; align-items: center; }
       footer { flex-direction: column; gap: .5rem; text-align: center; }
     }
+  
+    /* ── HERO TAGS (blush pills) ── */
+    .hero-tags {
+      display: flex; flex-wrap: wrap; gap: .55rem; justify-content: center;
+      margin-top: 2.5rem;
+      opacity: 0; animation: fadeUp .9s 1.05s ease forwards;
+    }
+    .hero-tag {
+      background: var(--blush); border: 1px solid var(--lavender);
+      color: var(--plum); font-size: .75rem; font-weight: 400;
+      padding: .38rem .95rem; border-radius: 100px; letter-spacing: .02em;
+    }
+  
+    .status-pill {
+      background: var(--blush); border: 1px solid var(--lavender);
+      color: var(--plum); font-size: .68rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .3rem .85rem; border-radius: 100px;
+    }
   </style>
 </head>
 <body>
 
+<!-- ORBS -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="index.html">Unfinished, After Hours</a>
+  <a class="nav-logo" href="index.html">Unfinished, <em style="font-style:italic;color:var(--coral);">After Hours</em></a>
   <ul class="nav-links">
     <li><a href="#how">How it works</a></li>
-    <li><a href="#footer-cta" class="nav-cta">Sign in</a></li>
+    <li><span class="status-pill">Demo</span></li>
+    <li><a href="quiz.html" class="nav-cta">Sign in</a></li>
   </ul>
 </nav>
 
@@ -584,6 +641,12 @@
     <a href="dashboard.html" class="hero-browse">or browse quietly →</a>
 
     <p class="hero-microcopy">No yelling. &nbsp;&nbsp;No hustle slogans. &nbsp;&nbsp;Just truth.</p>
+    <div class="hero-tags">
+      <span class="hero-tag">Burnout validation</span>
+      <span class="hero-tag">Not toxic positivity</span>
+      <span class="hero-tag">For students &amp; workers</span>
+      <span class="hero-tag">Actually human</span>
+    </div>
   </div>
 </section>
 
