@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soft To-Do — Unfinished, After Hours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--plum:#2D1B4E;--plum-mid:#3e2670;--plum-light:#7B5EA7;--coral:#E07B6A;--coral-hover:#c9624f;--lavender:#C4B5E8;--blush:#EDE8F7;--bg:#FAF8FF;--muted:#9e94b8;--text:#2C2C2C;--text-soft:#5a5070;--cream:#FAF8FF;--warm-white:#FAF8FF;--sage:#7BAE8E}
+    body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text);min-height:100vh}
+    .app-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    aside{background:var(--plum);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:2rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .aside-logo{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:rgba(250,247,242,.85);text-decoration:none;line-height:1.3}
+    .nav-section{display:flex;flex-direction:column;gap:.3rem}
+    .nav-section-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,247,242,.3);padding:.5rem .6rem .3rem;font-weight:500}
+    .nav-link{display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;border-radius:8px;font-size:.85rem;color:rgba(250,247,242,.6);text-decoration:none;transition:background .2s,color .2s;font-weight:300}
+    .nav-link:hover{background:rgba(255,255,255,.08);color:rgba(250,247,242,.9)}
+    .nav-link.active{background:rgba(255,255,255,.12);color:rgba(250,247,242,1);font-weight:400}
+    .nav-link svg{opacity:.7;flex-shrink:0}
+    .nav-link.active svg{opacity:1}
+    .aside-bottom{margin-top:auto}
+    .profile-pill{display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;border-radius:10px;background:rgba(255,255,255,.07)}
+    .profile-avatar{width:28px;height:28px;border-radius:50%;background:var(--coral);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:#fff;flex-shrink:0}
+    .profile-name{font-size:.82rem;color:rgba(250,247,242,.75);font-weight:300}
+    .profile-tag{font-size:.68rem;color:rgba(250,247,242,.4);letter-spacing:.04em}
+    .page-main{overflow-y:auto}
+    @media(max-width:900px){.app-layout{grid-template-columns:1fr}aside{display:none}}
+    .page-wrap{max-width:800px;margin:0 auto;padding:3.5rem 5vw 6rem}
+    .page-header{margin-bottom:2.5rem}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:300;color:var(--plum);margin-bottom:.4rem}
+    .page-sub{font-size:.88rem;color:var(--muted);font-weight:300}
+    .enough-banner{background:rgba(232,112,90,.07);border:1.5px solid rgba(232,112,90,.2);border-radius:14px;padding:1.2rem 1.6rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:2.5rem}
+    .enough-text{font-size:.9rem;color:var(--text-soft);font-weight:300;font-style:italic}
+    .enough-text strong{color:var(--plum);font-style:normal;font-weight:500}
+    .btn-enough{background:var(--coral);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:.55rem 1.2rem;border-radius:100px;cursor:pointer;transition:background .2s;white-space:nowrap;flex-shrink:0}
+    .btn-enough:hover{background:var(--coral-hover)}
+    .btn-enough:disabled{opacity:.5;cursor:default}
+    .columns{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+    .col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid rgba(59,31,58,.08)}
+    .col-title{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+    .col-count{font-size:.72rem;color:rgba(59,31,58,.3)}
+    .add-row{display:flex;gap:.5rem;margin-bottom:1rem}
+    .add-input{flex:1;background:var(--cream);border:1px solid rgba(59,31,58,.1);border-radius:8px;padding:.6rem .9rem;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:300;color:var(--text);outline:none;transition:border-color .2s}
+    .add-input:focus{border-color:var(--plum-light)}
+    .add-btn{width:32px;height:32px;border-radius:8px;background:var(--plum);color:var(--cream);border:none;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+    .add-btn:hover{background:var(--plum-mid)}
+    .task-list{display:flex;flex-direction:column;gap:.5rem;min-height:120px}
+    .task{display:flex;align-items:flex-start;gap:.7rem;padding:.75rem .9rem;border-radius:10px;background:var(--cream);border:1px solid rgba(59,31,58,.07);transition:opacity .3s,transform .2s}
+    .task.done{opacity:.45}
+    .task.enough-mark{border-color:rgba(232,112,90,.3);background:rgba(232,112,90,.04)}
+    .task-check{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(59,31,58,.2);cursor:pointer;flex-shrink:0;margin-top:2px;transition:all .2s;background:transparent;display:flex;align-items:center;justify-content:center}
+    .task.done .task-check{background:var(--plum);border-color:var(--plum)}
+    .task.done .task-check::after{content:'✓';font-size:.6rem;color:#fff}
+    .task-text{flex:1;font-size:.9rem;font-weight:300;color:var(--text-soft);line-height:1.5;cursor:pointer}
+    .task.done .task-text{text-decoration:line-through;color:var(--muted)}
+    .task-enough-badge{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);background:rgba(232,112,90,.1);padding:.18rem .55rem;border-radius:100px;flex-shrink:0;align-self:center}
+    .task-archive{font-size:.7rem;color:rgba(59,31,58,.2);background:none;border:none;cursor:pointer;padding:.1rem;transition:color .2s;flex-shrink:0;title:'Not today, and that\'s okay'}
+    .task-archive:hover{color:var(--muted)}
+    .empty-state{display:flex;align-items:center;justify-content:center;min-height:100px;font-size:.82rem;color:var(--muted);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:1rem;border:1px dashed rgba(59,31,58,.1);border-radius:10px}
+    .microcopy{margin-top:2.5rem;text-align:center;color:var(--muted);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:1rem}
+    @media(max-width:600px){.columns{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar">
+    <a class="aside-logo" href="index.html">Unfinished,<br>After Hours</a>
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-link" href="dashboard.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a class="nav-link" href="conversation.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Have a Conversation</a>
+      <a class="nav-link" href="resets.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Resets</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-link active" href="todo.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Soft To-Do</a>
+      <a class="nav-link" href="journal.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Journal Space</a>
+      <a class="nav-link" href="letters.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Unsent Letters</a>
+    </div>
+    <div class="aside-bottom">
+      <div class="profile-pill">
+        <div class="profile-avatar" id="profile-avatar">?</div>
+        <div><div class="profile-name" id="profile-name">You</div><div class="profile-tag" id="profile-tag">—</div></div>
+      </div>
+    </div>
+  </aside>
+  <div class="page-main">
+    <div class="page-wrap">
+      <div class="page-header">
+        <p style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);font-weight:500;margin-bottom:.6rem;">Tools</p>
+        <h1 class="page-title">Soft To-Do</h1>
+        <p class="page-sub">Start small, or don't start at all. No streaks. No metrics.</p>
+      </div>
+      <div class="enough-banner" id="enoughBanner">
+        <p class="enough-text">When you're ready to stop, hit <strong>"Enough for Today"</strong> — it marks one task as sufficient and lets you close the list with peace.</p>
+        <button class="btn-enough" id="enoughBtn" onclick="markEnough()">Enough for Today</button>
+      </div>
+      <div class="columns">
+        <div>
+          <div class="col-header"><span class="col-title">Must do</span><span class="col-count" id="must-count">0 tasks</span></div>
+          <div class="add-row">
+            <input class="add-input" id="must-input" type="text" placeholder="Add something..." onkeydown="if(event.key==='Enter')addTask('must')" />
+            <button class="add-btn" onclick="addTask('must')">+</button>
+          </div>
+          <div class="task-list" id="must-list"></div>
+        </div>
+        <div>
+          <div class="col-header"><span class="col-title">Could do</span><span class="col-count" id="could-count">0 tasks</span></div>
+          <div class="add-row">
+            <input class="add-input" id="could-input" type="text" placeholder="Maybe, if energy allows..." onkeydown="if(event.key==='Enter')addTask('could')" />
+            <button class="add-btn" onclick="addTask('could')">+</button>
+          </div>
+          <div class="task-list" id="could-list"></div>
+        </div>
+      </div>
+      <p class="microcopy">Progress counts, even if it's quiet.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── theme ──────────────────────────────────────────────────────────
+  var u={};try{u=JSON.parse(sessionStorage.getItem('uah_user')||'{}');}catch(e){}
+  function hexToRgb(hex){
+    if(!hex)return[160,120,160];
+    var rgb=hex.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if(rgb)return[parseInt(rgb[1]),parseInt(rgb[2]),parseInt(rgb[3])];
+    if(hex.length<7)return[160,120,160];
+    return[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
+  }
+  function rgbStr(r,g,b){return'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';}
+  function darken(rgb,p){return[rgb[0]*p,rgb[1]*p,rgb[2]*p];}
+  function lighten(rgb,m){return[rgb[0]+(255-rgb[0])*m,rgb[1]+(255-rgb[1])*m,rgb[2]+(255-rgb[2])*m];}
+  function lum(rgb){return rgb.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce(function(s,v,i){return s+v*[.2126,.7152,.0722][i];},0);}
+  function contrast(a,b){var l1=lum(a),l2=lum(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05);}
+  (function(){
+    if(!u.swatches||!u.swatches.length)return;
+    var av=u.avoidColor||null;
+    var safe=u.swatches.filter(function(h){if(!av)return true;var a=hexToRgb(av),b=hexToRgb(h);return(Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])+Math.abs(a[2]-b[2]))>40;});
+    if(!safe.length)safe=['#7BAE8E','#C9A84C'];
+    var p=hexToRgb(safe[0]),s=safe[1]?hexToRgb(safe[1]):darken(p,.75);
+    var dp=darken(p,.45),dpm=darken(p,.65),dpl=darken(p,.80);
+    var acc=s;if(contrast(acc,[255,255,255])<3)acc=darken(acc,.6);
+    var root=document.documentElement;
+    root.style.setProperty('--plum',rgbStr.apply(null,dp));root.style.setProperty('--plum-mid',rgbStr.apply(null,dpm));root.style.setProperty('--plum-light',rgbStr.apply(null,dpl));
+    root.style.setProperty('--coral',rgbStr.apply(null,acc));root.style.setProperty('--coral-hover',rgbStr.apply(null,darken(acc,.85)));
+    root.style.setProperty('--warm-white',rgbStr.apply(null,lighten(p,.92)));root.style.setProperty('--cream',rgbStr.apply(null,lighten(p,.94)));
+    root.style.setProperty('--muted',rgbStr.apply(null,lighten(dp,.45)));root.style.setProperty('--text-soft',rgbStr.apply(null,darken(p,.5)));
+    document.body.style.background='linear-gradient(160deg,rgba('+p[0]+','+p[1]+','+p[2]+',.1) 0%,'+rgbStr.apply(null,lighten(p,.92))+' 35%)';
+    var sb=document.getElementById('sidebar');if(sb)sb.style.background=rgbStr.apply(null,dp);
+  })();
+  var av2=document.getElementById('profile-avatar'),pn2=document.getElementById('profile-name'),pt2=document.getElementById('profile-tag');
+  if(av2)av2.textContent=u.name?u.name.charAt(0).toUpperCase():'?';
+  if(pn2)pn2.textContent=u.name||'You';
+  if(pt2)pt2.textContent=u.profile||'—';
+
+  // ── tasks (sessionStorage) ─────────────────────────────────────────
+  var tasks={must:[],could:[]};
+  var enoughUsed=false;
+  var nextId=1;
+  try{
+    var saved=JSON.parse(sessionStorage.getItem('uah_tasks')||'null');
+    if(saved){tasks=saved.tasks;enoughUsed=saved.enoughUsed||false;nextId=saved.nextId||1;}
+  }catch(e){}
+
+  function saveTasks(){try{sessionStorage.setItem('uah_tasks',JSON.stringify({tasks:tasks,enoughUsed:enoughUsed,nextId:nextId}));}catch(e){}}
+
+  function render(){
+    ['must','could'].forEach(function(col){
+      var list=document.getElementById(col+'-list');
+      var items=tasks[col];
+      if(!items.length){list.innerHTML='<div class="empty-state">Nothing here yet.</div>';}
+      else{
+        list.innerHTML=items.map(function(t){
+          return'<div class="task'+(t.done?' done':'')+(t.enough?' enough-mark':'')+'" id="task-'+t.id+'">'+
+            '<div class="task-check" onclick="toggleDone('+t.id+',\''+col+'\')"></div>'+
+            '<span class="task-text" onclick="toggleDone('+t.id+',\''+col+'\')">'+t.text+'</span>'+
+            (t.enough?'<span class="task-enough-badge">Enough</span>':'')+
+            '<button class="task-archive" onclick="archiveTask('+t.id+',\''+col+'\')" title="Not today, and that\'s okay">✕</button></div>';
+        }).join('');
+      }
+      document.getElementById(col+'-count').textContent=items.length+' task'+(items.length!==1?'s':'');
+    });
+    var eb=document.getElementById('enoughBtn');
+    if(eb&&enoughUsed)eb.disabled=true;
+  }
+
+  function addTask(col){
+    var input=document.getElementById(col+'-input');
+    var text=input.value.trim();
+    if(!text)return;
+    tasks[col].push({id:nextId++,text:text,done:false,enough:false});
+    input.value='';
+    saveTasks();render();
+  }
+
+  function toggleDone(id,col){
+    var t=tasks[col].find(function(x){return x.id===id;});
+    if(t){t.done=!t.done;saveTasks();render();}
+  }
+
+  function archiveTask(id,col){
+    tasks[col]=tasks[col].filter(function(t){return t.id!==id;});
+    saveTasks();render();
+  }
+
+  function markEnough(){
+    if(enoughUsed)return;
+    var target=tasks.must.find(function(t){return!t.done;})||tasks.could.find(function(t){return!t.done;});
+    if(!target){
+      document.getElementById('enoughBanner').innerHTML='<p class="enough-text"><strong>You\'re already done.</strong> Everything\'s checked off. That is enough.</p>';
+      enoughUsed=true;saveTasks();return;
+    }
+    target.enough=true;enoughUsed=true;
+    document.getElementById('enoughBanner').innerHTML='<p class="enough-text"><strong>That\'s enough for today.</strong> You can close this list now. The rest will be here if and when you want it.</p>';
+    saveTasks();render();
+  }
+
+  render();
+</script>
+</body>
+</html>

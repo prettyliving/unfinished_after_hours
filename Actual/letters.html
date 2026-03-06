@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unsent Letters — Unfinished, After Hours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--plum:#2D1B4E;--plum-mid:#3e2670;--plum-light:#7B5EA7;--coral:#E07B6A;--coral-hover:#c9624f;--lavender:#C4B5E8;--blush:#EDE8F7;--bg:#FAF8FF;--muted:#9e94b8;--text:#2C2C2C;--text-soft:#5a5070;--cream:#FAF8FF;--warm-white:#FAF8FF;--sage:#7BAE8E}
+    body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text);min-height:100vh}
+
+    /* ── SAME LAYOUT AS ALL OTHER PAGES ── */
+    .app-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    aside{background:var(--plum);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:2rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .aside-logo{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:rgba(250,247,242,.85);text-decoration:none;line-height:1.3}
+    .nav-section{display:flex;flex-direction:column;gap:.3rem}
+    .nav-section-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,247,242,.3);padding:.5rem .6rem .3rem;font-weight:500}
+    .nav-link{display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;border-radius:8px;font-size:.85rem;color:rgba(250,247,242,.6);text-decoration:none;transition:background .2s,color .2s;font-weight:300}
+    .nav-link:hover{background:rgba(255,255,255,.08);color:rgba(250,247,242,.9)}
+    .nav-link.active{background:rgba(255,255,255,.12);color:rgba(250,247,242,1);font-weight:400}
+    .nav-link svg{opacity:.7;flex-shrink:0}
+    .nav-link.active svg{opacity:1}
+    .aside-bottom{margin-top:auto}
+    .profile-pill{display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;border-radius:10px;background:rgba(255,255,255,.07)}
+    .profile-avatar{width:28px;height:28px;border-radius:50%;background:var(--coral);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:#fff;flex-shrink:0}
+    .profile-name{font-size:.82rem;color:rgba(250,247,242,.75);font-weight:300}
+    .profile-tag{font-size:.68rem;color:rgba(250,247,242,.4);letter-spacing:.04em}
+
+    /* ── PAGE MAIN ── */
+    .page-main{overflow-y:auto;display:flex;flex-direction:column}
+
+    /* ── INNER TWO-COLUMN: recipients + write area ── */
+    .letters-body{
+      display:grid;
+      grid-template-columns:240px 1fr;
+      flex:1;
+      min-height:100vh;
+    }
+
+    /* ── RECIPIENT SIDEBAR ── */
+    .recipients-panel{
+      border-right:1px solid rgba(45,27,78,.08);
+      padding:2.4rem 1.6rem;
+      overflow-y:auto;
+      background:var(--warm-white);
+      display:flex;flex-direction:column;
+    }
+    .panel-header{margin-bottom:2rem}
+    .panel-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--plum);margin-bottom:.3rem;line-height:1.2}
+    .panel-sub{font-size:.8rem;color:var(--muted);font-weight:300;line-height:1.6}
+    .panel-label{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.65rem;font-weight:500}
+
+    .recipients{display:flex;flex-direction:column;gap:.3rem;margin-bottom:2rem}
+    .recipient-btn{
+      display:flex;align-items:center;gap:.75rem;
+      padding:.65rem .85rem;border-radius:9px;
+      cursor:pointer;border:1px solid transparent;background:transparent;
+      font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--text-soft);font-weight:300;
+      text-align:left;transition:all .18s;width:100%;
+    }
+    .recipient-btn:hover{background:rgba(45,27,78,.05)}
+    .recipient-btn.active{background:var(--blush);border-color:rgba(196,181,232,.45);color:var(--plum);font-weight:400}
+    .recipient-icon{font-size:.95rem;flex-shrink:0;width:22px;text-align:center}
+
+    .saved-section{margin-top:auto;padding-top:1.5rem;border-top:1px solid rgba(45,27,78,.07)}
+    .letter-list{display:flex;flex-direction:column;gap:.35rem;margin-top:.65rem}
+    .letter-item{
+      padding:.65rem .8rem;border-radius:9px;cursor:pointer;
+      background:rgba(45,27,78,.03);border:1px solid rgba(45,27,78,.07);
+      transition:border-color .18s;
+    }
+    .letter-item:hover{border-color:rgba(45,27,78,.18)}
+    .letter-item.active{border-color:var(--coral)}
+    .letter-recipient{font-size:.67rem;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);margin-bottom:.2rem}
+    .letter-preview{font-size:.8rem;color:var(--text-soft);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .letter-date{font-size:.65rem;color:rgba(45,27,78,.25);margin-top:.15rem}
+    .no-letters{font-size:.8rem;color:var(--muted);font-style:italic;padding:.3rem 0}
+
+    /* ── WRITE AREA ── */
+    .write-area{
+      display:flex;flex-direction:column;
+      padding:3rem 4rem;
+      overflow-y:auto;
+    }
+    .letter-header{margin-bottom:2rem}
+    .to-line{display:flex;align-items:baseline;gap:.85rem;margin-bottom:.75rem}
+    .to-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;flex-shrink:0}
+    .to-value{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:400;color:var(--plum);font-style:italic;line-height:1.2}
+    .letter-hint{font-size:.88rem;color:var(--muted);font-weight:300;line-height:1.75;max-width:520px;font-style:italic}
+
+    .letter-textarea{
+      flex:1;width:100%;min-height:400px;
+      background:rgba(255,255,255,.75);
+      border:1.5px solid rgba(196,181,232,.35);
+      border-radius:16px;
+      padding:2.2rem 2.4rem;
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.18rem;font-weight:300;color:var(--text);
+      line-height:1.95;resize:none;outline:none;
+      transition:border-color .2s,box-shadow .2s;
+      margin-bottom:1.4rem;
+    }
+    .letter-textarea:focus{border-color:var(--lavender);box-shadow:0 0 0 3px rgba(196,181,232,.15)}
+    .letter-textarea::placeholder{color:rgba(45,27,78,.2);font-style:italic}
+
+    .letter-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+    .btn-vault{
+      background:var(--plum);color:#fff;border:none;
+      font-family:'DM Sans',sans-serif;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;
+      padding:.7rem 1.6rem;border-radius:100px;cursor:pointer;transition:background .2s;
+    }
+    .btn-vault:hover{background:var(--plum-mid)}
+    .btn-discard{
+      background:transparent;border:1px solid rgba(45,27,78,.15);
+      color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.78rem;
+      letter-spacing:.06em;text-transform:uppercase;
+      padding:.7rem 1.3rem;border-radius:100px;cursor:pointer;transition:all .2s;
+    }
+    .btn-discard:hover{border-color:#C04040;color:#C04040}
+    .send-note{margin-left:auto;font-size:.74rem;color:var(--muted);font-style:italic}
+
+    .save-toast{
+      position:fixed;bottom:2rem;right:2rem;
+      background:var(--plum);color:#fff;
+      font-family:'DM Sans',sans-serif;font-size:.82rem;
+      padding:.75rem 1.5rem;border-radius:100px;
+      opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;
+    }
+    .save-toast.show{opacity:1}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .25s ease}
+
+    @media(max-width:1100px){.write-area{padding:2.5rem 2.5rem}}
+    @media(max-width:900px){.app-layout{grid-template-columns:1fr}aside{display:none}}
+    @media(max-width:700px){.letters-body{grid-template-columns:1fr}.recipients-panel{display:none}.write-area{padding:2rem 1.5rem}}
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- NAV SIDEBAR (identical to all other pages) -->
+  <aside id="sidebar">
+    <a class="aside-logo" href="index.html">Unfinished,<br>After Hours</a>
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-link" href="dashboard.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a class="nav-link" href="conversation.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Have a Conversation</a>
+      <a class="nav-link" href="resets.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Resets</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-link" href="todo.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Soft To-Do</a>
+      <a class="nav-link" href="journal.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Journal Space</a>
+      <a class="nav-link active" href="letters.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Unsent Letters</a>
+    </div>
+    <div class="aside-bottom">
+      <div class="profile-pill">
+        <div class="profile-avatar" id="profile-avatar">?</div>
+        <div>
+          <div class="profile-name" id="profile-name">You</div>
+          <div class="profile-tag" id="profile-tag">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PAGE MAIN -->
+  <div class="page-main">
+    <div class="letters-body">
+
+      <!-- RECIPIENT PANEL -->
+      <div class="recipients-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Unsent Letters</h2>
+          <p class="panel-sub">Write it. Don't send it.<br>That's enough.</p>
+        </div>
+
+        <p class="panel-label">Write to…</p>
+        <div class="recipients" id="recipients">
+          <button class="recipient-btn active" data-recipient="My burnout"><span class="recipient-icon">🔥</span>My burnout</button>
+          <button class="recipient-btn" data-recipient="My inner critic"><span class="recipient-icon">🪞</span>My inner critic</button>
+          <button class="recipient-btn" data-recipient="Someone I can't talk to"><span class="recipient-icon">💬</span>Someone I can't talk to</button>
+          <button class="recipient-btn" data-recipient="My future self"><span class="recipient-icon">✨</span>My future self</button>
+          <button class="recipient-btn" data-recipient="My past self"><span class="recipient-icon">🌱</span>My past self</button>
+          <button class="recipient-btn" data-recipient="The version of me that's tired"><span class="recipient-icon">🫂</span>The version of me that's tired</button>
+          <button class="recipient-btn" data-recipient="The pressure I carry"><span class="recipient-icon">🪨</span>The pressure I carry</button>
+          <button class="recipient-btn" data-recipient="No one in particular"><span class="recipient-icon">🌙</span>No one in particular</button>
+        </div>
+
+        <div class="saved-section">
+          <p class="panel-label">Saved letters</p>
+          <div class="letter-list" id="letterList">
+            <p class="no-letters">No saved letters yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- WRITE AREA -->
+      <div class="write-area">
+        <div class="letter-header fade-in" id="letterHeader">
+          <div class="to-line">
+            <span class="to-label">To</span>
+            <span class="to-value" id="toValue">My burnout</span>
+          </div>
+          <p class="letter-hint" id="letterHint">You've been carrying this for a while. You don't need to be fair or reasonable. Just honest.</p>
+        </div>
+
+        <textarea class="letter-textarea" id="letterText" placeholder="Dear my burnout..."></textarea>
+
+        <div class="letter-actions">
+          <button class="btn-vault" id="saveBtn">Save to vault</button>
+          <button class="btn-discard" id="discardBtn">Discard</button>
+          <span class="send-note">This letter will never be sent.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="save-toast" id="toast">Saved to vault ✓</div>
+
+<script>
+  var u={};try{u=JSON.parse(sessionStorage.getItem('uah_user')||'{}');}catch(e){}
+
+  // ── theme ─────────────────────────────────────────────────────────
+  function hexToRgb(hex){
+    if(!hex)return[160,120,160];
+    var rgb=hex.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if(rgb)return[parseInt(rgb[1]),parseInt(rgb[2]),parseInt(rgb[3])];
+    if(hex.length<7)return[160,120,160];
+    return[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
+  }
+  function rgbStr(r,g,b){return'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';}
+  function darken(rgb,p){return[rgb[0]*p,rgb[1]*p,rgb[2]*p];}
+  function lighten(rgb,m){return[rgb[0]+(255-rgb[0])*m,rgb[1]+(255-rgb[1])*m,rgb[2]+(255-rgb[2])*m];}
+  function lum(rgb){return rgb.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce(function(s,v,i){return s+v*[.2126,.7152,.0722][i];},0);}
+  function contrast(a,b){var l1=lum(a),l2=lum(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05);}
+  (function(){
+    if(!u.swatches||!u.swatches.length)return;
+    var av=u.avoidColor||null;
+    var safe=u.swatches.filter(function(h){if(!av)return true;var a=hexToRgb(av),b=hexToRgb(h);return(Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])+Math.abs(a[2]-b[2]))>40;});
+    if(!safe.length)safe=['#7BAE8E','#C9A84C'];
+    var p=hexToRgb(safe[0]),s=safe[1]?hexToRgb(safe[1]):darken(p,.75);
+    var dp=darken(p,.45),dpm=darken(p,.65),dpl=darken(p,.80);
+    var acc=s;if(contrast(acc,[255,255,255])<3)acc=darken(acc,.6);
+    var root=document.documentElement;
+    root.style.setProperty('--plum',rgbStr.apply(null,dp));
+    root.style.setProperty('--plum-mid',rgbStr.apply(null,dpm));
+    root.style.setProperty('--plum-light',rgbStr.apply(null,dpl));
+    root.style.setProperty('--coral',rgbStr.apply(null,acc));
+    root.style.setProperty('--coral-hover',rgbStr.apply(null,darken(acc,.85)));
+    root.style.setProperty('--warm-white',rgbStr.apply(null,lighten(p,.92)));
+    root.style.setProperty('--cream',rgbStr.apply(null,lighten(p,.94)));
+    root.style.setProperty('--muted',rgbStr.apply(null,lighten(dp,.45)));
+    root.style.setProperty('--text-soft',rgbStr.apply(null,darken(p,.5)));
+    document.body.style.background=rgbStr.apply(null,lighten(p,.92));
+    var sb=document.getElementById('sidebar');if(sb)sb.style.background=rgbStr.apply(null,dp);
+  })();
+
+  // ── profile pill ──
+  var av2=document.getElementById('profile-avatar'),pn2=document.getElementById('profile-name'),pt2=document.getElementById('profile-tag');
+  if(av2)av2.textContent=u.name?u.name.charAt(0).toUpperCase():'?';
+  if(pn2)pn2.textContent=u.name||'You';
+  if(pt2)pt2.textContent=u.profile||'—';
+
+  // ── letter logic ─────────────────────────────────────────────────
+  var hints={
+    'My burnout':'You\'ve been carrying this for a while. You don\'t need to be fair or reasonable. Just honest.',
+    'My inner critic':'Say what you\'ve always wanted to say back. No filters needed here.',
+    'Someone I can\'t talk to':'This is the conversation you couldn\'t have. Have it here instead.',
+    'My future self':'What do you need them to know? What do you want them to remember?',
+    'My past self':'What would you say if you could reach back? Comfort, anger, love — all allowed.',
+    'The version of me that\'s tired':'Speak directly to that exhausted part of you. It\'s listening.',
+    'The pressure I carry':'Name it. Address it. You don\'t have to make peace with it. Just acknowledge it.',
+    'No one in particular':'Sometimes it just needs to go somewhere. This is that place.'
+  };
+  var placeholders={
+    'My burnout':'Dear my burnout...',
+    'My inner critic':'Dear the voice that says I\'m not enough...',
+    'Someone I can\'t talk to':'There\'s something I\'ve needed to say...',
+    'My future self':'I want you to know...',
+    'My past self':'Looking back, I wish I could tell you...',
+    'The version of me that\'s tired':'I see you. You\'ve been...',
+    'The pressure I carry':'I\'ve been meaning to tell you...',
+    'No one in particular':'I just need to say this somewhere...'
+  };
+
+  var currentRecipient='My burnout';
+  var letters=[];
+  try{letters=JSON.parse(sessionStorage.getItem('uah_letters')||'[]');}catch(e){}
+
+  // recipient button clicks
+  document.querySelectorAll('.recipient-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      currentRecipient=btn.dataset.recipient;
+      document.querySelectorAll('.recipient-btn').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      document.getElementById('toValue').textContent=currentRecipient;
+      document.getElementById('letterHint').textContent=hints[currentRecipient]||hints['No one in particular'];
+      var ta=document.getElementById('letterText');
+      ta.placeholder=placeholders[currentRecipient]||'Dear...';
+      ta.value='';
+      ta.focus();
+      var h=document.getElementById('letterHeader');
+      h.classList.remove('fade-in');void h.offsetWidth;h.classList.add('fade-in');
+    });
+  });
+
+  function renderLetterList(){
+    var list=document.getElementById('letterList');
+    if(!letters.length){list.innerHTML='<p class="no-letters">No saved letters yet.</p>';return;}
+    list.innerHTML=letters.map(function(l,i){
+      return '<div class="letter-item'+(i===0?' active':'')+'" data-idx="'+i+'">'+
+        '<div class="letter-recipient">'+l.recipient+'</div>'+
+        '<div class="letter-preview">'+l.preview+'</div>'+
+        '<div class="letter-date">'+l.date+'</div></div>';
+    }).join('');
+    list.querySelectorAll('.letter-item').forEach(function(el){
+      el.addEventListener('click',function(){loadLetter(parseInt(el.dataset.idx));});
+    });
+  }
+
+  function loadLetter(i){
+    var l=letters[i];if(!l)return;
+    currentRecipient=l.recipient;
+    document.getElementById('toValue').textContent=l.recipient;
+    document.getElementById('letterHint').textContent=hints[l.recipient]||hints['No one in particular'];
+    var ta=document.getElementById('letterText');
+    ta.placeholder=placeholders[l.recipient]||'Dear...';
+    ta.value=l.full;
+    document.querySelectorAll('.recipient-btn').forEach(function(b){b.classList.toggle('active',b.dataset.recipient===l.recipient);});
+    document.querySelectorAll('.letter-item').forEach(function(el,j){el.classList.toggle('active',j===i);});
+  }
+
+  document.getElementById('saveBtn').addEventListener('click',function(){
+    var text=document.getElementById('letterText').value.trim();
+    if(!text)return;
+    var now=new Date();
+    var dateStr=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    letters.unshift({recipient:currentRecipient,preview:text.slice(0,55)+(text.length>55?'...':''),full:text,date:dateStr});
+    try{sessionStorage.setItem('uah_letters',JSON.stringify(letters));}catch(e){}
+    document.getElementById('letterText').value='';
+    renderLetterList();
+    var t=document.getElementById('toast');t.classList.add('show');
+    setTimeout(function(){t.classList.remove('show');},2200);
+  });
+
+  document.getElementById('discardBtn').addEventListener('click',function(){
+    document.getElementById('letterText').value='';
+    document.getElementById('letterText').focus();
+  });
+
+  renderLetterList();
+</script>
+</body>
+</html>
+ENDOFOFFILE
