@@ -486,11 +486,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+  // ── journal prompt save ──
+  var saveBtn = document.querySelector('.btn-save');
+  var promptInput = document.querySelector('.prompt-input');
+  var promptQ = document.querySelector('.prompt-q');
+
+  if (saveBtn && promptInput) {
+    saveBtn.addEventListener('click', function() {
+      var text = promptInput.value.trim();
+      if (!text) return;
+      var entries = [];
+      try { entries = JSON.parse(sessionStorage.getItem('uah_journal') || '[]'); } catch(e) {}
+      entries.unshift({
+        prompt: promptQ ? promptQ.textContent : 'Journal entry',
+        text: text,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      });
+      try { sessionStorage.setItem('uah_journal', JSON.stringify(entries.slice(0, 50))); } catch(e) {}
+      promptInput.value = '';
+      saveBtn.textContent = 'Saved ✓';
+      saveBtn.style.background = 'var(--sage)';
+      setTimeout(function() {
+        saveBtn.textContent = 'Save entry';
+        saveBtn.style.background = '';
+      }, 2000);
+    });
+  }
+
   // ── sign out ──
   var soBtn = document.getElementById('signout-btn');
   if (soBtn) {
     soBtn.addEventListener('click', function() {
       sessionStorage.removeItem('uah_user');
+      try { localStorage.removeItem('uah_last_email'); } catch(e) {}
       window.location.href = 'index.html';
     });
   }

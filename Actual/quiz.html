@@ -515,6 +515,16 @@
       font-size: .8rem; color: var(--muted); font-weight: 300; line-height: 1.5;
     }
 
+    /* social name overlay */
+    .social-overlay { display:none; position:fixed; inset:0; background:rgba(45,27,78,.5); backdrop-filter:blur(4px); z-index:200; align-items:center; justify-content:center; opacity:0; transition:opacity .3s; }
+    .social-overlay.active { opacity:1; }
+    .social-overlay-card { background:#fff; border-radius:18px; padding:2.4rem 2.2rem 2rem; width:100%; max-width:380px; box-shadow:0 24px 60px rgba(45,27,78,.18); }
+    .social-overlay-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:500; color:var(--plum); margin-bottom:.4rem; }
+    .social-overlay-sub { font-size:.85rem; color:var(--text-soft); font-weight:300; margin-bottom:1.5rem; line-height:1.6; }
+    .social-overlay-btns { display:flex; gap:.7rem; margin-top:1.2rem; }
+    .social-overlay-btns .auth-submit { flex:1; margin:0; }
+    .social-cancel { flex:1; background:transparent; border:1.5px solid rgba(45,27,78,.15); color:var(--text-soft); font-family:'DM Sans',sans-serif; font-size:.85rem; border-radius:100px; cursor:pointer; transition:border-color .2s; }
+    .social-cancel:hover { border-color:var(--plum); }
     .rg-profile-pill {
       display: inline-flex; align-items: center; gap: .5rem;
       background: var(--blush); border: 1px solid rgba(196,181,232,.4);
@@ -641,6 +651,23 @@
 
 </div>
 <!-- END AUTH SCREEN -->
+
+<!-- SOCIAL NAME OVERLAY -->
+<div class="social-overlay" id="social-name-overlay">
+  <div class="social-overlay-card">
+    <h2 class="social-overlay-title">One quick thing.</h2>
+    <p class="social-overlay-sub">What should we call you? You can always change this later.</p>
+    <div class="auth-field">
+      <label class="auth-label" for="social-name-input">Your name <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
+      <input class="auth-input" type="text" id="social-name-input" placeholder="Your name or a nickname" autocomplete="given-name" />
+      <p class="auth-error-msg" id="social-name-error">Please enter a name to continue.</p>
+    </div>
+    <div class="social-overlay-btns">
+      <button class="social-cancel" id="social-cancel-btn">Cancel</button>
+      <button class="auth-submit" id="social-continue-btn">Continue with <span id="social-provider-label">Google</span> →</button>
+    </div>
+  </div>
+</div>
 
 <nav>
   <a class="nav-logo" href="index.html">Unfinished, <em>After Hours</em></a>
@@ -853,6 +880,19 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
+  // Pre-fill sign-in email if we remember the last user
+  try {
+    var lastEmail = localStorage.getItem('uah_last_email');
+    if (lastEmail) {
+      document.getElementById('signin-email').value = lastEmail;
+      // Switch to sign-in tab if they have an account
+      if (getAccount(lastEmail)) {
+        switchTab('signin');
+        setTimeout(function() { document.getElementById('signin-pass').focus(); }, 200);
+      }
+    }
+  } catch(e) {}
+
   // ════════════════════════════════════
   // QUIZ STATE
   // ════════════════════════════════════
@@ -897,10 +937,37 @@ document.addEventListener('DOMContentLoaded', function() {
   // ════════════════════════════════════
   // AUTH
   // ════════════════════════════════════
-  const DEMO_USERS = {
-    'returning@demo.com': { name: 'Alicia', password: 'password123', profile: 'The Over-Functioner', lastSeen: '3 days ago' },
-    'test@test.com':      { name: 'Friend', password: 'test1234',    profile: 'The Spiral Planner',  lastSeen: '1 week ago' }
-  };
+  // ── account store (localStorage so it persists across sessions) ──
+  function getAccounts() {
+    try { return JSON.parse(localStorage.getItem('uah_accounts') || '{}'); } catch(e) { return {}; }
+  }
+  function saveAccounts(accounts) {
+    try { localStorage.setItem('uah_accounts', JSON.stringify(accounts)); } catch(e) {}
+  }
+  function getAccount(email) {
+    return getAccounts()[email.toLowerCase()] || null;
+  }
+  function createAccount(email, password, name) {
+    var accounts = getAccounts();
+    accounts[email.toLowerCase()] = { name: name, password: password, profile: null, createdAt: Date.now() };
+    saveAccounts(accounts);
+    return accounts[email.toLowerCase()];
+  }
+  function updateAccountProfile(email, profile) {
+    var accounts = getAccounts();
+    if (accounts[email.toLowerCase()]) {
+      accounts[email.toLowerCase()].profile = profile;
+      accounts[email.toLowerCase()].lastSeen = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      saveAccounts(accounts);
+    }
+  }
+  function setSocialAccount(name) {
+    var key = 'social_' + Date.now();
+    var accounts = getAccounts();
+    accounts[key] = { name: name, password: null, profile: null, social: true, createdAt: Date.now() };
+    saveAccounts(accounts);
+    return key;
+  }
 
   function switchTab(tab) {
     document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
@@ -927,7 +994,16 @@ document.addEventListener('DOMContentLoaded', function() {
     var re    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!re.test(email)) { showFieldError('signup-email', 'signup-email-err'); return; }
     if (pass.length < 8) { showFieldError('signup-pass',  'signup-pass-err');  return; }
+    // Check if account already exists
+    if (getAccount(email)) {
+      document.getElementById('signup-email').classList.add('error');
+      document.getElementById('signup-email-err').textContent = 'An account with this email already exists. Sign in instead.';
+      document.getElementById('signup-email-err').classList.add('visible');
+      return;
+    }
     var name = document.getElementById('signup-name').value.trim() || 'Friend';
+    createAccount(email, pass, name);
+    try { localStorage.setItem('uah_last_email', email); } catch(e) {}
     sessionStorage.setItem('uah_user', JSON.stringify({ name: name, email: email, isNew: true }));
     launchQuiz(false);
   }
@@ -938,10 +1014,22 @@ document.addEventListener('DOMContentLoaded', function() {
     var pass  = document.getElementById('signin-pass').value;
     var re    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!re.test(email)) { showFieldError('signin-email', 'signin-email-err'); return; }
-    var user = DEMO_USERS[email.toLowerCase()];
-    if (!user || user.password !== pass) { showFieldError('signin-pass', 'signin-pass-err'); return; }
+    var user = getAccount(email);
+    if (!user || user.password !== pass) {
+      showFieldError('signin-pass', 'signin-pass-err');
+      document.getElementById('signin-pass-err').textContent = 'Incorrect email or password.';
+      return;
+    }
+    // Update last seen
+    updateAccountProfile(email, user.profile);
+    try { localStorage.setItem('uah_last_email', email); } catch(e) {}
     sessionStorage.setItem('uah_user', JSON.stringify({ name: user.name, email: email, isNew: false, profile: user.profile }));
-    showReturningGate(user);
+    if (user.profile) {
+      showReturningGate(user);
+    } else {
+      // Account exists but never finished quiz
+      launchQuiz(false);
+    }
   }
 
   function showReturningGate(user) {
@@ -994,12 +1082,40 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('signup-submit-btn').addEventListener('click', handleSignUp);
   document.getElementById('signin-submit-btn').addEventListener('click', handleSignIn);
 
-  // Social buttons — all treat as new user for demo
-  ['google-signup-btn','apple-signup-btn','google-signin-btn','apple-signin-btn'].forEach(function(id) {
-    document.getElementById(id).addEventListener('click', function() {
-      sessionStorage.setItem('uah_user', JSON.stringify({ name: 'Friend', isNew: true }));
+  // Social buttons — show a name prompt, then create account
+  function handleSocialAuth(provider) {
+    var overlay = document.getElementById('social-name-overlay');
+    document.getElementById('social-provider-label').textContent = provider;
+    document.getElementById('social-name-input').value = '';
+    document.getElementById('social-name-error').classList.remove('visible');
+    overlay.style.display = 'flex';
+    setTimeout(function() { overlay.classList.add('active'); document.getElementById('social-name-input').focus(); }, 10);
+  }
+
+  document.getElementById('google-signup-btn').addEventListener('click',  function() { handleSocialAuth('Google'); });
+  document.getElementById('apple-signup-btn').addEventListener('click',   function() { handleSocialAuth('Apple'); });
+  document.getElementById('google-signin-btn').addEventListener('click',  function() { handleSocialAuth('Google'); });
+  document.getElementById('apple-signin-btn').addEventListener('click',   function() { handleSocialAuth('Apple'); });
+
+  document.getElementById('social-continue-btn').addEventListener('click', function() {
+    var name = document.getElementById('social-name-input').value.trim() || 'Friend';
+    var key = setSocialAccount(name);
+    sessionStorage.setItem('uah_user', JSON.stringify({ name: name, email: key, isNew: true, social: true }));
+    document.getElementById('social-name-overlay').classList.remove('active');
+    setTimeout(function() {
+      document.getElementById('social-name-overlay').style.display = 'none';
       launchQuiz(false);
-    });
+    }, 300);
+  });
+
+  document.getElementById('social-name-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('social-continue-btn').click();
+  });
+
+  document.getElementById('social-cancel-btn').addEventListener('click', function() {
+    var overlay = document.getElementById('social-name-overlay');
+    overlay.classList.remove('active');
+    setTimeout(function() { overlay.style.display = 'none'; }, 300);
   });
 
   // Returning gate buttons
@@ -1154,6 +1270,8 @@ document.addEventListener('DOMContentLoaded', function() {
       u.swatches = swatches;
       u.avoidColor = colorAvoided ? (colorAvoided.dataset.hex || colorAvoided.style.background) : null;
       sessionStorage.setItem('uah_user', JSON.stringify(u));
+      // Persist profile back to localStorage account
+      if (u.email) updateAccountProfile(u.email, p.name);
     } catch(e) {}
   }
 
