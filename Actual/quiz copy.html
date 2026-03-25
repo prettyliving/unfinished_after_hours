@@ -778,9 +778,9 @@
       </div>
     </div>
 
-    <!-- Q4 colour -->
+    <!-- Q4 color -->
     <div class="step" id="step-4">
-      <p class="step-eyebrow">Question 4 · Colour</p>
+      <p class="step-eyebrow">Question 4 · Color</p>
       <h2 class="step-q">Pick up to three colours you're drawn to right now.</h2>
       <p class="step-hint">These shape your space. Then switch to "Avoiding" to mark one that feels wrong.</p>
 
@@ -1133,14 +1133,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // account = the stored account object
     touchLastSeen(email);
     var fresh = getAccount(email); // re-read to get updated lastSeen
-    setSession({
-      name:            fresh.name,
-      email:           email,
-      profile:         fresh.profile    || null,
-      profileComplete: !!(fresh.profile),
-      swatches:        fresh.swatches   || null,
-      avoidColor:      fresh.avoidColor || null
-    });
+    setSession({ name: fresh.name, email: email, profile: fresh.profile || null });
     try { localStorage.setItem('uah_last_email', email); } catch(e) {}
 
     if (fresh.profile) {
@@ -1462,21 +1455,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save to session + localStorage
     try {
       var u = JSON.parse(sessionStorage.getItem('uah_user') || '{}');
-      u.profile         = p.name;
-      u.profileComplete = true;
-      u.swatches        = swatches;
-      u.avoidColor      = colorAvoided ? (colorAvoided.dataset.hex || colorAvoided.style.background) : null;
+      u.profile = p.name; u.profileComplete = true;
+      u.swatches = swatches;
+      u.avoidColor = colorAvoided ? (colorAvoided.dataset.hex || colorAvoided.style.background) : null;
       setSession(u);
-      if (u.email) {
-        persistProfile(u.email, p.name);
-        // Also persist swatches + avoidColor so the theme survives future logins
-        var accts = getAccounts();
-        if (accts[u.email.toLowerCase()]) {
-          accts[u.email.toLowerCase()].swatches   = u.swatches;
-          accts[u.email.toLowerCase()].avoidColor = u.avoidColor;
-          saveAccounts(accts);
-        }
-      }
+      if (u.email) persistProfile(u.email, p.name);
     } catch(e) {}
   }
 
