@@ -103,8 +103,7 @@ function openStripeCheckout(productKey, mode) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        productKey: productKey,      // backend resolves price from env
-        priceId:    priceId,         // fallback if productKey not set
+        priceId:    priceId,
         mode:       mode,
         customerEmail: u.email || '',
         successUrl: baseUrl + 'upgrade.html?success=1',

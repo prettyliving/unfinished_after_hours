@@ -1,7 +1,5 @@
 /* ============================================================
    Unfinished, After Hours — page-conversation.js
-   UPDATED: fetch() now calls /api/chat (your Vercel proxy)
-            instead of api.anthropic.com directly.
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
   if (!requireAuth()) return;
@@ -38,16 +36,10 @@ document.addEventListener('DOMContentLoaded', function() {
     conversationHistory.push({ role: 'user', content: text });
     showTyping(true); scrollToBottom();
 
-    // ── CHANGED: points to your Vercel proxy, not Anthropic directly ──
-    fetch('/api/chat', {
+    fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model:      'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system:     systemPrompt,
-        messages:   conversationHistory
-      })
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: systemPrompt, messages: conversationHistory })
     })
     .then(function(r){ return r.json(); })
     .then(function(data) {
