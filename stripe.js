@@ -26,14 +26,14 @@
 // Format: 'https://buy.stripe.com/...'
 // Leave as '' if not yet created — button will go to upgrade.html
 var UAH_PAYMENT_LINKS = {
-  plus_monthly:  '',   // ← paste e.g. 'https://buy.stripe.com/test_abc123'
-  plus_yearly:   '',
-  kit_guilt:     '',
-  kit_deadline:  '',
-  kit_plateau:   '',
-  bundle_kits:   '',
-  theme_pack:    '',
-  audio_pack:    ''
+  plus_monthly:  'https://buy.stripe.com/fZu7sK6706hGb1Z7WPfAc01',
+  plus_yearly:   'https://buy.stripe.com/aFaaEW9jcfSg8TR3GzfAc00',
+  kit_guilt:     'https://buy.stripe.com/28EcN46707lKeebeldfAc02',
+  kit_deadline:  'https://buy.stripe.com/fZu5kC52WbC0fifdh9fAc03',
+  kit_plateau:   'https://buy.stripe.com/cNidR81QKdK88TR90TfAc04',
+  bundle_kits:   'https://buy.stripe.com/dRmbJ0brk9tS3zxeldfAc05',
+  theme_pack:    'https://buy.stripe.com/aFa7sKeDw5dCb1Z6SLfAc06',
+  audio_pack:    'https://buy.stripe.com/8x24gydzs0Xmda75OHfAc07'
 };
 
 // ── AFTER-PURCHASE: tell Stripe to redirect here ─────────────
