@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="mobile-nav.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -18,6 +19,8 @@
       --lavender:   #C4B5E8;
       --blush:      #EDE8F7;
       --bg:         #FAF8FF;
+      --warm-white: #FAF8FF;
+      --cream:      #FAF8FF;
       --muted:      #9e94b8;
       --text:       #2C2C2C;
       --text-soft:  #5a5070;
@@ -1498,7 +1501,19 @@ document.addEventListener('DOMContentLoaded', function() {
     updateProgress(1); currentStep = 1;
   };
 
-  el('go-to-dashboard-btn').addEventListener('click', function() { window.location.href = 'dashboard.html'; });
+  // Handle ?next= param from index.html hero CTAs
+  var _nextParam = (function() {
+    try {
+      var p = new URLSearchParams(window.location.search).get('next');
+      if (p === 'conversation') return 'conversation.html';
+      if (p === 'browse')       return 'dashboard.html';
+    } catch(e) {}
+    return null;
+  })();
+
+  el('go-to-dashboard-btn').addEventListener('click', function() {
+    window.location.href = _nextParam || 'dashboard.html';
+  });
 
   // ══════════════════════════════════════════════════════
   // CHECK-IN QUIZ (3 questions, returning users)
@@ -1607,7 +1622,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ciUpdateProgress(1);
   };
 
-  el('ci-go-btn').addEventListener('click', function() { window.location.href = ciDestHref; });
+  el('ci-go-btn').addEventListener('click', function() { window.location.href = _nextParam || ciDestHref; });
 
 }); // end DOMContentLoaded
 </script>

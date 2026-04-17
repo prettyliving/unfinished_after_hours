@@ -19,8 +19,6 @@
       --lavender:   #C4B5E8;
       --blush:      #EDE8F7;
       --bg:         #FAF8FF;
-      --warm-white: #FAF8FF;
-      --cream:      #FAF8FF;
       --muted:      #9e94b8;
       --text:       #2C2C2C;
       --text-soft:  #5a5070;
@@ -1501,19 +1499,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateProgress(1); currentStep = 1;
   };
 
-  // Handle ?next= param from index.html hero CTAs
-  var _nextParam = (function() {
-    try {
-      var p = new URLSearchParams(window.location.search).get('next');
-      if (p === 'conversation') return 'conversation.html';
-      if (p === 'browse')       return 'dashboard.html';
-    } catch(e) {}
-    return null;
-  })();
-
-  el('go-to-dashboard-btn').addEventListener('click', function() {
-    window.location.href = _nextParam || 'dashboard.html';
-  });
+  el('go-to-dashboard-btn').addEventListener('click', function() { window.location.href = 'dashboard.html'; });
 
   // ══════════════════════════════════════════════════════
   // CHECK-IN QUIZ (3 questions, returning users)
@@ -1622,7 +1608,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ciUpdateProgress(1);
   };
 
-  el('ci-go-btn').addEventListener('click', function() { window.location.href = _nextParam || ciDestHref; });
+  el('ci-go-btn').addEventListener('click', function() { window.location.href = ciDestHref; });
 
 }); // end DOMContentLoaded
 </script>

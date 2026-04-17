@@ -2,6 +2,7 @@
    Unfinished, After Hours — page-dashboard.js
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
+  if (!requireAuth()) return;
 
   var PROFILES = {
     'The Over-Functioner': {
