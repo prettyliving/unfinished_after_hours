@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Unfinished, After Hours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="base.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--warm-white); color: var(--text); min-height: 100vh; }
+
+    /* ── LAYOUT ── */
+    .app-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    aside { background: var(--plum); padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .aside-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 500; color: rgba(250,247,242,.85); text-decoration: none; line-height: 1.3; }
+    .nav-section { display: flex; flex-direction: column; gap: .3rem; }
+    .nav-section-label { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(250,247,242,.3); padding: .5rem .6rem .3rem; font-weight: 500; }
+    .nav-link { display: flex; align-items: center; gap: .7rem; padding: .6rem .8rem; border-radius: 8px; font-size: .85rem; color: rgba(250,247,242,.6); text-decoration: none; transition: background .2s, color .2s; font-weight: 300; }
+    .nav-link:hover { background: rgba(255,255,255,.08); color: rgba(250,247,242,.9); }
+    .nav-link.active { background: rgba(255,255,255,.12); color: rgba(250,247,242,1); font-weight: 400; }
+    .nav-link svg { opacity: .7; flex-shrink: 0; }
+    .nav-link.active svg { opacity: 1; }
+    .aside-bottom { margin-top: auto; display: flex; flex-direction: column; gap: .35rem; }
+    .signout-btn { display: block; width: 100%; text-align: left; padding: .45rem .9rem; font-family: 'DM Sans', sans-serif; font-size: .7rem; letter-spacing: .07em; text-transform: uppercase; color: rgba(250,247,242,.28); background: none; border: none; cursor: pointer; border-radius: 8px; transition: color .2s, background .2s; }
+    .signout-btn:hover { color: rgba(250,247,242,.6); background: rgba(255,255,255,.06); }
+    .profile-pill { display: flex; align-items: center; gap: .7rem; padding: .7rem .8rem; border-radius: 10px; background: rgba(255,255,255,.07); }
+    .profile-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--coral); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 500; color: #fff; flex-shrink: 0; }
+    .profile-name { font-size: .82rem; color: rgba(250,247,242,.75); font-weight: 300; }
+    .profile-tag { font-size: .68rem; color: rgba(250,247,242,.4); letter-spacing: .04em; }
+    .nav-link.upgrade-link { color: rgba(232,112,90,.8); border: 1px solid rgba(232,112,90,.2); background: rgba(232,112,90,.07); margin-top: .4rem; }
+    .nav-link.upgrade-link:hover { background: rgba(232,112,90,.14); color: rgba(232,112,90,1); }
+    .page-main { overflow-y: auto; }
+
+    /* ── PAGE ── */
+    .page-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 4rem 5vw 6rem;
+    }
+
+    .page-header { margin-bottom: 3.5rem; }
+    .page-eyebrow {
+      font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+      color: var(--coral); font-weight: 500; margin-bottom: .8rem;
+    }
+    .page-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300; color: var(--plum); line-height: 1.15;
+      margin-bottom: .6rem;
+    }
+    .page-title em { font-style: italic; }
+    .page-sub {
+      font-size: .92rem; color: var(--muted); font-weight: 300;
+      line-height: 1.7; max-width: 480px;
+    }
+
+    /* ── TWO-COLUMN LAYOUT ── */
+    .contact-body {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    /* ── FORM ── */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: .45rem; }
+
+    .field-label {
+      font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-soft); font-weight: 500;
+    }
+
+    .field-input,
+    .field-select,
+    .field-textarea {
+      width: 100%;
+      background: rgba(255,255,255,.75);
+      border: 1.5px solid rgba(196,181,232,.35);
+      border-radius: 12px;
+      padding: .85rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .field-input:focus,
+    .field-select:focus,
+    .field-textarea:focus {
+      border-color: var(--lavender);
+      box-shadow: 0 0 0 3px rgba(196,181,232,.18);
+    }
+    .field-input::placeholder,
+    .field-textarea::placeholder {
+      color: rgba(45,27,78,.22);
+      font-style: italic;
+    }
+
+    .field-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e94b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+    .field-select option { font-weight: 300; }
+
+    .field-textarea {
+      resize: vertical;
+      min-height: 160px;
+      line-height: 1.7;
+    }
+
+    /* character counter */
+    .field-footer {
+      display: flex;
+      justify-content: flex-end;
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: -.2rem;
+    }
+    .char-count.near-limit { color: var(--coral); }
+
+    /* two-col row */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* checkboxes / radios */
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      margin-top: .2rem;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      cursor: pointer;
+    }
+    .checkbox-item input[type="checkbox"],
+    .checkbox-item input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border: 1.5px solid rgba(196,181,232,.6);
+      border-radius: 5px;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all .15s;
+      position: relative;
+    }
+    .checkbox-item input[type="radio"] { border-radius: 50%; }
+    .checkbox-item input[type="checkbox"]:checked,
+    .checkbox-item input[type="radio"]:checked {
+      background: var(--plum);
+      border-color: var(--plum);
+    }
+    .checkbox-item input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 5px;
+      width: 5px; height: 9px;
+      border: 1.5px solid #fff;
+      border-top: none; border-left: none;
+      transform: rotate(42deg);
+    }
+    .checkbox-item input[type="radio"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .checkbox-label {
+      font-size: .87rem;
+      color: var(--text-soft);
+      font-weight: 300;
+      line-height: 1.4;
+    }
+
+    /* submit button */
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--plum);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: .9rem 2rem;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s, opacity .2s;
+      align-self: flex-start;
+    }
+    .btn-submit:hover { background: var(--plum-mid); transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-submit svg { transition: transform .2s; }
+    .btn-submit:hover svg { transform: translateX(3px); }
+
+    /* ── SUCCESS STATE ── */
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+      animation: fadeUp .4s ease;
+    }
+    .form-success.show { display: block; }
+    .success-icon {
+      width: 56px; height: 56px;
+      background: rgba(123,174,142,.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.4rem;
+      font-size: 1.4rem;
+    }
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 400;
+      color: var(--plum); margin-bottom: .6rem;
+    }
+    .success-body {
+      font-size: .9rem; color: var(--muted);
+      font-weight: 300; line-height: 1.7;
+      max-width: 340px; margin: 0 auto 1.8rem;
+    }
+
+    /* ── ASIDE PANEL ── */
+    .contact-aside {
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .aside-card {
+      background: var(--cream);
+      border: 1px solid rgba(196,181,232,.3);
+      border-radius: 16px;
+      padding: 1.6rem 1.5rem;
+    }
+    .aside-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 400;
+      color: var(--plum); margin-bottom: .4rem;
+    }
+    .aside-card-body {
+      font-size: .84rem; color: var(--text-soft);
+      font-weight: 300; line-height: 1.7;
+    }
+    .aside-card-link {
+      display: inline-flex; align-items: center; gap: .35rem;
+      margin-top: .9rem;
+      font-size: .78rem; font-weight: 500;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--coral); text-decoration: none;
+      transition: gap .15s;
+    }
+    .aside-card-link:hover { gap: .55rem; }
+
+    .crisis-card {
+      background: rgba(45,27,78,.04);
+      border: 1.5px solid rgba(45,27,78,.1);
+      border-radius: 16px;
+      padding: 1.6rem 1.5rem;
+    }
+    .crisis-label {
+      font-size: .63rem; letter-spacing: .13em; text-transform: uppercase;
+      color: var(--muted); font-weight: 500; margin-bottom: .6rem;
+    }
+    .crisis-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; font-weight: 400;
+      color: var(--plum); margin-bottom: .5rem; line-height: 1.3;
+    }
+    .crisis-body {
+      font-size: .82rem; color: var(--text-soft);
+      font-weight: 300; line-height: 1.7; margin-bottom: .9rem;
+    }
+    .crisis-resource {
+      display: flex;
+      align-items: baseline;
+      gap: .5rem;
+      margin-bottom: .4rem;
+    }
+    .crisis-resource-name {
+      font-size: .8rem; font-weight: 500; color: var(--plum);
+    }
+    .crisis-resource-detail {
+      font-size: .78rem; color: var(--muted); font-weight: 300;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn   { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation: fadeIn .3s ease; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) { .app-layout { grid-template-columns: 1fr; } aside { display: none; } }
+    @media (max-width: 720px) { .contact-body { grid-template-columns: 1fr; } .contact-aside { order: -1; } .field-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- NAV SIDEBAR -->
+  <aside id="sidebar">
+    <a class="aside-logo" href="index.html">Unfinished,<br>After Hours</a>
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-link" href="dashboard.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard
+      </a>
+      <a class="nav-link" href="conversation.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Have a Conversation
+      </a>
+      <a class="nav-link" href="resets.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Resets
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-link" href="todo.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Soft To-Do
+      </a>
+      <a class="nav-link" href="journal.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Journal Space
+      </a>
+      <a class="nav-link" href="letters.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Unsent Letters
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Account</div>
+      <a class="nav-link upgrade-link" id="upgrade-nav-link" href="upgrade.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        After Hours+
+      </a>
+      <a class="nav-link active" href="contact.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Contact
+      </a>
+    </div>
+    <div class="aside-bottom">
+      <button class="signout-btn" id="signout-btn">Sign out</button>
+      <div class="profile-pill">
+        <div class="profile-avatar" id="profile-avatar">?</div>
+        <div>
+          <div class="profile-name" id="profile-name">You</div>
+          <div class="profile-tag" id="profile-tag">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PAGE MAIN -->
+  <div class="page-main">
+    <div class="page-wrap">
+
+      <div class="page-header fade-in">
+        <p class="page-eyebrow">Support</p>
+        <h1 class="page-title">Get in touch.<br><em>No rush, no ticket number.</em></h1>
+        <p class="page-sub">We read everything. If you're struggling, there's also a list of crisis resources below — no account needed.</p>
+      </div>
+
+      <div class="contact-body">
+
+        <!-- ── FORM ── -->
+        <div>
+          <!-- The form itself -->
+          <div id="contactFormWrap">
+            <div class="contact-form" id="contactForm" novalidate>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="cf-name">Your name</label>
+                  <input class="field-input" type="text" id="cf-name" name="name" placeholder="Whatever you go by" autocomplete="name" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="cf-email">Email</label>
+                  <input class="field-input" type="email" id="cf-email" name="email" placeholder="For a reply (optional)" autocomplete="email" />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="cf-subject">What's this about?</label>
+                <select class="field-select" id="cf-subject" name="subject">
+                  <option value="" disabled selected>Choose a topic</option>
+                  <option value="billing">Billing or subscription</option>
+                  <option value="bug">Something isn't working</option>
+                  <option value="feature">Suggestion or feature idea</option>
+                  <option value="feedback">General feedback</option>
+                  <option value="profile">My burnout profile feels off</option>
+                  <option value="privacy">Privacy or data question</option>
+                  <option value="other">Something else</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="cf-message">Your message</label>
+                <textarea class="field-textarea" id="cf-message" name="message" placeholder="Take your time. There's no right way to say it." maxlength="2000"></textarea>
+                <div class="field-footer"><span class="char-count" id="charCount">0 / 2000</span></div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">How are you doing right now?</label>
+                <p style="font-size:.78rem;color:var(--muted);font-weight:300;margin-bottom:.6rem;line-height:1.5;">Helps us respond with the right tone. Skip it if you'd rather.</p>
+                <div class="checkbox-group">
+                  <label class="checkbox-item">
+                    <input type="radio" name="mood" value="okay" />
+                    <span class="checkbox-label">I'm okay — just have a question</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="radio" name="mood" value="tired" />
+                    <span class="checkbox-label">A bit tired, keeping it together</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="radio" name="mood" value="struggling" />
+                    <span class="checkbox-label">Struggling a fair bit right now</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="radio" name="mood" value="skip" />
+                    <span class="checkbox-label">Prefer not to say</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" id="cf-reply" name="wantsReply" />
+                  <span class="checkbox-label">I'd like a reply (we'll use your email above)</span>
+                </label>
+              </div>
+
+              <!-- error state -->
+              <div id="formError" style="display:none; font-size:.84rem; color:#C04040; font-weight:300; padding:.6rem 1rem; background:rgba(192,64,64,.06); border-radius:10px; border:1px solid rgba(192,64,64,.15);"></div>
+
+              <button class="btn-submit" id="submitBtn" type="button">
+                Send message
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Success state -->
+          <div class="form-success" id="formSuccess">
+            <div class="success-icon">✓</div>
+            <h2 class="success-title">Message received.</h2>
+            <p class="success-body">We read every message here — usually within a couple of days. If you left an email and want a reply, we'll be in touch.</p>
+            <button class="btn-submit" id="sendAnotherBtn" style="margin: 0 auto;">Send another</button>
+          </div>
+        </div>
+
+        <!-- ── ASIDE ── -->
+        <div class="contact-aside">
+
+          <div class="aside-card">
+            <h3 class="aside-card-title">Response times</h3>
+            <p class="aside-card-body">We're a small team. We read everything and reply to billing or technical issues within 2–3 business days. Feedback and suggestions are read with care, even if we can't always respond individually.</p>
+          </div>
+
+          <div class="aside-card">
+            <h3 class="aside-card-title">Billing questions</h3>
+            <p class="aside-card-body">Need to cancel, change your plan, or dispute a charge? Select "Billing or subscription" above and we'll sort it out — no hassle.</p>
+            <a class="aside-card-link" href="upgrade.html">
+              Manage your plan →
+            </a>
+          </div>
+
+          <div class="aside-card">
+            <h3 class="aside-card-title">Something not working?</h3>
+            <p class="aside-card-body">Tell us the page, what you were doing, and what happened. Screenshots are always helpful. We fix bugs as fast as we can.</p>
+          </div>
+
+          <!-- Crisis resources — always visible -->
+          <div class="crisis-card">
+            <p class="crisis-label">If you need immediate support</p>
+            <h3 class="crisis-title">This isn't a crisis line, but here's where to reach one</h3>
+            <p class="crisis-body">If you're in a difficult place right now, these are real humans who can help — no account, no wait.</p>
+            <div class="crisis-resource">
+              <span class="crisis-resource-name">988 Lifeline</span>
+              <span class="crisis-resource-detail">Call or text 988 (US)</span>
+            </div>
+            <div class="crisis-resource">
+              <span class="crisis-resource-name">Crisis Text Line</span>
+              <span class="crisis-resource-detail">Text HOME to 741741</span>
+            </div>
+            <div class="crisis-resource">
+              <span class="crisis-resource-name">International</span>
+              <span class="crisis-resource-detail">findahelpline.com</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="stripe.js"></script>
+<script src="mobile-nav.js"></script>
+<script>
+/* ── Contact form logic ── */
+document.addEventListener('DOMContentLoaded', function() {
+  /* Character counter */
+  var msgEl   = document.getElementById('cf-message');
+  var countEl = document.getElementById('charCount');
+  if (msgEl) {
+    msgEl.addEventListener('input', function() {
+      var len = msgEl.value.length;
+      countEl.textContent = len + ' / 2000';
+      countEl.classList.toggle('near-limit', len > 1800);
+    });
+  }
+
+  /* Submit */
+  var submitBtn = document.getElementById('submitBtn');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function() {
+      submitForm();
+    });
+  }
+
+  /* Send another */
+  var sendAnotherBtn = document.getElementById('sendAnotherBtn');
+  if (sendAnotherBtn) {
+    sendAnotherBtn.addEventListener('click', function() {
+      document.getElementById('formSuccess').classList.remove('show');
+      resetForm();
+    });
+  }
+
+  function submitForm() {
+    var name    = document.getElementById('cf-name').value.trim();
+    var email   = document.getElementById('cf-email').value.trim();
+    var subject = document.getElementById('cf-subject').value;
+    var message = document.getElementById('cf-message').value.trim();
+    var errEl   = document.getElementById('formError');
+
+    // Basic validation
+    if (!subject) {
+      showError('Please choose a topic so we can route your message.');
+      return;
+    }
+    if (!message) {
+      showError('Your message is empty — add at least a line or two.');
+      return;
+    }
+    if (email && !isValidEmail(email)) {
+      showError('That email doesn\'t look quite right. Check it and try again.');
+      return;
+    }
+    errEl.style.display = 'none';
+
+    // Disable button & show loading state
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    // ── FORMSPREE ─────────────────────────────────────────────
+    // Replace YOUR_FORMSPREE_ID below with your form ID from
+    // formspree.io (looks like: xrgvkwop)
+    // ─────────────────────────────────────────────────────────
+    var FORMSPREE_ID = 'YOUR_FORMSPREE_ID';
+
+    var mood = '';
+    document.querySelectorAll('input[name="mood"]').forEach(function(r) {
+      if (r.checked) mood = r.value;
+    });
+    var wantsReply = document.getElementById('cf-reply').checked;
+
+    var formData = {
+      name:       name      || '(not provided)',
+      email:      email     || '(not provided)',
+      subject:    subject,
+      message:    message,
+      mood:       mood      || '(not answered)',
+      wantsReply: wantsReply ? 'Yes' : 'No',
+      _replyto:   email     || '',
+      _subject:   'UAH Contact: ' + subject,
+    };
+
+    fetch('https://formspree.io/f/' + FORMSPREE_ID, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body:    JSON.stringify(formData),
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        showSuccess();
+      } else {
+        var msg = (res.data && res.data.errors && res.data.errors[0] && res.data.errors[0].message) || 'Something went wrong. Please try again.';
+        showError(msg);
+        var btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.innerHTML = 'Send message <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+      }
+    })
+    .catch(function() {
+      showError('Could not send — check your connection and try again.');
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = false;
+      btn.innerHTML = 'Send message <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+    });
+  }
+
+  function showError(msg) {
+    var el = document.getElementById('formError');
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function showSuccess() {
+    document.getElementById('contactForm').style.display = 'none';
+    var s = document.getElementById('formSuccess');
+    s.classList.add('show');
+    s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetForm() {
+    document.getElementById('cf-name').value    = '';
+    document.getElementById('cf-email').value   = '';
+    document.getElementById('cf-subject').value = '';
+    document.getElementById('cf-message').value = '';
+    document.getElementById('cf-reply').checked = false;
+    document.querySelectorAll('input[name="mood"]').forEach(function(r){ r.checked = false; });
+    document.getElementById('charCount').textContent = '0 / 2000';
+    document.getElementById('formError').style.display = 'none';
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = false;
+    btn.innerHTML = 'Send message <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+    document.getElementById('contactForm').style.display = '';
+  }
+
+  function isValidEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  }
+
+  var FORMSPREE_ID = 'https://formspree.io/f/mbdqoyol'; 
+
+});
+</script>
+</body>
+</html>
