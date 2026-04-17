@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     ];
 
-    fetch('https://api.anthropic.com/v1/messages', {
+    fetch('/api/chat', {x
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
