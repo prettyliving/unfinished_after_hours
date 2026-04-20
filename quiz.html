@@ -1037,6 +1037,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var a = getAccounts();
     if (!a[email.toLowerCase()]) return;
     a[email.toLowerCase()].profile = profileName;
+    saveAccounts(a);
     touchLastSeen(email);
   }
 
