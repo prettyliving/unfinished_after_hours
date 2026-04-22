@@ -1,100 +1,33 @@
-# Unfinished, After Hours — Stripe Setup Guide
+# Stripe Payment Link Redirect Setup
 
-## What was added
+After a user completes payment, Stripe needs to redirect them back to the app so their membership activates. Do this once per payment link.
 
-| File | Purpose |
-|---|---|
-| `server.js` | Express backend — creates Checkout Sessions, handles webhooks |
-| `package.json` | Node dependencies (stripe, express, dotenv) |
-| `.env.example` | All environment variables you need to fill in |
-| `.gitignore` | Keeps `.env` and `node_modules` out of git |
-| `stripe.js` *(updated)* | Now sends `productKey` to backend so price IDs stay server-side |
+## Steps (repeat for all 8 links)
 
----
+1. Go to [Stripe Dashboard → Payment Links](https://dashboard.stripe.com/payment-links)
+2. Click on a payment link to open it
+3. Click **Edit**
+4. Scroll to **"After payment"** section
+5. Set **Confirmation page** to: **"Redirect customers to your website"**
+6. Enter this URL:
+   ```
+   https://unfinishedafter.com/upgrade.html?success=1
+   ```
+7. Click **Save**
 
-## Quick-start
+## Your 8 Payment Links to Update
 
-### 1. Install dependencies
-```bash
-npm install
-```
+| Product | Key |
+|---------|-----|
+| After Hours+ Monthly ($5/mo) | plus_monthly |
+| After Hours+ Yearly ($45/yr) | plus_yearly |
+| Productivity Guilt Survival Kit ($7) | kit_guilt |
+| Deadline Season Mode ($10) | kit_deadline |
+| The Burnout Plateau ($12) | kit_plateau |
+| Bundle of 3 Kits ($20) | bundle_kits |
+| Theme Pack ($4) | theme_pack |
+| Audio Pack ($5) | audio_pack |
 
-### 2. Configure environment
-```bash
-cp .env.example .env
-```
-Open `.env` and fill in:
-- `STRIPE_SECRET_KEY` — from [Stripe Dashboard → API keys](https://dashboard.stripe.com/apikeys)
-- `STRIPE_PUBLISHABLE_KEY` — same page (also paste into `stripe.js` line 40)
-- All `STRIPE_PRICE_*` values — from [Stripe Dashboard → Products](https://dashboard.stripe.com/products)
+## Testing
 
-### 3. Create your Stripe products
-
-In the Stripe Dashboard, create these products and paste the **Price IDs** into `.env`:
-
-| Product | Type | Price |
-|---|---|---|
-| After Hours+ Monthly | Recurring | $5/month |
-| After Hours+ Yearly | Recurring | $45/year |
-| Productivity Guilt Survival Kit | One-time | $7 |
-| Deadline Season Mode | One-time | $10 |
-| The Burnout Plateau | One-time | $12 |
-| Bundle of 3 Kits | One-time | $20 |
-| Theme Pack | One-time | $4 |
-| Audio Pack | One-time | $5 |
-
-### 4. Set up webhooks
-
-**For local development:**
-```bash
-# Install Stripe CLI, then:
-stripe listen --forward-to localhost:4242/api/webhook
-# Copy the whsec_... secret it prints into .env as STRIPE_WEBHOOK_SECRET
-```
-
-**For production:** Add `https://yourdomain.com/api/webhook` in [Stripe Dashboard → Webhooks](https://dashboard.stripe.com/webhooks).
-
-Subscribe to these events:
-- `checkout.session.completed`
-- `customer.subscription.created`
-- `customer.subscription.updated`
-- `customer.subscription.deleted`
-
-### 5. Run the server
-```bash
-npm start
-# or for auto-restart during dev:
-npm run dev
-```
-
-Visit `http://localhost:4242/upgrade.html` — all buy buttons are now live.
-
----
-
-## How the payment flow works
-
-```
-User clicks buy → stripe.js → POST /api/create-checkout-session
-  → server creates Stripe session → returns { url }
-  → stripe.js redirects to Stripe Checkout
-  → User pays → Stripe redirects to upgrade.html?success=1
-  → activatePlusMembership() marks user as Plus in localStorage
-  → Stripe also fires webhook → server confirms payment server-side
-```
-
----
-
-## Production checklist
-
-- [ ] Switch `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` from `sk_test_` / `pk_test_` to live keys
-- [ ] Update `APP_URL` in `.env` to your real domain
-- [ ] Deploy webhook endpoint and add to Stripe Dashboard
-- [ ] Add database persistence in the webhook handler `TODO` blocks in `server.js`
-- [ ] Enable HTTPS on your server
-- [ ] Set `STRIPE_WEBHOOK_SECRET` to the production webhook secret
-
----
-
-## Optional: Payment Links (no backend needed)
-
-If you'd rather skip the backend entirely, create Payment Links in Stripe Dashboard and paste the `https://buy.stripe.com/...` URLs directly into the `UAH_PAYMENT_LINKS` object in `stripe.js`. The client will redirect straight there, bypassing the server entirely.
+After setting redirects, test with a Stripe test-mode payment link if you have one, or do a real $5 purchase and verify you land on `upgrade.html?success=1` and see the "you're now a member" confirmation.
