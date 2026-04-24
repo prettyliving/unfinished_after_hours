@@ -18,9 +18,90 @@ document.addEventListener('DOMContentLoaded', function() {
        pn==='The Numb Drifter'    ? ' They feel emotionally flat and overloaded. Gentle, no-pressure responses work best.' : '');
   }
 
-  var systemPrompt = 'You are the conversational guide inside "Unfinished, After Hours," a burnout support platform.' + profileContext + '\n\nCore principles:\n- Reflective, not directive — ask questions, don\'t give advice\n- Validate before exploring: name the feeling first\n- Keep responses SHORT (2-4 sentences max) and conversational\n- Use gentle, grounded language — no toxic positivity, no slogans\n- Never say "self-care", "wellness journey", "optimize", "crush your goals", or "just"\n- Follow CBT phases naturally\n- Occasionally (sparingly) suggest: resets, journal prompts, unsent letters, or soft to-do\n- If user mentions self-harm or crisis: respond with warmth and share 988 Lifeline and Crisis Text Line (text HOME to 741741)\n- Never diagnose or make promises\n\nTone: honest, warm, grounded. Short sentences. Real language.';
+  var STATIC_SYSTEM = 'You are the conversational guide inside "Unfinished, After Hours," a burnout support platform.\n\nCore principles:\n- Reflective, not directive — ask questions, don\'t give advice\n- Validate before exploring: name the feeling first\n- Keep responses SHORT (2-4 sentences max) and conversational\n- Use gentle, grounded language — no toxic positivity, no slogans\n- Never say "self-care", "wellness journey", "optimize", "crush your goals", or "just"\n- Follow CBT phases naturally\n- Occasionally (sparingly) suggest: resets, journal prompts, unsent letters, or soft to-do\n- If user mentions self-harm or crisis: respond with warmth and share 988 Lifeline and Crisis Text Line (text HOME to 741741)\n- Never diagnose or make promises\n\nTone: honest, warm, grounded. Short sentences. Real language.';
+  var USER_CONTEXT_SYSTEM = profileContext ? ('User context: ' + profileContext) : 'No additional user context.';
 
-  // Free tier: 3 conversations per month (session-based for demo)
+  // Auto-save conversation ID
+  var convoId = sessionStorage.getItem('uah_active_convo_id');
+  if (!convoId) {
+    convoId = 'convo_' + Date.now();
+    sessionStorage.setItem('uah_active_convo_id', convoId);
+  }
+  function saveConvo() {
+    try {
+      localStorage.setItem(convoId, JSON.stringify({
+        messages: conversationHistory,
+        updatedAt: Date.now()
+      }));
+    } catch(e) {}
+  }
+
+  // Soft pause timer (25-min notice, 30-min pause)
+  var SESSION_WARN_MS  = 25 * 60 * 1000;
+  var SESSION_PAUSE_MS = 30 * 60 * 1000;
+  var sessionStart = Date.now();
+  var warnShown = false, pauseActive = false;
+  setInterval(function() {
+    var elapsed = Date.now() - sessionStart;
+    if (!warnShown && elapsed >= SESSION_WARN_MS) {
+      warnShown = true;
+      showSessionNotice();
+    }
+    if (!pauseActive && elapsed >= SESSION_PAUSE_MS) {
+      pauseActive = true;
+      showPauseScreen();
+    }
+  }, 10000);
+
+  function showSessionNotice() {
+    var msgs = document.getElementById('messages');
+    if (!msgs) return;
+    var div = document.createElement('div');
+    div.className = 'msg msg-ai session-notice';
+    div.innerHTML = '<div class="bubble notice-bubble">You\'ve been here for 25 minutes. That\'s a lot of thinking. A pause is here whenever you want it. <button onclick="this.closest(\'.session-notice\').remove()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.8rem;margin-left:.5rem;">Dismiss</button></div>';
+    msgs.appendChild(div);
+    scrollToBottom();
+  }
+
+  function showPauseScreen() {
+    var inputArea = document.getElementById('chatInput');
+    if (inputArea) inputArea.disabled = true;
+    var sendBtn = document.querySelector('.send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+    var msgs = document.getElementById('messages');
+    if (!msgs) return;
+    var div = document.createElement('div');
+    div.className = 'msg msg-ai pause-screen';
+    div.innerHTML = '<div class="bubble pause-bubble">' +
+      '<p><strong>You\'ve been here for 30 minutes.</strong></p>' +
+      '<p>Rest. Come back when you\'re ready. There\'s no timer on that part.</p>' +
+      '<div style="display:flex;gap:.75rem;margin-top:1rem;">' +
+      '<button onclick="resumeSession()" class="ts-btn ts-btn-yes">Keep going</button>' +
+      '<a href="dashboard.html" class="ts-btn ts-btn-no">Go to dashboard</a>' +
+      '</div></div>';
+    msgs.appendChild(div);
+    scrollToBottom();
+  }
+
+  window.resumeSession = function() {
+    pauseActive = false; warnShown = false;
+    sessionStart = Date.now();
+    var inputArea = document.getElementById('chatInput');
+    if (inputArea) inputArea.disabled = false;
+    var sendBtn = document.querySelector('.send-btn');
+    if (sendBtn) sendBtn.disabled = false;
+    document.querySelectorAll('.pause-screen').forEach(function(el){ el.remove(); });
+    var msgs = document.getElementById('messages');
+    if (msgs) {
+      var div = document.createElement('div');
+      div.className = 'msg msg-ai';
+      div.innerHTML = '<div class="bubble">Welcome back. Pick up wherever feels right.</div>';
+      msgs.appendChild(div);
+    }
+    scrollToBottom();
+  };
+
+  // Free tier: 3 conversations per month
   var FREE_CONVO_LIMIT = 3;
 
   function sendMessage() {
@@ -38,15 +119,19 @@ document.addEventListener('DOMContentLoaded', function() {
     conversationHistory.push({ role: 'user', content: text });
     showTyping(true); scrollToBottom();
 
-    // ── CHANGED: points to your Vercel proxy, not Anthropic directly ──
+    // ── Proxy with prompt caching ──
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model:      'claude-sonnet-4-6',
         max_tokens: 1000,
-        system:     systemPrompt,
-        messages:   conversationHistory
+        system: [
+          { type: 'text', text: STATIC_SYSTEM,        cache_control: { type: 'ephemeral' } },
+          { type: 'text', text: USER_CONTEXT_SYSTEM,  cache_control: { type: 'ephemeral' } }
+        ],
+        messages:        conversationHistory,
+        anthropic_beta:  'prompt-caching-2024-07-31'
       })
     })
     .then(function(r){ return r.json(); })
@@ -54,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var reply = data.content?.[0]?.text || "I'm here. Take your time.";
       showTyping(false);
       conversationHistory.push({ role: 'assistant', content: reply });
+      saveConvo();
       appendMessage('ai', reply);
       if (conversationHistory.length === 2) {
         var convos = [];

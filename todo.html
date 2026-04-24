@@ -98,7 +98,14 @@
   </aside>
   <div class="page-main">
     <div class="page-wrap">
-      <div class="page-header">
+      <div class="paywall-banner" id="todo-paywall">
+  <div class="paywall-text">You've added your
+    <strong>5 free tasks</strong> for today.
+    After Hours+ gives you unlimited tasks, every day.
+  </div>
+  <a class="paywall-cta" href="upgrade.html">Unlock &rarr;</a>
+</div>
+<div class="page-header">
         <p style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);font-weight:500;margin-bottom:.6rem;">Tools</p>
         <h1 class="page-title">Soft To-Do</h1>
         <p class="page-sub">Start small, or don't start at all. No streaks. No metrics.</p>
@@ -116,6 +123,7 @@
           </div>
           <div class="task-list" id="must-list"></div>
         </div>
+<p class="tasks-remaining" id="tasks-remaining-badge" style="font-size:.72rem;color:var(--muted);margin-bottom:.85rem;display:none;"></p>
         <div>
           <div class="col-header"><span class="col-title">Could do</span><span class="col-count" id="could-count">0 tasks</span></div>
           <div class="add-row">

@@ -91,4 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   renderLetterList();
+  // Show export button for Plus members (Fix #7)
+  var exportBtn = document.getElementById('exportBtn');
+  if (exportBtn && isPlusMember(getUser())) exportBtn.style.display = 'inline-flex';
 });

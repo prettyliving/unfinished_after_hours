@@ -89,20 +89,63 @@ function showToast(msg, toastId) {
 }
 
 // ── Free-tier limit check ───────────────────────────────────
-// key: string, limit: number, bannerId: element id to show
+// localStorage + date-keyed buckets (daily or monthly)
+var MONTHLY_KEYS = ['convos', 'checkins'];
+var DAILY_KEYS   = ['resets', 'journal_saves', 'todo_tasks'];
+
+function todayKey()  { return new Date().toISOString().slice(0, 10); }
+function monthKey()  { return new Date().toISOString().slice(0, 7);  }
+
+function _getLimitBucket(period) {
+  var isMonthly = (period === 'monthly');
+  var currentKey = isMonthly ? monthKey() : todayKey();
+  var storageKey = 'uah_limits_' + period + '_' + currentKey;
+  // Prune stale buckets
+  try {
+    var prefix = 'uah_limits_' + period + '_';
+    Object.keys(localStorage).forEach(function(k) {
+      if (k.indexOf(prefix) === 0 && k !== storageKey)
+        localStorage.removeItem(k);
+    });
+  } catch(e) {}
+  var bucket = {};
+  try { bucket = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
+  return { storageKey: storageKey, bucket: bucket };
+}
+
 function checkFreeLimit(key, limit, bannerId) {
   var u = getUser();
   if (isPlusMember(u)) return true;
-  var counts = {};
-  try { counts = JSON.parse(sessionStorage.getItem('uah_limits')||'{}'); } catch(e) {}
-  counts[key] = (counts[key]||0) + 1;
-  try { sessionStorage.setItem('uah_limits', JSON.stringify(counts)); } catch(e) {}
-  if (counts[key] > limit) {
+  var period = MONTHLY_KEYS.indexOf(key) >= 0 ? 'monthly' : 'daily';
+  var data   = _getLimitBucket(period);
+  var count  = (data.bucket[key] || 0) + 1;
+  data.bucket[key] = count;
+  try { localStorage.setItem(data.storageKey, JSON.stringify(data.bucket)); } catch(e) {}
+  if (count > limit) {
     var el = document.getElementById(bannerId);
     if (el) el.classList.add('show');
     return false;
   }
   return true;
+}
+
+// Read usage without incrementing (for "X left today" badges)
+function getLimitStatus(key, limit) {
+  var u = getUser();
+  if (isPlusMember(u)) return { used:0, limit:Infinity, remaining:Infinity };
+  var period = MONTHLY_KEYS.indexOf(key) >= 0 ? 'monthly' : 'daily';
+  var data   = _getLimitBucket(period);
+  var used   = data.bucket[key] || 0;
+  return { used:used, limit:limit, remaining:Math.max(0, limit - used) };
+}
+
+// Gate entirely-Plus features (export, audio)
+function requirePlus(bannerId) {
+  var u = getUser();
+  if (isPlusMember(u)) return true;
+  var el = document.getElementById(bannerId);
+  if (el) el.classList.add('show');
+  return false;
 }
 
 // ── Auth guard ───────────────────────────────────────────────

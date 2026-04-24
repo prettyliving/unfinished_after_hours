@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var input = document.getElementById(col+'-input');
     var text  = input.value.trim();
     if (!text) return;
+    // Gate: 5 tasks per day for free users
+    if (!checkFreeLimit('todo_tasks', 5, 'todo-paywall')) return;
     tasks[col].push({ id: nextId++, text, done: false, enough: false });
     input.value = '';
     saveTasks(); render();
@@ -72,6 +74,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     enoughUsed = true; saveTasks(); render();
   };
+
+  function updateRemainingBadge() {
+    var badge = document.getElementById('tasks-remaining-badge');
+    if (!badge || isPlusMember(getUser())) {
+      if (badge) badge.style.display = 'none'; return;
+    }
+    var status = getLimitStatus('todo_tasks', 5);
+    badge.style.display = 'block';
+    if (status.remaining <= 0) {
+      badge.textContent = 'Daily limit reached — upgrade for unlimited';
+      badge.style.color = 'var(--coral)';
+    } else {
+      badge.textContent = status.remaining + ' task' +
+        (status.remaining !== 1 ? 's' : '') + ' left today';
+      badge.style.color = 'var(--muted)';
+    }
+  }
+
+  // Patch render to also update badge
+  var _origRender = render;
+  render = function() { _origRender(); updateRemainingBadge(); };
 
   render();
 });

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Journal Space — Unfinished, After Hours</title>
+<meta name="description" content="Journal prompts for people experiencing burnout. Private, judgment-free, and designed for when you have nothing left to say.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="base.css" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -69,6 +70,12 @@
     .save-toast{position:fixed;bottom:2rem;right:2rem;background:var(--plum);color:var(--cream);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:.7rem 1.3rem;border-radius:100px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
     .save-toast.show{opacity:1}
   </style>
+<style media="print">
+  aside, .nav-link, .paywall-banner,
+  .btn-save, .btn-discard, .btn-vault { display: none !important; }
+  .app-layout { grid-template-columns: 1fr !important; }
+  body { background: white !important; color: black !important; }
+</style>
 </head>
 <body>
 <div class="app-layout">
@@ -136,6 +143,7 @@
         <div class="write-actions">
           <button class="btn-save" onclick="saveEntry()">Save entry</button>
           <button class="btn-discard" onclick="discardEntry()">Clear</button>
+<button id="exportBtn" style="display:none" onclick="window.print()" class="btn-outline">Export as PDF</button>
         </div>
       </div>
 

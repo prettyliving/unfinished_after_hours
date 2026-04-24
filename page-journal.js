@@ -46,8 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (words>0&&words%20===0) { var h=document.getElementById('writeHint'); if(h) h.textContent=hints[Math.floor(Math.random()*hints.length)]; }
   };
 
+  var JOURNAL_KEY = 'uah_journal_' + (u.email || 'guest');
   var entries = [];
-  try { entries = JSON.parse(sessionStorage.getItem('uah_journal')||'[]'); } catch(e) {}
+  try { entries = JSON.parse(localStorage.getItem(JOURNAL_KEY)||'[]'); } catch(e) {}
 
   // Free tier: 1 prompt per day = 1 save per session for demo
   window.saveEntry = function() {
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var text = document.getElementById('journalText').value.trim();
     if (!text) return;
     entries.unshift({ prompt: prompts[currentPrompt], date: 'Just now', preview: text.slice(0,160)+(text.length>160?'...':'') });
-    try { sessionStorage.setItem('uah_journal', JSON.stringify(entries)); } catch(e) {}
+    try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries)); } catch(e) {}
     document.getElementById('journalText').value = '';
     var wc = document.getElementById('wordCount'); if(wc) wc.textContent='0 words';
     renderEntries();
@@ -72,4 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   renderPrompt();
   renderEntries();
+
+  // Show export button for Plus members
+  var exportBtn = document.getElementById('exportBtn');
+  if (exportBtn && isPlusMember(u)) exportBtn.style.display = 'inline-flex';
 });

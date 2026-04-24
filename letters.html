@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Unsent Letters — Unfinished, After Hours</title>
+<meta name="description" content="Write what you can't say out loud. Unsent letters for your burnout, your inner critic, your future self. Never sent. Always yours.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="base.css" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -139,6 +140,12 @@
     @media(max-width:900px){.app-layout{grid-template-columns:1fr}aside{display:none}}
     @media(max-width:700px){.letters-body{grid-template-columns:1fr}.recipients-panel{display:none}.write-area{padding:2rem 1.5rem}}
   </style>
+<style media="print">
+  aside, .nav-link, .paywall-banner,
+  .btn-save, .btn-discard, .btn-vault { display: none !important; }
+  .app-layout { grid-template-columns: 1fr !important; }
+  body { background: white !important; color: black !important; }
+</style>
 </head>
 <body>
 <div class="app-layout">
@@ -222,6 +229,7 @@
 
         <div class="letter-actions">
           <button class="btn-vault" id="saveBtn">Save to vault</button>
+<button id="exportBtn" style="display:none" onclick="window.print()" class="btn-outline">Export as PDF</button>
           <button class="btn-discard" id="discardBtn">Discard</button>
           <span class="send-note">This letter will never be sent.</span>
         </div>
