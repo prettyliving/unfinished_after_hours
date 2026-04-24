@@ -36,9 +36,10 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch(e) {}
   }
 
-  // Soft pause timer (25-min notice, 30-min pause)
-  var SESSION_WARN_MS  = 25 * 60 * 1000;
-  var SESSION_PAUSE_MS = 30 * 60 * 1000;
+  // Soft pause timer — Plus: 60-min session (50-min notice), Free: 30-min (25-min notice)
+  var isPlus = isPlusMember(u);
+  var SESSION_WARN_MS  = (isPlus ? 50 : 25) * 60 * 1000;
+  var SESSION_PAUSE_MS = (isPlus ? 60 : 30) * 60 * 1000;
   var sessionStart = Date.now();
   var warnShown = false, pauseActive = false;
   setInterval(function() {
@@ -58,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!msgs) return;
     var div = document.createElement('div');
     div.className = 'msg msg-ai session-notice';
-    div.innerHTML = '<div class="bubble notice-bubble">You\'ve been here for 25 minutes. That\'s a lot of thinking. A pause is here whenever you want it. <button onclick="this.closest(\'.session-notice\').remove()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.8rem;margin-left:.5rem;">Dismiss</button></div>';
+    var warnMins = isPlus ? 50 : 25;
+    div.innerHTML = '<div class="bubble notice-bubble">You\'ve been here for ' + warnMins + ' minutes. That\'s a lot of thinking. A pause is here whenever you want it. <button onclick="this.closest(\'.session-notice\').remove()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.8rem;margin-left:.5rem;">Dismiss</button></div>';
     msgs.appendChild(div);
     scrollToBottom();
   }
@@ -73,7 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var div = document.createElement('div');
     div.className = 'msg msg-ai pause-screen';
     div.innerHTML = '<div class="bubble pause-bubble">' +
-      '<p><strong>You\'ve been here for 30 minutes.</strong></p>' +
+      var pauseMins = isPlus ? 60 : 30;
+      '<p><strong>You\'ve been here for ' + pauseMins + ' minutes.</strong></p>' +
       '<p>Rest. Come back when you\'re ready. There\'s no timer on that part.</p>' +
       '<div style="display:flex;gap:.75rem;margin-top:1rem;">' +
       '<button onclick="resumeSession()" class="ts-btn ts-btn-yes">Keep going</button>' +
