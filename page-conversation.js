@@ -6,7 +6,11 @@
 document.addEventListener('DOMContentLoaded', function() {
   if (!requireAuth()) return;
   var u = getUser();
-  var conversationHistory = [];
+  // Seed history with the opening message so Claude has full context from turn 1
+  var OPENING_MESSAGE = "Hi. You wanted to talk this through. There's no agenda here — just space to think out loud. What's sitting heavy right now?";
+  var conversationHistory = [
+    { role: 'assistant', content: OPENING_MESSAGE }
+  ];
 
   var profileContext = window._uahProfileContext || '';
   if (!profileContext) {
@@ -112,8 +116,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var text  = input.value.trim();
     if (!text) return;
 
-    // Check free limit on first message of new conversation
-    if (conversationHistory.length === 0) {
+    // Check free limit on first message of new conversation (history starts with 1 seeded assistant msg)
+    if (conversationHistory.length === 1) {
       if (!checkFreeLimit('convos', FREE_CONVO_LIMIT, 'convo-paywall')) return;
     }
 
@@ -144,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
       conversationHistory.push({ role: 'assistant', content: reply });
       saveConvo();
       appendMessage('ai', reply);
-      if (conversationHistory.length === 2) {
+      if (conversationHistory.length === 3) {
         var convos = [];
         try { convos = JSON.parse(sessionStorage.getItem('uah_convos')||'[]'); } catch(e) {}
         var title = text.length > 50 ? text.slice(0,50)+'...' : text;
