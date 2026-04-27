@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!msgs) return;
     var div = document.createElement('div');
     div.className = 'msg msg-ai pause-screen';
+    var pauseMins = isPlus ? 60 : 30;
     div.innerHTML = '<div class="bubble pause-bubble">' +
-      var pauseMins = isPlus ? 60 : 30;
       '<p><strong>You\'ve been here for ' + pauseMins + ' minutes.</strong></p>' +
       '<p>Rest. Come back when you\'re ready. There\'s no timer on that part.</p>' +
       '<div style="display:flex;gap:.75rem;margin-top:1rem;">' +
