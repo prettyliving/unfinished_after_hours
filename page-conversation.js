@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var conversationHistory = [
     { role: 'assistant', content: OPENING_MESSAGE }
   ];
+  var conversationStarted = false;  // track whether limit has been checked this session
 
   var profileContext = window._uahProfileContext || '';
   if (!profileContext) {
@@ -116,9 +117,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var text  = input.value.trim();
     if (!text) return;
 
-    // Check free limit on first message of new conversation (history starts with 1 seeded assistant msg)
-    if (conversationHistory.length === 1) {
+    // Check free limit once per conversation (not per message)
+    if (!conversationStarted) {
       if (!checkFreeLimit('convos', FREE_CONVO_LIMIT, 'convo-paywall')) return;
+      conversationStarted = true;
     }
 
     input.value = ''; input.style.height = 'auto';
