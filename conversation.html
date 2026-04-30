@@ -4,11 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Have a Conversation — Unfinished, After Hours</title>
-<meta name="description" content="Talk it through. A CBT-informed conversation space that validates what you're feeling and helps you unpack it — no advice, no pressure.">
+  <meta name="description" content="Talk it through. A CBT-informed conversation space that validates what you're feeling and helps you unpack it — no advice, no pressure.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="base.css" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Scripts loaded with defer: execute after HTML parsed, in order, no conflicts -->
+  <script src="main.js" defer></script>
+  <script src="stripe.js" defer></script>
+  <script src="mobile-nav.js" defer></script>
+  <script src="page-conversation.js" defer></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text);height:100vh;overflow:hidden}
@@ -22,7 +27,11 @@
     .nav-link.active{background:rgba(255,255,255,.12);color:rgba(250,247,242,1);font-weight:400}
     .nav-link svg{opacity:.7;flex-shrink:0}
     .nav-link.active svg{opacity:1}
-    .aside-bottom{margin-top:auto}
+    .nav-link.upgrade-link{color:rgba(232,112,90,.8);border:1px solid rgba(232,112,90,.2);background:rgba(232,112,90,.07);margin-top:.4rem}
+    .nav-link.upgrade-link:hover{background:rgba(232,112,90,.14);color:rgba(232,112,90,1)}
+    .aside-bottom{margin-top:auto;display:flex;flex-direction:column;gap:.35rem}
+    .signout-btn{display:block;width:100%;text-align:left;padding:.45rem .9rem;font-family:'DM Sans',sans-serif;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:rgba(250,247,242,.28);background:none;border:none;cursor:pointer;border-radius:8px;transition:color .2s,background .2s}
+    .signout-btn:hover{color:rgba(250,247,242,.6);background:rgba(255,255,255,.06)}
     .profile-pill{display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;border-radius:10px;background:rgba(255,255,255,.07)}
     .profile-avatar{width:28px;height:28px;border-radius:50%;background:var(--coral);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:#fff;flex-shrink:0}
     .profile-name{font-size:.82rem;color:rgba(250,247,242,.75);font-weight:300}
@@ -67,8 +76,7 @@
     .send-btn:hover{background:var(--coral-hover);transform:scale(1.05)}
     .input-hint{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem 0 0}
     @media(max-width:768px){.chat-sidebar{display:none}.msg{padding:.5rem 1.2rem}.tool-suggest{padding:0 1.2rem}.input-area{padding:1rem 1.2rem}.typing{padding:.5rem 1.2rem}}
-
-    /* ── Therapist Safety Card ── */
+    /* Therapist Safety Card */
     .therapist-safety-card{margin:.5rem auto 1rem;width:100%;max-width:720px;padding:0 2.5rem;box-sizing:border-box}
     .tsc-inner{background:linear-gradient(135deg,rgba(59,31,58,.06) 0%,rgba(232,112,90,.06) 100%);border:1.5px solid rgba(59,31,58,.15);border-radius:14px;padding:1.4rem 1.5rem}
     .tsc-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;color:var(--plum);font-weight:500;font-size:.9rem}
@@ -128,113 +136,44 @@
     </div>
   </aside>
 
-<div class="chat-wrap">
-  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-    <!-- Free tier paywall banner -->
-    <div class="paywall-banner" id="convo-paywall" style="margin:1rem 2rem 0;display:none;">
-      <div class="paywall-text">You've used your <strong>3 free conversations</strong> this month. After Hours+ gives you unlimited access.</div>
-      <a class="paywall-cta" href="upgrade.html">Unlock →</a>
+  <div class="chat-wrap">
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <!-- Free tier paywall banner -->
+      <div class="paywall-banner" id="convo-paywall" style="margin:1rem 2rem 0;display:none;">
+        <div class="paywall-text">You've used your <strong>3 free conversations</strong> this month. After Hours+ gives you unlimited access.</div>
+        <a class="paywall-cta" href="upgrade.html">Unlock →</a>
+      </div>
+      <div class="messages" id="messages">
+        <div class="msg msg-ai"><div class="bubble">Hi. You wanted to talk this through. There's no agenda here — just space to think out loud. What's sitting heavy right now?</div></div>
+        <div class="msg-spacer"></div>
+      </div>
+      <div class="typing" id="typing"><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+      <div class="input-area">
+        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Say whatever comes to mind..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="sendMessage()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+      <p class="input-hint" style="padding:.4rem 2rem .8rem;flex-shrink:0">This conversation is private. It's saved for the duration of your session.</p>
     </div>
-    <div class="messages" id="messages">
-      <div class="msg msg-ai"><div class="bubble">Hi. You wanted to talk this through. There's no agenda here — just space to think out loud. What's sitting heavy right now?</div></div>
-      <div class="msg-spacer"></div>
+    <div class="chat-sidebar">
+      <div class="sidebar-section">
+        <p class="sidebar-label">About this space</p>
+        <p class="sidebar-note">This isn't therapy — it's a thought-unpacking tool. Ask questions, sit with things, notice patterns. No pressure to fix anything.</p>
+      </div>
+      <div class="sidebar-section">
+        <p class="sidebar-label">Suggested tools</p>
+        <a class="sidebar-tool" href="resets.html"><svg class="sidebar-tool-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span class="sidebar-tool-name">You Don't Need to Earn Rest</span></a>
+        <a class="sidebar-tool" href="journal.html"><svg class="sidebar-tool-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span class="sidebar-tool-name">Journal: What needs to feel lighter?</span></a>
+        <a class="sidebar-tool" href="letters.html"><svg class="sidebar-tool-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="sidebar-tool-name">Write an unsent letter</span></a>
+      </div>
+      <div class="sidebar-section">
+        <p class="sidebar-label">If you need more</p>
+        <p class="sidebar-note" style="margin-bottom:.7rem">988 Suicide &amp; Crisis Lifeline — call or text 988</p>
+        <p class="sidebar-note">Crisis Text Line — text HOME to 741741</p>
+        <p class="sidebar-note">Veterans Crisis Line — call 988 then press 1 or text 838255</p>
+      </div>
     </div>
-    <div class="typing" id="typing"><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
-    <div class="input-area">
-      <textarea class="chat-input" id="chatInput" rows="1" placeholder="Say whatever comes to mind..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" onclick="sendMessage()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-    </div>
-    <p class="input-hint" style="padding:.4rem 2rem .8rem;flex-shrink:0">This conversation is private. It's saved for the duration of your session.</p>
   </div>
-  <div class="chat-sidebar">
-    <div class="sidebar-section">
-      <p class="sidebar-label">About this space</p>
-      <p class="sidebar-note">This isn't therapy — it's a thought-unpacking tool. Ask questions, sit with things, notice patterns. No pressure to fix anything.</p>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Suggested tools</p>
-      <a class="sidebar-tool" href="resets.html"><svg class="sidebar-tool-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span class="sidebar-tool-name">You Don't Need to Earn Rest</span></a>
-      <a class="sidebar-tool" href="journal.html"><svg class="sidebar-tool-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span class="sidebar-tool-name">Journal: What needs to feel lighter?</span></a>
-      <a class="sidebar-tool" href="letters.html"><svg class="sidebar-tool-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="sidebar-tool-name">Write an unsent letter</span></a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">If you need more</p>
-      <p class="sidebar-note" style="margin-bottom:.7rem">988 Suicide & Crisis Lifeline — call or text 988</p>
-      <p class="sidebar-note">Crisis Text Line — text HOME to 741741</p>
-      <p class="sidebar-note">Veterans Crisis Line - call 988 then press 1 or text 838255</p>
-    </div>
-  </div>
-</div>
 </div><!-- /app-layout -->
 
-<script>
-  // ── theme ──────────────────────────────────────────────────────────
-  var u={};try{u=JSON.parse(sessionStorage.getItem('uah_user')||'{}');}catch(e){}
-  if(!u||!u.name){window.location.href='quiz.html';}
-  function hexToRgb(hex){
-    if(!hex)return[160,120,160];
-    var rgb=hex.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    if(rgb)return[parseInt(rgb[1]),parseInt(rgb[2]),parseInt(rgb[3])];
-    if(hex.length<7)return[160,120,160];
-    return[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
-  }
-  function rgbStr(r,g,b){return'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';}
-  function darken(rgb,p){return[rgb[0]*p,rgb[1]*p,rgb[2]*p];}
-  function lighten(rgb,m){return[rgb[0]+(255-rgb[0])*m,rgb[1]+(255-rgb[1])*m,rgb[2]+(255-rgb[2])*m];}
-  function lum(rgb){return rgb.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce(function(s,v,i){return s+v*[.2126,.7152,.0722][i];},0);}
-  function contrast(a,b){var l1=lum(a),l2=lum(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05);}
-  (function(){
-    if(!u.swatches||!u.swatches.length)return;
-    var av=u.avoidColor||null;
-    var safe=u.swatches.filter(function(h){if(!av)return true;var a=hexToRgb(av),b=hexToRgb(h);return(Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])+Math.abs(a[2]-b[2]))>40;});
-    if(!safe.length)safe=['#7BAE8E','#C9A84C'];
-    var p=hexToRgb(safe[0]),s=safe[1]?hexToRgb(safe[1]):darken(p,.75);
-    var dp=darken(p,.45),dpm=darken(p,.65),dpl=darken(p,.80);
-    var acc=s;if(contrast(acc,[255,255,255])<3)acc=darken(acc,.6);
-    var root=document.documentElement;
-    root.style.setProperty('--plum',rgbStr.apply(null,dp));root.style.setProperty('--plum-mid',rgbStr.apply(null,dpm));root.style.setProperty('--plum-light',rgbStr.apply(null,dpl));
-    root.style.setProperty('--coral',rgbStr.apply(null,acc));root.style.setProperty('--coral-hover',rgbStr.apply(null,darken(acc,.85)));
-    root.style.setProperty('--warm-white',rgbStr.apply(null,lighten(p,.92)));root.style.setProperty('--cream',rgbStr.apply(null,lighten(p,.94)));
-    root.style.setProperty('--muted',rgbStr.apply(null,lighten(dp,.45)));root.style.setProperty('--text-soft',rgbStr.apply(null,darken(p,.5)));
-    document.body.style.background=rgbStr.apply(null,lighten(p,.92));
-    var sb=document.getElementById('sidebar');if(sb)sb.style.background=rgbStr.apply(null,dp);
-  })();
-
-  // ── profile pill ──
-  var av2=document.getElementById('profile-avatar'),pn2=document.getElementById('profile-name'),pt2=document.getElementById('profile-tag');
-  if(av2)av2.textContent=u.name?u.name.charAt(0).toUpperCase():'?';
-  if(pn2)pn2.textContent=u.name||'You';
-  if(pt2)pt2.textContent=u.profile||'—';
-
-  // ── sign out ──
-  var soBtn=document.getElementById('signout-btn');
-  if(soBtn)soBtn.addEventListener('click',function(){sessionStorage.removeItem('uah_user');try{localStorage.removeItem('uah_last_email');}catch(e){}window.location.href='index.html';});
-
-  // ── upgrade link visibility ──
-  var ul=document.getElementById('upgrade-nav-link');
-  if(ul)ul.style.display=(u.plus)?'none':'flex';
-
-
-  // ── chat setup ──────────────────────────────────────────────────────
-  // NOTE: conversationHistory is managed entirely by page-conversation.js
-  // (loaded below). Do NOT re-declare it here — that caused messages to
-  // send with an empty history, breaking the API call.
-
-  // Build profile-aware system prompt — stored on window so page-conversation.js can read it
-  var profileName=u.profile||'';
-  var profileContext='';
-  if(profileName) profileContext=' The user has identified as "'+profileName+'".'+
-    (profileName==='The Over-Functioner'?' They tend to overwork and struggle to rest without guilt.':
-     profileName==='The Spiral Planner'?' They care deeply but struggle with over-planning and perfectionism.':
-     profileName==='The Quiet Quitter'?' They\'ve mentally stepped back but still show up. Reconnection, not motivation, is the goal.':
-     profileName==='The Numb Drifter'?' They feel emotionally flat and overloaded. Gentle, no-pressure responses work best.'
-    :'');
-  window._uahProfileContext = profileContext;
-</script>
-
-<script src="main.js"></script>
-<script src="stripe.js"></script>
-<script src="mobile-nav.js"></script>
-<script src="page-conversation.js"></script>
 </body>
 </html>
