@@ -47,12 +47,6 @@ function openStripeCheckout(productKey) {
   var link = UAH_PAYMENT_LINKS[productKey];
 
   if (link && link.startsWith('https://')) {
-    // Append prefill params if we have the user's email
-    var u = (typeof getUser === 'function') ? getUser() : {};
-    if (u.email) {
-      var sep = link.includes('?') ? '&' : '?';
-      link = link + sep + 'prefilled_email=' + encodeURIComponent(u.email);
-    }
     window.location.href = link;
     return;
   }
@@ -81,12 +75,5 @@ function activatePlusMembership() {
   u.plus = true;
   u.plusActivatedAt = Date.now();
   if (typeof setUser === 'function') setUser(u);
-  if (u.email) {
-    var accounts = {};
-    try { accounts = JSON.parse(localStorage.getItem('uah_accounts')||'{}'); } catch(e) {}
-    if (accounts[u.email.toLowerCase()]) {
-      accounts[u.email.toLowerCase()].plus = true;
-      try { localStorage.setItem('uah_accounts', JSON.stringify(accounts)); } catch(e) {}
-    }
-  }
+  // account lookup by email removed for privacy
 }

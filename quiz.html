@@ -1011,6 +1011,35 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   // ══════════════════════════════════════════════════════
+  // ONE-TIME DATA WIPE
+  // Clears any previously stored emails/passwords from
+  // localStorage on first visit after this deploy.
+  // The flag 'uah_wiped_v1' ensures it only runs once.
+  // ══════════════════════════════════════════════════════
+  try {
+    if (!localStorage.getItem('uah_wiped_v1')) {
+      localStorage.removeItem('uah_accounts');
+      localStorage.removeItem('uah_last_email');
+      localStorage.setItem('uah_wiped_v1', '1');
+    }
+  } catch(e) {}
+
+  // ══════════════════════════════════════════════════════
+  // LOG SIGNUPS TO VERCEL (visible in your Vercel dashboard
+  // under Deployments → Logs)
+  // ══════════════════════════════════════════════════════
+  function logSignup(type, email, name) {
+    try {
+      fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: type, email: email, name: name || '' })
+      });
+      // fire-and-forget — don't await, don't block the user
+    } catch(e) {}
+  }
+
+  // ══════════════════════════════════════════════════════
   // ACCOUNT STORE  (localStorage — persists across tabs)
   // ══════════════════════════════════════════════════════
   function getAccounts() {
@@ -1120,13 +1149,9 @@ document.addEventListener('DOMContentLoaded', function() {
   el('go-to-signin').addEventListener('click', function(e) { e.preventDefault(); switchTab('signin'); });
   el('go-to-signup').addEventListener('click', function(e) { e.preventDefault(); switchTab('signup'); });
 
-  // Auto-switch to sign-in if we remember their email
+  // Email auto-fill removed for privacy
   try {
-    var lastEmail = localStorage.getItem('uah_last_email');
-    if (lastEmail && getAccount(lastEmail)) {
-      el('signin-email').value = lastEmail;
-      switchTab('signin');
-      setTimeout(function() { el('signin-pass').focus(); }, 200);
+    if (false) {
     }
   } catch(e) {}
 
@@ -1139,13 +1164,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var fresh = getAccount(email); // re-read to get updated lastSeen
     setSession({
       name:            fresh.name,
-      email:           email,
       profile:         fresh.profile    || null,
       profileComplete: !!(fresh.profile),
       swatches:        fresh.swatches   || null,
       avoidColor:      fresh.avoidColor || null
     });
-    try { localStorage.setItem('uah_last_email', email); } catch(e) {}
+    // email not stored for privacy
 
     if (fresh.profile) {
       showReturningGate(fresh);
@@ -1172,6 +1196,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     var acct = createAccount(email, pass, name);
+    logSignup('signup', email, name);
     afterAuth(acct, email);
   }
 
@@ -1196,6 +1221,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
 
+    logSignup('signin', email, '');
     afterAuth(acct, email);
   }
 
@@ -1266,6 +1292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         afterAuth(existing, email);
       } else {
         var acct = createAccount(email, null, name);
+        logSignup('signup', email, name);
         afterAuth(acct, email);
       }
     });

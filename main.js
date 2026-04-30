@@ -4,6 +4,25 @@
    ============================================================ */
 'use strict';
 
+// ── One-time privacy wipe ────────────────────────────────────
+// Clears all stored emails, account records, and remembered
+// login info. Runs once per browser, keyed by version flag.
+(function () {
+  var WIPE_KEY = 'uah_privacy_wipe_v1';
+  if (localStorage.getItem(WIPE_KEY)) return;
+  var toRemove = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && (k === 'uah_accounts' || k === 'uah_last_email')) {
+      toRemove.push(k);
+    }
+  }
+  toRemove.forEach(function (k) { localStorage.removeItem(k); });
+  sessionStorage.removeItem('uah_user');
+  localStorage.setItem(WIPE_KEY, '1');
+})();
+
+
 // ── Colour helpers ──────────────────────────────────────────
 function hexToRgb(hex) {
   if (!hex) return [160,120,160];
