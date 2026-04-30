@@ -67,6 +67,25 @@
     .send-btn:hover{background:var(--coral-hover);transform:scale(1.05)}
     .input-hint{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem 0 0}
     @media(max-width:768px){.chat-sidebar{display:none}.msg{padding:.5rem 1.2rem}.tool-suggest{padding:0 1.2rem}.input-area{padding:1rem 1.2rem}.typing{padding:.5rem 1.2rem}}
+
+    /* ── Therapist Safety Card ── */
+    .therapist-safety-card{margin:.5rem auto 1rem;width:100%;max-width:720px;padding:0 2.5rem;box-sizing:border-box}
+    .tsc-inner{background:linear-gradient(135deg,rgba(59,31,58,.06) 0%,rgba(232,112,90,.06) 100%);border:1.5px solid rgba(59,31,58,.15);border-radius:14px;padding:1.4rem 1.5rem}
+    .tsc-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;color:var(--plum);font-weight:500;font-size:.9rem}
+    .tsc-header svg{color:var(--coral);flex-shrink:0}
+    .tsc-body{font-size:.85rem;color:var(--text-soft);line-height:1.65;font-weight:300;margin-bottom:1rem}
+    .tsc-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.9rem}
+    .tsc-btn{font-size:.75rem;letter-spacing:.04em;padding:.5rem 1rem;border-radius:100px;text-decoration:none;font-weight:400;transition:all .2s;display:inline-block;white-space:nowrap}
+    .tsc-btn-primary{background:var(--plum);color:#fff}
+    .tsc-btn-primary:hover{background:var(--plum-mid)}
+    .tsc-btn-secondary{background:transparent;border:1.5px solid rgba(59,31,58,.25);color:var(--text-soft)}
+    .tsc-btn-secondary:hover{border-color:var(--plum);color:var(--plum)}
+    .tsc-crisis{background:rgba(232,112,90,.08);border-radius:8px;padding:.6rem .9rem;font-size:.78rem;display:flex;flex-direction:column;gap:.2rem;margin-bottom:.8rem}
+    .tsc-crisis strong{color:var(--coral);font-weight:500}
+    .tsc-crisis span{color:var(--text-soft);font-weight:300}
+    .tsc-dismiss{background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;padding:.3rem 0;text-decoration:underline;text-underline-offset:2px}
+    .tsc-dismiss:hover{color:var(--text-soft)}
+    @media(max-width:768px){.therapist-safety-card{padding:0 1.2rem}.tsc-actions{flex-direction:column}.tsc-btn{text-align:center}}
   </style>
 </head>
 <body>
@@ -91,6 +110,10 @@
       <a class="nav-link upgrade-link" id="upgrade-nav-link" href="upgrade.html">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         After Hours+
+      </a>
+      <a class="nav-link" href="profile.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
       </a>
     </div>
     <div class="aside-bottom">
@@ -192,8 +215,10 @@
   if(ul)ul.style.display=(u.plus)?'none':'flex';
 
 
-  // ── chat ──────────────────────────────────────────────────────────
-  var conversationHistory=[];
+  // ── chat setup ──────────────────────────────────────────────────────
+  // NOTE: conversationHistory is managed entirely by page-conversation.js
+  // (loaded below). Do NOT re-declare it here — that caused messages to
+  // send with an empty history, breaking the API call.
 
   // Build profile-aware system prompt — stored on window so page-conversation.js can read it
   var profileName=u.profile||'';

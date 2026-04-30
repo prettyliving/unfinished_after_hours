@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model:      'claude-sonnet-4-6',
+        model:      'claude-sonnet-4-5',
         max_tokens: 1000,
         system: [
           { type: 'text', text: STATIC_SYSTEM,        cache_control: { type: 'ephemeral' } },
@@ -169,6 +169,56 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToBottom();
   }
 
+  // ── Therapist-finder safety feature ──────────────────────────────
+  // Keywords that suggest the user might benefit from professional support
+  var THERAPIST_SIGNALS = [
+    'therapist','therapy','professional help','mental health professional',
+    'psychiatrist','counselor','counselling','counseling',
+    'need help','can\'t cope','can\'t handle','falling apart','breaking down',
+    'not okay','not ok','hopeless','worthless','nobody cares',
+    'give up','no point','end it','hurt myself','self harm','self-harm',
+    'suicidal','want to die','don\'t want to be here','don\'t want to exist',
+    '988','crisis line','crisis text'
+  ];
+  var therapistCardShown = false;
+
+  function checkForTherapistSignals(text) {
+    if (therapistCardShown) return;
+    var lower = text.toLowerCase();
+    var matched = THERAPIST_SIGNALS.some(function(kw){ return lower.indexOf(kw) !== -1; });
+    if (matched) {
+      therapistCardShown = true;
+      setTimeout(showTherapistSafetyCard, 800);
+    }
+  }
+
+  function showTherapistSafetyCard() {
+    var msgs = document.getElementById('messages');
+    if (!msgs) return;
+    var card = document.createElement('div');
+    card.className = 'therapist-safety-card';
+    card.id = 'therapist-safety-card';
+    card.innerHTML =
+      '<div class="tsc-inner">' +
+        '<div class="tsc-header">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+          '<span>You don\'t have to do this alone</span>' +
+        '</div>' +
+        '<p class="tsc-body">What you\'re carrying sounds heavy. A real therapist can offer something I can\'t — consistent, professional support over time.</p>' +
+        '<div class="tsc-actions">' +
+          '<a class="tsc-btn tsc-btn-primary" href="https://www.psychologytoday.com/us/therapists" target="_blank" rel="noopener">Find a therapist near me</a>' +
+          '<a class="tsc-btn tsc-btn-secondary" href="https://www.betterhelp.com" target="_blank" rel="noopener">Try online therapy</a>' +
+        '</div>' +
+        '<div class="tsc-crisis">' +
+          '<strong>If you\'re in crisis right now:</strong>' +
+          '<span>Call or text 988 · Text HOME to 741741</span>' +
+        '</div>' +
+        '<button class="tsc-dismiss" onclick="document.getElementById(\'therapist-safety-card\').remove()">Keep talking here</button>' +
+      '</div>';
+    msgs.appendChild(card);
+    scrollToBottom();
+  }
+
   function appendMessage(role, text) {
     var msgs = document.getElementById('messages');
     var div = document.createElement('div');
@@ -177,6 +227,8 @@ document.addEventListener('DOMContentLoaded', function() {
     div.innerHTML = '<div class="bubble">'+formatted+'</div>';
     msgs.appendChild(div);
     var spacer = document.createElement('div'); spacer.className = 'msg-spacer'; msgs.appendChild(spacer);
+    // Check user messages for safety signals
+    if (role === 'user') checkForTherapistSignals(text);
   }
 
   function appendToolSuggestion(lower) {

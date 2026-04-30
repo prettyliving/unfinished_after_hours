@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — Unfinished, After Hours</title>
+  <meta name="description" content="View your account, purchases, and subscription status.">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--warm-white); color: var(--text); min-height: 100vh; }
+    .layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    aside { background: var(--plum); padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .aside-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 500; color: rgba(250,247,242,.85); letter-spacing: .01em; text-decoration: none; line-height: 1.3; }
+    .nav-section { display: flex; flex-direction: column; gap: .3rem; }
+    .nav-section-label { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(250,247,242,.3); padding: .5rem .6rem .3rem; font-weight: 500; }
+    .nav-link { display: flex; align-items: center; gap: .7rem; padding: .6rem .8rem; border-radius: 8px; font-size: .85rem; color: rgba(250,247,242,.6); text-decoration: none; transition: background .2s, color .2s; font-weight: 300; }
+    .nav-link:hover { background: rgba(255,255,255,.08); color: rgba(250,247,242,.9); }
+    .nav-link.active { background: rgba(255,255,255,.12); color: rgba(250,247,242,1); font-weight: 400; }
+    .nav-link svg { opacity: .7; flex-shrink: 0; }
+    .nav-link.active svg { opacity: 1; }
+    .nav-link.upgrade-link { color: rgba(232,112,90,.8); border: 1px solid rgba(232,112,90,.2); background: rgba(232,112,90,.07); margin-top: .4rem; }
+    .nav-link.upgrade-link:hover { background: rgba(232,112,90,.14); color: rgba(232,112,90,1); }
+    .aside-bottom { margin-top: auto; display: flex; flex-direction: column; gap: .35rem; }
+    .signout-btn { display: block; width: 100%; text-align: left; padding: .45rem .9rem; font-family: 'DM Sans', sans-serif; font-size: .7rem; letter-spacing: .07em; text-transform: uppercase; color: rgba(250,247,242,.28); background: none; border: none; cursor: pointer; border-radius: 8px; transition: color .2s, background .2s; }
+    .signout-btn:hover { color: rgba(250,247,242,.6); background: rgba(255,255,255,.06); }
+    .profile-pill { display: flex; align-items: center; gap: .7rem; padding: .7rem .8rem; border-radius: 10px; background: rgba(255,255,255,.07); }
+    .profile-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--coral); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 500; color: #fff; flex-shrink: 0; }
+    .profile-name { font-size: .82rem; color: rgba(250,247,242,.75); font-weight: 300; }
+    .profile-tag { font-size: .68rem; color: rgba(250,247,242,.4); letter-spacing: .04em; }
+
+    /* ── Main ── */
+    main { padding: 3rem 3.5rem; max-width: 860px; }
+
+    .page-header { margin-bottom: 2.8rem; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 400; color: var(--plum); margin-bottom: .35rem; }
+    .page-subtitle { font-size: .9rem; color: var(--muted); font-weight: 300; }
+
+    .section-label { font-size: .65rem; letter-spacing: .14em; text-transform: uppercase; color: var(--coral); font-weight: 500; margin-bottom: 1rem; }
+
+    /* ── Profile Card ── */
+    .profile-hero { background: var(--cream); border: 1px solid rgba(59,31,58,.08); border-radius: 16px; padding: 2rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1.8rem; }
+    .profile-avatar-lg { width: 68px; height: 68px; border-radius: 50%; background: var(--coral); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 400; color: #fff; flex-shrink: 0; }
+    .profile-hero-info { flex: 1; }
+    .profile-hero-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; color: var(--plum); margin-bottom: .2rem; }
+    .profile-hero-email { font-size: .85rem; color: var(--muted); font-weight: 300; margin-bottom: .5rem; }
+    .profile-hero-type { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 500; letter-spacing: .04em; padding: .3rem .75rem; border-radius: 100px; }
+    .profile-hero-type.free { background: rgba(59,31,58,.07); color: var(--text-soft); }
+    .profile-hero-type.plus { background: rgba(232,112,90,.1); color: var(--coral); border: 1px solid rgba(232,112,90,.2); }
+    .profile-hero-type svg { flex-shrink: 0; }
+
+    /* ── Subscription Card ── */
+    .sub-card { background: var(--cream); border: 1px solid rgba(59,31,58,.08); border-radius: 16px; padding: 1.8rem 2rem; margin-bottom: 2.5rem; }
+    .sub-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+    .sub-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; color: var(--plum); margin-bottom: .2rem; }
+    .sub-card-desc { font-size: .83rem; color: var(--muted); font-weight: 300; }
+    .sub-status-badge { flex-shrink: 0; font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; font-weight: 500; padding: .28rem .7rem; border-radius: 100px; }
+    .sub-status-badge.active { background: rgba(123,174,142,.15); color: #4a8f63; border: 1px solid rgba(123,174,142,.3); }
+    .sub-status-badge.free { background: rgba(59,31,58,.07); color: var(--muted); }
+
+    .sub-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .sub-detail-item { padding: 1rem; background: var(--warm-white); border-radius: 10px; border: 1px solid rgba(59,31,58,.06); }
+    .sub-detail-label { font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .35rem; font-weight: 500; }
+    .sub-detail-value { font-size: .95rem; color: var(--plum); font-weight: 400; }
+
+    .sub-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: .5rem; font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 400; padding: .6rem 1.2rem; border-radius: 100px; cursor: pointer; border: none; transition: all .2s; text-decoration: none; letter-spacing: .02em; }
+    .btn-primary { background: var(--coral); color: #fff; }
+    .btn-primary:hover { background: var(--coral-hover); }
+    .btn-secondary { background: transparent; border: 1.5px solid rgba(59,31,58,.2); color: var(--text-soft); }
+    .btn-secondary:hover { border-color: var(--plum); color: var(--plum); }
+    .btn-danger { background: transparent; border: 1.5px solid rgba(220,80,80,.2); color: rgba(180,60,60,.8); }
+    .btn-danger:hover { background: rgba(220,80,80,.06); border-color: rgba(220,80,80,.4); }
+    .btn:disabled { opacity: .45; cursor: default; pointer-events: none; }
+
+    /* ── Purchases ── */
+    .purchases-section { margin-bottom: 2.5rem; }
+    .purchase-empty { text-align: center; padding: 2.5rem; background: var(--cream); border-radius: 14px; border: 1px dashed rgba(59,31,58,.12); }
+    .purchase-empty p { font-size: .88rem; color: var(--muted); font-weight: 300; margin-bottom: .8rem; }
+    .purchase-list { display: flex; flex-direction: column; gap: .75rem; }
+    .purchase-item { background: var(--cream); border: 1px solid rgba(59,31,58,.08); border-radius: 12px; padding: 1.1rem 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .purchase-item-left { display: flex; align-items: center; gap: 1rem; }
+    .purchase-item-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(232,112,90,.1); display: flex; align-items: center; justify-content: center; color: var(--coral); flex-shrink: 0; }
+    .purchase-item-name { font-size: .9rem; color: var(--plum); font-weight: 400; margin-bottom: .1rem; }
+    .purchase-item-date { font-size: .75rem; color: var(--muted); font-weight: 300; }
+    .purchase-item-price { font-size: .85rem; color: var(--text-soft); font-weight: 400; white-space: nowrap; }
+    .purchase-item-tag { font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; padding: .2rem .55rem; border-radius: 100px; background: rgba(123,174,142,.12); color: #4a8f63; font-weight: 500; }
+
+    /* ── Usage ── */
+    .usage-section { margin-bottom: 2.5rem; }
+    .usage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .9rem; }
+    .usage-item { background: var(--cream); border: 1px solid rgba(59,31,58,.08); border-radius: 12px; padding: 1.2rem 1.3rem; }
+    .usage-item-label { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; font-weight: 500; }
+    .usage-item-count { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 400; color: var(--plum); line-height: 1; margin-bottom: .25rem; }
+    .usage-item-sub { font-size: .75rem; color: var(--muted); font-weight: 300; }
+    .usage-bar { height: 4px; background: rgba(59,31,58,.08); border-radius: 2px; margin-top: .7rem; overflow: hidden; }
+    .usage-bar-fill { height: 100%; border-radius: 2px; background: var(--coral); transition: width .6s ease; }
+
+    /* ── Cancel Modal ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(20,10,30,.45); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--warm-white); border-radius: 18px; padding: 2rem 2.2rem; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(20,10,30,.2); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 400; color: var(--plum); margin-bottom: .5rem; }
+    .modal-body { font-size: .87rem; color: var(--text-soft); font-weight: 300; line-height: 1.7; margin-bottom: 1.5rem; }
+    .modal-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--plum); color: rgba(250,247,242,.9); font-size: .83rem; padding: .65rem 1.3rem; border-radius: 100px; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; z-index: 2000; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media(max-width:900px){ .layout{grid-template-columns:1fr} aside{display:none} main{padding:2rem 1.5rem} }
+    @media(max-width:600px){ .profile-hero{flex-direction:column;text-align:center} .sub-card-header{flex-direction:column} .sub-detail-item:last-child{display:none} }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <aside id="sidebar">
+    <a class="aside-logo" href="index.html">Unfinished,<br>After Hours</a>
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-link" href="dashboard.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard
+      </a>
+      <a class="nav-link" href="conversation.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Have a Conversation
+      </a>
+      <a class="nav-link" href="resets.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Resets
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-link" href="todo.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Soft To-Do
+      </a>
+      <a class="nav-link" href="journal.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Journal Space
+      </a>
+      <a class="nav-link" href="letters.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Unsent Letters
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Account</div>
+      <a class="nav-link upgrade-link" id="upgrade-nav-link" href="upgrade.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        After Hours+
+      </a>
+      <a class="nav-link active" href="profile.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+      </a>
+    </div>
+    <div class="aside-bottom">
+      <button class="signout-btn" id="signout-btn">Sign out</button>
+      <div class="profile-pill">
+        <div class="profile-avatar" id="profile-avatar">?</div>
+        <div>
+          <div class="profile-name" id="profile-name">You</div>
+          <div class="profile-tag" id="profile-tag">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="page-header">
+      <h1 class="page-title">My Profile</h1>
+      <p class="page-subtitle">Your account, plan, and everything you've unlocked.</p>
+    </div>
+
+    <!-- Profile Hero -->
+    <div class="profile-hero">
+      <div class="profile-avatar-lg" id="hero-avatar">?</div>
+      <div class="profile-hero-info">
+        <div class="profile-hero-name" id="hero-name">—</div>
+        <div class="profile-hero-email" id="hero-email">—</div>
+        <div class="profile-hero-type" id="hero-type-badge">
+          <span id="hero-type-text">Free</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscription -->
+    <div class="sub-card" id="sub-card">
+      <div class="sub-card-header">
+        <div>
+          <div class="sub-card-title" id="sub-title">After Hours — Free</div>
+          <div class="sub-card-desc" id="sub-desc">3 conversations / month · Basic access</div>
+        </div>
+        <div class="sub-status-badge" id="sub-badge">Free</div>
+      </div>
+
+      <div class="sub-details" id="sub-details">
+        <div class="sub-detail-item">
+          <div class="sub-detail-label">Plan</div>
+          <div class="sub-detail-value" id="detail-plan">Free</div>
+        </div>
+        <div class="sub-detail-item" id="detail-since-wrap">
+          <div class="sub-detail-label">Member Since</div>
+          <div class="sub-detail-value" id="detail-since">—</div>
+        </div>
+        <div class="sub-detail-item" id="detail-renews-wrap" style="display:none">
+          <div class="sub-detail-label">Next Billing</div>
+          <div class="sub-detail-value" id="detail-renews">—</div>
+        </div>
+      </div>
+
+      <div class="sub-actions" id="sub-actions">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Purchases -->
+    <div class="purchases-section">
+      <p class="section-label">Purchases</p>
+      <div id="purchase-list-wrap">
+        <div class="purchase-empty" id="purchase-empty">
+          <p>No one-time purchases yet.</p>
+          <a href="upgrade.html" class="btn btn-secondary">Browse kits &amp; add-ons →</a>
+        </div>
+        <div class="purchase-list" id="purchase-list" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Monthly Usage -->
+    <div class="usage-section">
+      <p class="section-label">This Month</p>
+      <div class="usage-grid" id="usage-grid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal">
+    <div class="modal-title">Cancel After Hours+?</div>
+    <p class="modal-body">
+      You'll keep access until the end of your current billing period. After that, you'll return to the free plan — 3 conversations per month, no bonus tools.
+      <br><br>
+      Your journal entries, letters, and to-dos will stay saved.
+    </p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="confirm-cancel-btn">Yes, cancel my plan</button>
+      <button class="btn btn-secondary" onclick="closeCancelModal()">Keep my plan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var u = {}; try { u = JSON.parse(sessionStorage.getItem('uah_user')||'{}'); } catch(e) {}
+  if (!u || !u.name) { window.location.href = 'quiz.html'; }
+
+  // ── Theme helpers (inline, same as other pages) ──
+  function hexToRgb(hex){ if(!hex)return[160,120,160]; var rgb=hex.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/); if(rgb)return[+rgb[1],+rgb[2],+rgb[3]]; if(hex.length<7)return[160,120,160]; return[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)]; }
+  function rgbStr(r,g,b){return'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';}
+  function darken(rgb,p){return[rgb[0]*p,rgb[1]*p,rgb[2]*p];}
+  function lighten(rgb,m){return[rgb[0]+(255-rgb[0])*m,rgb[1]+(255-rgb[1])*m,rgb[2]+(255-rgb[2])*m];}
+  function lum(rgb){return rgb.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce(function(s,v,i){return s+v*[.2126,.7152,.0722][i];},0);}
+  function contrast(a,b){var l1=lum(a),l2=lum(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05);}
+
+  (function(){
+    if(!u.swatches||!u.swatches.length)return;
+    var av=u.avoidColor||null;
+    var safe=u.swatches.filter(function(h){if(!av)return true;var a=hexToRgb(av),b=hexToRgb(h);return(Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])+Math.abs(a[2]-b[2]))>40;});
+    if(!safe.length)safe=['#7BAE8E','#C9A84C'];
+    var p=hexToRgb(safe[0]),s=safe[1]?hexToRgb(safe[1]):darken(p,.75);
+    var dp=darken(p,.45),dpm=darken(p,.65),dpl=darken(p,.80);
+    var acc=s; if(contrast(acc,[255,255,255])<3)acc=darken(acc,.6);
+    var root=document.documentElement;
+    root.style.setProperty('--plum',rgbStr.apply(null,dp));
+    root.style.setProperty('--plum-mid',rgbStr.apply(null,dpm));
+    root.style.setProperty('--plum-light',rgbStr.apply(null,dpl));
+    root.style.setProperty('--coral',rgbStr.apply(null,acc));
+    root.style.setProperty('--coral-hover',rgbStr.apply(null,darken(acc,.85)));
+    root.style.setProperty('--warm-white',rgbStr.apply(null,lighten(p,.92)));
+    root.style.setProperty('--cream',rgbStr.apply(null,lighten(p,.94)));
+    root.style.setProperty('--muted',rgbStr.apply(null,lighten(dp,.45)));
+    root.style.setProperty('--text-soft',rgbStr.apply(null,darken(p,.5)));
+    document.body.style.background=rgbStr.apply(null,lighten(p,.92));
+    var sb=document.getElementById('sidebar');if(sb)sb.style.background=rgbStr.apply(null,dp);
+  })();
+</script>
+
+<script src="main.js"></script>
+<script src="stripe.js"></script>
+<script src="mobile-nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var u = (typeof getUser === 'function') ? getUser() : {};
+  var isPlus = !!(u.plus);
+
+  // ── Sidebar ──
+  var av = document.getElementById('profile-avatar'), pn = document.getElementById('profile-name'), pt = document.getElementById('profile-tag');
+  if (av) av.textContent = u.name ? u.name.charAt(0).toUpperCase() : '?';
+  if (pn) pn.textContent = u.name || 'You';
+  if (pt) pt.textContent = u.profile || '—';
+  var soBtn = document.getElementById('signout-btn');
+  if (soBtn) soBtn.addEventListener('click', function(){ sessionStorage.removeItem('uah_user'); try{localStorage.removeItem('uah_last_email');}catch(e){} window.location.href='index.html'; });
+  var ul = document.getElementById('upgrade-nav-link');
+  if (ul) ul.style.display = isPlus ? 'none' : 'flex';
+
+  // ── Hero ──
+  var heroAvatar = document.getElementById('hero-avatar');
+  var heroName   = document.getElementById('hero-name');
+  var heroEmail  = document.getElementById('hero-email');
+  var heroBadge  = document.getElementById('hero-type-badge');
+  var heroTypeText = document.getElementById('hero-type-text');
+
+  if (heroAvatar) heroAvatar.textContent = u.name ? u.name.charAt(0).toUpperCase() : '?';
+  if (heroName) heroName.textContent = u.name || 'Anonymous';
+  if (heroEmail) heroEmail.textContent = u.email || 'No email saved';
+  if (heroBadge) {
+    if (isPlus) {
+      heroBadge.classList.add('plus');
+      heroTypeText.textContent = '★  After Hours+';
+    } else {
+      heroBadge.classList.add('free');
+      heroTypeText.textContent = 'Free Plan';
+    }
+  }
+
+  // ── Subscription Card ──
+  var subTitle   = document.getElementById('sub-title');
+  var subDesc    = document.getElementById('sub-desc');
+  var subBadge   = document.getElementById('sub-badge');
+  var detailPlan = document.getElementById('detail-plan');
+  var detailSince = document.getElementById('detail-since');
+  var detailRenews = document.getElementById('detail-renews');
+  var detailRenewsWrap = document.getElementById('detail-renews-wrap');
+  var subActions = document.getElementById('sub-actions');
+
+  // Try to get stored account for 'since' date
+  var accts = {}; try { accts = JSON.parse(localStorage.getItem('uah_accounts')||'{}'); } catch(e) {}
+  var acct = u.email ? (accts[u.email.toLowerCase()]||null) : null;
+  var memberSinceMs = (acct && acct.createdAt) ? acct.createdAt : (u.plusActivatedAt || null);
+  var memberSinceStr = memberSinceMs ? new Date(memberSinceMs).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : 'Recently';
+
+  if (detailSince) detailSince.textContent = memberSinceStr;
+
+  if (isPlus) {
+    if (subTitle)   subTitle.textContent   = 'After Hours+';
+    if (subDesc)    subDesc.textContent    = 'Unlimited conversations · All tools · Priority support';
+    if (subBadge)   { subBadge.textContent = 'Active'; subBadge.classList.add('active'); }
+    if (detailPlan) detailPlan.textContent = 'After Hours+';
+    if (detailRenewsWrap) detailRenewsWrap.style.display = '';
+    // Estimate next billing (30 days from activation if monthly)
+    if (u.plusActivatedAt) {
+      var nextBill = new Date(u.plusActivatedAt);
+      nextBill.setMonth(nextBill.getMonth() + 1);
+      if (detailRenews) detailRenews.textContent = nextBill.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    } else {
+      if (detailRenews) detailRenews.textContent = '—';
+    }
+    if (subActions) subActions.innerHTML =
+      '<a class="btn btn-secondary" href="https://billing.stripe.com/p/login/test_00000000" target="_blank" rel="noopener">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>' +
+        'Manage billing' +
+      '</a>' +
+      '<button class="btn btn-danger" onclick="openCancelModal()">' +
+        'Cancel plan' +
+      '</button>';
+  } else {
+    if (subTitle)   subTitle.textContent   = 'After Hours — Free';
+    if (subDesc)    subDesc.textContent    = '3 conversations / month · Basic access to all tools';
+    if (subBadge)   subBadge.classList.add('free');
+    if (detailPlan) detailPlan.textContent = 'Free';
+    if (subActions) subActions.innerHTML =
+      '<a class="btn btn-primary" href="upgrade.html">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>' +
+        'Upgrade to After Hours+' +
+      '</a>';
+  }
+
+  // ── Purchases ──
+  // Build purchase list from user object (kits stored as u.purchases[])
+  var purchases = (u.purchases && Array.isArray(u.purchases)) ? u.purchases : [];
+
+  // Also check localStorage for kit purchases set by stripe.js activations
+  var kitKeys = ['kit_guilt', 'kit_deadline', 'kit_plateau', 'bundle_kits', 'theme_pack', 'audio_pack'];
+  var kitNames = {
+    kit_guilt:    { name: 'Productivity Guilt Survival Kit', price: '$7' },
+    kit_deadline: { name: 'Deadline Season Mode', price: '$10' },
+    kit_plateau:  { name: 'The Burnout Plateau', price: '$12' },
+    bundle_kits:  { name: 'Bundle: All 3 Kits', price: '$20' },
+    theme_pack:   { name: 'Theme Pack', price: '$4' },
+    audio_pack:   { name: 'Audio Pack', price: '$5' }
+  };
+  kitKeys.forEach(function(k) {
+    var stored = localStorage.getItem('uah_purchase_' + k);
+    if (stored) {
+      var d = null; try { d = JSON.parse(stored); } catch(e) {}
+      if (d && !purchases.find(function(p){ return p.key === k; })) {
+        purchases.push({ key: k, purchasedAt: d.purchasedAt || Date.now() });
+      }
+    }
+  });
+
+  // Also add Plus itself if active
+  if (isPlus) {
+    purchases.unshift({ key: 'plus', purchasedAt: u.plusActivatedAt || Date.now(), virtual: true });
+  }
+
+  var purchaseList = document.getElementById('purchase-list');
+  var purchaseEmpty = document.getElementById('purchase-empty');
+
+  if (purchases.length > 0) {
+    if (purchaseEmpty) purchaseEmpty.style.display = 'none';
+    if (purchaseList) purchaseList.style.display = 'flex';
+    purchases.forEach(function(p) {
+      var info;
+      if (p.key === 'plus') {
+        info = { name: 'After Hours+ Subscription', price: 'Active' };
+      } else {
+        info = kitNames[p.key] || { name: p.key, price: '' };
+      }
+      var dateStr = p.purchasedAt ? new Date(p.purchasedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+      var item = document.createElement('div');
+      item.className = 'purchase-item';
+      item.innerHTML =
+        '<div class="purchase-item-left">' +
+          '<div class="purchase-item-icon">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+          '</div>' +
+          '<div>' +
+            '<div class="purchase-item-name">' + info.name + '</div>' +
+            (dateStr ? '<div class="purchase-item-date">Purchased ' + dateStr + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:.6rem">' +
+          '<span class="purchase-item-price">' + info.price + '</span>' +
+          '<span class="purchase-item-tag">Unlocked</span>' +
+        '</div>';
+      if (purchaseList) purchaseList.appendChild(item);
+    });
+  }
+
+  // ── Usage ──
+  var usageGrid = document.getElementById('usage-grid');
+  var usageDefs = [
+    { key: 'convos',       label: 'Conversations', limit: isPlus ? Infinity : 3,  period: 'monthly' },
+    { key: 'journal_saves',label: 'Journal Saves',  limit: isPlus ? Infinity : 5,  period: 'daily' },
+    { key: 'resets',       label: 'Resets Used',    limit: isPlus ? Infinity : 3,  period: 'daily' },
+    { key: 'todo_tasks',   label: 'To-Do Items',    limit: isPlus ? Infinity : 10, period: 'daily' },
+  ];
+  function getUsageCount(key, period) {
+    var currentKey = (period === 'monthly') ? new Date().toISOString().slice(0,7) : new Date().toISOString().slice(0,10);
+    var storageKey = 'uah_limits_' + period + '_' + currentKey;
+    var bucket = {}; try { bucket = JSON.parse(localStorage.getItem(storageKey)||'{}'); } catch(e) {}
+    return bucket[key] || 0;
+  }
+  usageDefs.forEach(function(def) {
+    var used = getUsageCount(def.key, def.period);
+    var pct  = def.limit === Infinity ? 0 : Math.min(100, Math.round((used / def.limit) * 100));
+    var limitStr = def.limit === Infinity ? '∞' : String(def.limit);
+    var div = document.createElement('div');
+    div.className = 'usage-item';
+    div.innerHTML =
+      '<div class="usage-item-label">' + def.label + '</div>' +
+      '<div class="usage-item-count">' + used + '</div>' +
+      '<div class="usage-item-sub">of ' + limitStr + ' this ' + (def.period === 'monthly' ? 'month' : 'day') + '</div>' +
+      (def.limit !== Infinity ? '<div class="usage-bar"><div class="usage-bar-fill" style="width:' + pct + '%"></div></div>' : '');
+    if (usageGrid) usageGrid.appendChild(div);
+  });
+
+  // ── Cancel modal ──
+  window.openCancelModal = function() {
+    document.getElementById('cancel-modal').classList.add('open');
+  };
+  window.closeCancelModal = function() {
+    document.getElementById('cancel-modal').classList.remove('open');
+  };
+  document.getElementById('cancel-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCancelModal();
+  });
+
+  var confirmBtn = document.getElementById('confirm-cancel-btn');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function() {
+      // Client-side: remove plus flag (real cancellation goes through Stripe webhook)
+      u.plus = false;
+      u.plusActivatedAt = null;
+      if (typeof setUser === 'function') setUser(u);
+      // Update localStorage accounts too
+      if (u.email) {
+        var accounts2 = {}; try { accounts2 = JSON.parse(localStorage.getItem('uah_accounts')||'{}'); } catch(e) {}
+        if (accounts2[u.email.toLowerCase()]) {
+          accounts2[u.email.toLowerCase()].plus = false;
+          try { localStorage.setItem('uah_accounts', JSON.stringify(accounts2)); } catch(e) {}
+        }
+      }
+      closeCancelModal();
+      // Show toast then reload
+      var t = document.getElementById('toast');
+      if (t) { t.textContent = 'Subscription cancelled. Access continues until end of period.'; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); setTimeout(function(){ window.location.reload(); }, 400); }, 2600); }
+    });
+  }
+});
+</script>
+</body>
+</html>
