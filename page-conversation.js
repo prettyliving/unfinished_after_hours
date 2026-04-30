@@ -1,32 +1,54 @@
 /* ============================================================
    Unfinished, After Hours — page-conversation.js
-   UPDATED: fetch() now calls /api/chat (your Vercel proxy)
-            instead of api.anthropic.com directly.
+   Calls /api/chat (Vercel serverless proxy).
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
   if (!requireAuth()) return;
   var u = getUser();
-  // Seed history with the opening message so Claude has full context from turn 1
+
   var OPENING_MESSAGE = "Hi. You wanted to talk this through. There's no agenda here — just space to think out loud. What's sitting heavy right now?";
   var conversationHistory = [
     { role: 'assistant', content: OPENING_MESSAGE }
   ];
-  var conversationStarted = false;  // track whether limit has been checked this session
+  var conversationStarted = false;
 
   var profileContext = window._uahProfileContext || '';
   if (!profileContext) {
     var pn = u.profile || '';
-    if (pn) profileContext = ' The user has identified as "'+pn+'".'+
-      (pn==='The Over-Functioner' ? ' They tend to overwork and struggle to rest without guilt.' :
-       pn==='The Spiral Planner'  ? ' They care deeply but struggle with over-planning and perfectionism.' :
-       pn==='The Quiet Quitter'   ? ' They\'ve mentally stepped back but still show up. Reconnection is the goal.' :
-       pn==='The Numb Drifter'    ? ' They feel emotionally flat and overloaded. Gentle, no-pressure responses work best.' : '');
+    if (pn) {
+      profileContext = ' The user has identified as "' + pn + '".' +
+        (pn === 'The Over-Functioner' ? ' They tend to overwork and struggle to rest without guilt.' :
+         pn === 'The Spiral Planner'  ? ' They care deeply but struggle with over-planning and perfectionism.' :
+         pn === 'The Quiet Quitter'   ? ' They\'ve mentally stepped back but still show up. Reconnection is the goal.' :
+         pn === 'The Numb Drifter'    ? ' They feel emotionally flat and overloaded. Gentle, no-pressure responses work best.' : '');
+    }
   }
 
-  var STATIC_SYSTEM = 'You are the conversational guide inside \"Unfinished, After Hours,\" a burnout support platform.\n\nYour role is to help people unpack what they\'re feeling — not fix it. You reflect, you ask, you sit with them.\n\nHow you respond:\n- 2–4 sentences max. Every time. No exceptions.\n- Always end with a single question — never two.\n- Validate first, then gently explore. Name the feeling before anything else.\n- Mirror the user\'s own words back. If they say \"stuck\", you use \"stuck\".\n- Short sentences. Plain language. No lists, no headers, no structure.\n- Never give advice or tell them what to do.\n- Never say: self-care, wellness journey, optimize, crush your goals, toxic positivity, mindset, actionable. Avoid \"just\".\n- No slogans. No affirmations. No silver linings.\n\nWhen asking follow-up questions:\n- Make it feel like a natural next step, not a therapy intake form.\n- Zoom in on a specific word or phrase they used.\n- Bad: \"Can you tell me more about that?\" Good: \"What does stuck actually look like for you right now?\"\n\nOccasionally (sparingly, only when it fits):\n- Suggest a reset, journal prompt, unsent letter, or soft to-do — only when the conversation has genuinely led there.\n\nIf the user mentions self-harm or crisis:\n- Warmth first. Then share: 988 Suicide & Crisis Lifeline (call or text 988) and Crisis Text Line (text HOME to 741741).\n\nNever diagnose. Never promise outcomes. Never perform empathy — just be present.\n\nTone: honest, warm, unhurried. Like a friend who actually listens.';
-  var USER_CONTEXT_SYSTEM = profileContext ? ('User context: ' + profileContext) : 'No additional user context.';
+  var SYSTEM_PROMPT =
+    'You are the conversational guide inside "Unfinished, After Hours," a burnout support platform.\n\n' +
+    'Your role is to help people unpack what they\'re feeling — not fix it. You reflect, you ask, you sit with them.\n\n' +
+    'How you respond:\n' +
+    '- 2–4 sentences max. Every time. No exceptions.\n' +
+    '- Always end with a single question — never two.\n' +
+    '- Validate first, then gently explore. Name the feeling before anything else.\n' +
+    '- Mirror the user\'s own words back. If they say "stuck", you use "stuck".\n' +
+    '- Short sentences. Plain language. No lists, no headers, no structure.\n' +
+    '- Never give advice or tell them what to do.\n' +
+    '- Never say: self-care, wellness journey, optimize, crush your goals, toxic positivity, mindset, actionable. Avoid "just".\n' +
+    '- No slogans. No affirmations. No silver linings.\n\n' +
+    'When asking follow-up questions:\n' +
+    '- Make it feel like a natural next step, not a therapy intake form.\n' +
+    '- Zoom in on a specific word or phrase they used.\n' +
+    '- Bad: "Can you tell me more about that?" Good: "What does stuck actually look like for you right now?"\n\n' +
+    'Occasionally (sparingly, only when it fits):\n' +
+    '- Suggest a reset, journal prompt, unsent letter, or soft to-do — only when the conversation has genuinely led there.\n\n' +
+    'If the user mentions self-harm or crisis:\n' +
+    '- Warmth first. Then share: 988 Suicide & Crisis Lifeline (call or text 988) and Crisis Text Line (text HOME to 741741).\n\n' +
+    'Never diagnose. Never promise outcomes. Never perform empathy — just be present.\n\n' +
+    'Tone: honest, warm, unhurried. Like a friend who actually listens.' +
+    (profileContext ? '\n\nUser context:' + profileContext : '');
 
-  // Auto-save conversation ID
+  // ── Save/restore conversation ──────────────────────────────────────
   var convoId = sessionStorage.getItem('uah_active_convo_id');
   if (!convoId) {
     convoId = 'convo_' + Date.now();
@@ -41,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch(e) {}
   }
 
-  // Soft pause timer — Plus: 60-min session (50-min notice), Free: 30-min (25-min notice)
+  // ── Session timer ──────────────────────────────────────────────────
   var isPlus = isPlusMember(u);
   var SESSION_WARN_MS  = (isPlus ? 50 : 25) * 60 * 1000;
   var SESSION_PAUSE_MS = (isPlus ? 60 : 30) * 60 * 1000;
@@ -109,41 +131,58 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToBottom();
   };
 
-  // Free tier: 3 conversations per month
+  // ── Free tier: 3 conversations / month ────────────────────────────
+  // Check BEFORE the first message only (not per-message).
+  // Uses isPlusMember() early-exit so Plus users are never blocked.
   var FREE_CONVO_LIMIT = 3;
 
+  function isConvoAllowed() {
+    if (isPlusMember(u)) return true;
+    // Read-only check (does NOT increment) — increment happens in checkFreeLimit
+    var status = getLimitStatus('convos', FREE_CONVO_LIMIT);
+    return status.remaining > 0;
+  }
+
+  // ── Send ───────────────────────────────────────────────────────────
   function sendMessage() {
     var input = document.getElementById('chatInput');
-    var text  = input.value.trim();
+    if (!input) return;
+    var text = input.value.trim();
     if (!text) return;
 
-    // Check free limit once per conversation (not per message)
+    // Gate: check free limit once per conversation session
     if (!conversationStarted) {
-      if (!checkFreeLimit('convos', FREE_CONVO_LIMIT, 'convo-paywall')) return;
+      if (!checkFreeLimit('convos', FREE_CONVO_LIMIT, 'convo-paywall')) {
+        return;
+      }
       conversationStarted = true;
     }
 
-    input.value = ''; input.style.height = 'auto';
+    input.value = '';
+    input.style.height = 'auto';
     appendMessage('user', text);
     conversationHistory.push({ role: 'user', content: text });
-    showTyping(true); scrollToBottom();
+    showTyping(true);
+    scrollToBottom();
 
-    // ── Proxy call ──
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model:      'claude-haiku-4-5-20251001',
+        model:    'claude-haiku-4-5-20251001',
         max_tokens: 1000,
-        system:     STATIC_SYSTEM + '\n\n' + USER_CONTEXT_SYSTEM,
-        messages:   conversationHistory
+        system:   SYSTEM_PROMPT,
+        messages: conversationHistory
       })
     })
     .then(function(r) {
-      if (!r.ok) {
-        return r.json().then(function(e) { throw new Error(e.error || 'API error ' + r.status); });
-      }
-      return r.json();
+      return r.json().then(function(data) {
+        if (!r.ok) {
+          var msg = (data && data.error) ? data.error : ('HTTP ' + r.status);
+          throw new Error(msg);
+        }
+        return data;
+      });
     })
     .then(function(data) {
       var reply = (data.content && data.content[0] && data.content[0].text)
@@ -153,15 +192,19 @@ document.addEventListener('DOMContentLoaded', function() {
       conversationHistory.push({ role: 'assistant', content: reply });
       saveConvo();
       appendMessage('ai', reply);
+      // Save conversation title after first real exchange
       if (conversationHistory.length === 3) {
         var convos = [];
-        try { convos = JSON.parse(sessionStorage.getItem('uah_convos')||'[]'); } catch(e) {}
-        var title = text.length > 50 ? text.slice(0,50)+'...' : text;
+        try { convos = JSON.parse(sessionStorage.getItem('uah_convos') || '[]'); } catch(e) {}
+        var title = text.length > 50 ? text.slice(0, 50) + '...' : text;
         convos.unshift({ title: title, date: 'Just now' });
-        try { sessionStorage.setItem('uah_convos', JSON.stringify(convos.slice(0,10))); } catch(e) {}
+        try { sessionStorage.setItem('uah_convos', JSON.stringify(convos.slice(0, 10))); } catch(e) {}
       }
+      // Suggest a tool if Claude mentions one
       var lower = reply.toLowerCase();
-      if (lower.includes('reset')||lower.includes('journal')||lower.includes('unsent')||lower.includes('to-do')||lower.includes('todo')) {
+      if (lower.indexOf('reset') !== -1 || lower.indexOf('journal') !== -1 ||
+          lower.indexOf('unsent') !== -1 || lower.indexOf('to-do') !== -1 ||
+          lower.indexOf('todo') !== -1) {
         appendToolSuggestion(lower);
       }
     })
@@ -170,15 +213,15 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Chat error:', err);
       appendMessage('ai', "I'm still here. Something went quiet on my end — want to try again?");
     });
+
     scrollToBottom();
   }
 
-  // ── Therapist-finder safety feature ──────────────────────────────
-  // Keywords that suggest the user might benefit from professional support
+  // ── Therapist finder safety card ───────────────────────────────────
   var THERAPIST_SIGNALS = [
     'therapist','therapy','professional help','mental health professional',
     'psychiatrist','counselor','counselling','counseling',
-    'need help','can\'t cope','can\'t handle','falling apart','breaking down',
+    'can\'t cope','can\'t handle','falling apart','breaking down',
     'not okay','not ok','hopeless','worthless','nobody cares',
     'give up','no point','end it','hurt myself','self harm','self-harm',
     'suicidal','want to die','don\'t want to be here','don\'t want to exist',
@@ -189,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function checkForTherapistSignals(text) {
     if (therapistCardShown) return;
     var lower = text.toLowerCase();
-    var matched = THERAPIST_SIGNALS.some(function(kw){ return lower.indexOf(kw) !== -1; });
+    var matched = THERAPIST_SIGNALS.some(function(kw) { return lower.indexOf(kw) !== -1; });
     if (matched) {
       therapistCardShown = true;
       setTimeout(showTherapistSafetyCard, 800);
@@ -199,6 +242,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function showTherapistSafetyCard() {
     var msgs = document.getElementById('messages');
     if (!msgs) return;
+    var existing = document.getElementById('therapist-safety-card');
+    if (existing) return;
     var card = document.createElement('div');
     card.className = 'therapist-safety-card';
     card.id = 'therapist-safety-card';
@@ -215,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '</div>' +
         '<div class="tsc-crisis">' +
           '<strong>If you\'re in crisis right now:</strong>' +
-          '<span>Call or text 988 · Text HOME to 741741</span>' +
+          '<span>Call or text 988 &nbsp;·&nbsp; Text HOME to 741741</span>' +
         '</div>' +
         '<button class="tsc-dismiss" onclick="document.getElementById(\'therapist-safety-card\').remove()">Keep talking here</button>' +
       '</div>';
@@ -223,37 +268,54 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToBottom();
   }
 
+  // ── DOM helpers ────────────────────────────────────────────────────
   function appendMessage(role, text) {
     var msgs = document.getElementById('messages');
+    if (!msgs) return;
     var div = document.createElement('div');
-    div.className = 'msg msg-'+role;
-    var formatted = text.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
-    div.innerHTML = '<div class="bubble">'+formatted+'</div>';
+    div.className = 'msg msg-' + role;
+    var formatted = text.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+    div.innerHTML = '<div class="bubble">' + formatted + '</div>';
     msgs.appendChild(div);
-    var spacer = document.createElement('div'); spacer.className = 'msg-spacer'; msgs.appendChild(spacer);
-    // Check user messages for safety signals
+    var spacer = document.createElement('div');
+    spacer.className = 'msg-spacer';
+    msgs.appendChild(spacer);
     if (role === 'user') checkForTherapistSignals(text);
   }
 
   function appendToolSuggestion(lower) {
-    var href='resets.html', name='"You Don\'t Need to Earn Rest"';
-    if (lower.includes('journal'))  { href='journal.html';  name='your journal'; }
-    else if (lower.includes('unsent')) { href='letters.html'; name='Unsent Letters'; }
-    else if (lower.includes('to-do')||lower.includes('todo')) { href='todo.html'; name='Soft To-Do'; }
+    var href = 'resets.html', name = '"You Don\'t Need to Earn Rest"';
+    if (lower.indexOf('journal') !== -1)       { href = 'journal.html';  name = 'your journal'; }
+    else if (lower.indexOf('unsent') !== -1)   { href = 'letters.html'; name = 'Unsent Letters'; }
+    else if (lower.indexOf('to-do') !== -1 ||
+             lower.indexOf('todo')  !== -1)    { href = 'todo.html';    name = 'Soft To-Do'; }
     var msgs = document.getElementById('messages');
-    var wrap = document.createElement('div'); wrap.className = 'tool-suggest';
+    if (!msgs) return;
+    var wrap  = document.createElement('div'); wrap.className  = 'tool-suggest';
     var inner = document.createElement('div'); inner.className = 'tool-suggest-inner';
-    inner.innerHTML = '<span class="tool-suggest-text">There\'s a space called <strong>'+name+'</strong> that might fit right now.</span>'+
-      '<div class="tool-suggest-btns">'+
-      '<button class="ts-btn ts-btn-yes" onclick="window.location.href=\''+href+'\'">Try it</button>'+
-      '<button class="ts-btn ts-btn-no" onclick="this.closest(\'.tool-suggest\').remove()">Keep talking</button></div>';
-    wrap.appendChild(inner); msgs.appendChild(wrap);
+    inner.innerHTML =
+      '<span class="tool-suggest-text">There\'s a space called <strong>' + name + '</strong> that might fit right now.</span>' +
+      '<div class="tool-suggest-btns">' +
+        '<button class="ts-btn ts-btn-yes" onclick="window.location.href=\'' + href + '\'">Try it</button>' +
+        '<button class="ts-btn ts-btn-no" onclick="this.closest(\'.tool-suggest\').remove()">Keep talking</button>' +
+      '</div>';
+    wrap.appendChild(inner);
+    msgs.appendChild(wrap);
   }
 
-  function showTyping(show) { document.getElementById('typing').classList.toggle('visible', show); }
-  function scrollToBottom() { setTimeout(function(){ var m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }, 50); }
+  function showTyping(show) {
+    var t = document.getElementById('typing');
+    if (t) t.classList.toggle('visible', show);
+  }
 
-  window.handleKey   = function(e) { if (e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } };
-  window.autoResize  = function(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,130)+'px'; };
+  function scrollToBottom() {
+    setTimeout(function() {
+      var m = document.getElementById('messages');
+      if (m) m.scrollTop = m.scrollHeight;
+    }, 50);
+  }
+
+  window.handleKey   = function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+  window.autoResize  = function(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 130) + 'px'; };
   window.sendMessage = sendMessage;
 });
