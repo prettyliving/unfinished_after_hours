@@ -100,6 +100,31 @@
     .banner-text  { font-size:.9rem; color:var(--text-soft); font-weight:300; line-height:1.6; }
     .banner-text strong { color:var(--plum); }
 
+    /* ── Profile summary card ── */
+    .profile-card {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--cream); border: 1px solid rgba(59,31,58,.08);
+      border-radius: 14px; padding: 1.1rem 1.4rem; margin-bottom: 2.5rem;
+      gap: 1rem;
+    }
+    .profile-card-left { display: flex; align-items: center; gap: .9rem; }
+    .profile-card-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--coral); display: flex; align-items: center;
+      justify-content: center; font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 400; color: #fff; flex-shrink: 0;
+    }
+    .profile-card-name { font-size: .92rem; font-weight: 400; color: var(--plum); margin-bottom: .1rem; }
+    .profile-card-plan { font-size: .75rem; color: var(--muted); font-weight: 300; }
+    .profile-card-plan.plus-plan { color: var(--coral); }
+    .profile-card-link {
+      font-size: .76rem; letter-spacing: .06em; text-transform: uppercase;
+      font-weight: 500; color: var(--text-soft); text-decoration: none;
+      border: 1.5px solid rgba(59,31,58,.15); border-radius: 100px;
+      padding: .38rem .9rem; transition: border-color .2s, color .2s; white-space: nowrap;
+    }
+    .profile-card-link:hover { border-color: var(--plum); color: var(--plum); }
+
     /* ── Guarantee note ── */
     .guarantee { text-align:center; margin-top:3rem; font-size:.82rem; color:var(--muted); font-style:italic; }
 
@@ -126,6 +151,17 @@
       <a class="nav-link" href="journal.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Journal Space</a>
       <a class="nav-link" href="letters.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Unsent Letters</a>
     </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Account</div>
+      <a class="nav-link active upgrade-link" id="upgrade-nav-link" href="upgrade.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        After Hours+
+      </a>
+      <a class="nav-link" href="profile.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+      </a>
+    </div>
     <div class="aside-bottom">
       <button class="signout-btn" id="signout-btn">Sign out</button>
       <div class="profile-pill">
@@ -140,6 +176,18 @@
 
   <div class="page-main">
     <div class="upgrade-main">
+
+      <!-- Profile summary -->
+      <div class="profile-card" id="profile-card">
+        <div class="profile-card-left">
+          <div class="profile-card-avatar" id="upg-avatar">?</div>
+          <div>
+            <div class="profile-card-name" id="upg-name">—</div>
+            <div class="profile-card-plan" id="upg-plan">Free Plan</div>
+          </div>
+        </div>
+        <a class="profile-card-link" href="profile.html">View profile →</a>
+      </div>
 
       <!-- Post-purchase banners -->
       <div class="success-banner" id="success-banner">
@@ -277,9 +325,26 @@ document.addEventListener('DOMContentLoaded', function() {
     history.replaceState({}, '', 'upgrade.html');
   }
 
-  // Hide upgrade page pricing if already Plus
   var u = getUser();
-  if (isPlusMember(u)) {
+  var isPlus = isPlusMember(u);
+
+  // ── Profile card ──
+  var upgAvatar = document.getElementById('upg-avatar');
+  var upgName   = document.getElementById('upg-name');
+  var upgPlan   = document.getElementById('upg-plan');
+  if (upgAvatar) upgAvatar.textContent = u.name ? u.name.charAt(0).toUpperCase() : '?';
+  if (upgName)   upgName.textContent   = u.name || 'Anonymous';
+  if (upgPlan) {
+    if (isPlus) {
+      upgPlan.textContent = '★  After Hours+ — Active';
+      upgPlan.classList.add('plus-plan');
+    } else {
+      upgPlan.textContent = 'Free Plan · 3 conversations / month';
+    }
+  }
+
+  // Hide upgrade pricing if already a Plus member
+  if (isPlus) {
     var hero = document.querySelector('.upgrade-hero');
     if (hero) {
       hero.innerHTML = '<p class="upgrade-eyebrow">After Hours+</p><h1 class="upgrade-headline">You\'re <em>all in.</em></h1><p class="upgrade-sub">After Hours+ is active. The toolkits and packs below are still available whenever you want them.</p>';

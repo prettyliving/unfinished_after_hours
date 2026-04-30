@@ -128,24 +128,27 @@ document.addEventListener('DOMContentLoaded', function() {
     conversationHistory.push({ role: 'user', content: text });
     showTyping(true); scrollToBottom();
 
-    // ── Proxy with prompt caching ──
+    // ── Proxy call ──
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model:      'claude-sonnet-4-5',
+        model:      'claude-haiku-4-5-20251001',
         max_tokens: 1000,
-        system: [
-          { type: 'text', text: STATIC_SYSTEM,        cache_control: { type: 'ephemeral' } },
-          { type: 'text', text: USER_CONTEXT_SYSTEM,  cache_control: { type: 'ephemeral' } }
-        ],
-        messages:        conversationHistory,
-        anthropic_beta:  'prompt-caching-2024-07-31'
+        system:     STATIC_SYSTEM + '\n\n' + USER_CONTEXT_SYSTEM,
+        messages:   conversationHistory
       })
     })
-    .then(function(r){ return r.json(); })
+    .then(function(r) {
+      if (!r.ok) {
+        return r.json().then(function(e) { throw new Error(e.error || 'API error ' + r.status); });
+      }
+      return r.json();
+    })
     .then(function(data) {
-      var reply = data.content?.[0]?.text || "I'm here. Take your time.";
+      var reply = (data.content && data.content[0] && data.content[0].text)
+                  ? data.content[0].text
+                  : "I'm here. Take your time.";
       showTyping(false);
       conversationHistory.push({ role: 'assistant', content: reply });
       saveConvo();
@@ -162,8 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
         appendToolSuggestion(lower);
       }
     })
-    .catch(function() {
+    .catch(function(err) {
       showTyping(false);
+      console.error('Chat error:', err);
       appendMessage('ai', "I'm still here. Something went quiet on my end — want to try again?");
     });
     scrollToBottom();
