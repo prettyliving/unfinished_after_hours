@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Have a Conversation — Unfinished, After Hours</title>
-  <meta name="description" content="Talk it through. A CBT-informed conversation space that validates what you're feeling and helps you unpack it — no advice, no pressure.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="base.css" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,15 +39,13 @@
     .msg-user .bubble{background:var(--plum);color:rgba(250,247,242,.9);border-radius:16px 0 16px 16px;padding:1rem 1.3rem;font-size:.93rem;line-height:1.7;font-weight:300;max-width:75%;display:inline-block}
     .msg-spacer{height:.5rem}
     .tool-suggest{margin:.5rem auto;width:100%;max-width:720px;padding:0 2.5rem;box-sizing:border-box}
-    .tool-suggest-inner{background:rgba(232,112,90,.06);border:1px solid rgba(232,112,90,.2);border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .tool-suggest-inner{background:rgba(232,112,90,.06);border:1px solid rgba(232,112,90,.2);border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
     .tool-suggest-text{font-size:.85rem;color:var(--text-soft);font-weight:300}
     .tool-suggest-text strong{color:var(--plum);font-weight:500}
     .tool-suggest-btns{display:flex;gap:.5rem;flex-shrink:0}
     .ts-btn{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:.38rem .9rem;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;border:none}
     .ts-btn-yes{background:var(--coral);color:#fff}
-    .ts-btn-yes:hover{background:var(--coral-hover)}
     .ts-btn-no{background:transparent;border:1px solid rgba(59,31,58,.18);color:var(--text-soft)}
-    .ts-btn-no:hover{border-color:var(--plum);color:var(--plum)}
     .typing{display:none;padding:.5rem 2.5rem;max-width:720px;margin:0 auto;width:100%}
     .typing.visible{display:block}
     .typing-bubble{background:var(--cream);border:1px solid rgba(59,31,58,.08);border-radius:0 14px 14px 14px;padding:.8rem 1.2rem;display:inline-flex;gap:.4rem;align-items:center}
@@ -71,20 +68,17 @@
     .send-btn:hover{background:var(--coral-hover);transform:scale(1.05)}
     .input-hint{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem 0 0}
     @media(max-width:768px){.chat-sidebar{display:none}.msg{padding:.5rem 1.2rem}.tool-suggest{padding:0 1.2rem}.input-area{padding:1rem 1.2rem}.typing{padding:.5rem 1.2rem}}
-    .therapist-safety-card{margin:.5rem auto 1rem;width:100%;max-width:720px;padding:0 2.5rem;box-sizing:border-box}
-    .tsc-inner{background:linear-gradient(135deg,rgba(59,31,58,.06) 0%,rgba(232,112,90,.06) 100%);border:1.5px solid rgba(59,31,58,.15);border-radius:14px;padding:1.4rem 1.5rem}
-    .tsc-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;color:var(--plum);font-weight:500;font-size:.9rem}
-    .tsc-header svg{color:var(--coral);flex-shrink:0}
-    .tsc-body{font-size:.85rem;color:var(--text-soft);line-height:1.65;font-weight:300;margin-bottom:1rem}
-    .tsc-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.9rem}
-    .tsc-btn{font-size:.75rem;letter-spacing:.04em;padding:.5rem 1rem;border-radius:100px;text-decoration:none;font-weight:400;transition:all .2s;display:inline-block;white-space:nowrap}
-    .tsc-btn-primary{background:var(--plum);color:#fff}
-    .tsc-btn-secondary{background:transparent;border:1.5px solid rgba(59,31,58,.25);color:var(--text-soft)}
-    .tsc-crisis{background:rgba(232,112,90,.08);border-radius:8px;padding:.6rem .9rem;font-size:.78rem;display:flex;flex-direction:column;gap:.2rem;margin-bottom:.8rem}
-    .tsc-crisis strong{color:var(--coral);font-weight:500}
-    .tsc-crisis span{color:var(--text-soft);font-weight:300}
-    .tsc-dismiss{background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;padding:.3rem 0;text-decoration:underline;text-underline-offset:2px}
-    @media(max-width:768px){.therapist-safety-card{padding:0 1.2rem}.tsc-actions{flex-direction:column}.tsc-btn{text-align:center}}
+    .safety-card{margin:.5rem auto 1rem;width:100%;max-width:720px;padding:0 2.5rem;box-sizing:border-box}
+    .safety-card-inner{background:linear-gradient(135deg,rgba(59,31,58,.06),rgba(232,112,90,.06));border:1.5px solid rgba(59,31,58,.15);border-radius:14px;padding:1.4rem 1.5rem}
+    .safety-card-title{font-size:.9rem;font-weight:500;color:var(--plum);margin-bottom:.6rem}
+    .safety-card-body{font-size:.85rem;color:var(--text-soft);line-height:1.65;font-weight:300;margin-bottom:1rem}
+    .safety-card-links{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.9rem}
+    .safety-link{font-size:.75rem;padding:.5rem 1rem;border-radius:100px;text-decoration:none;font-weight:400;transition:all .2s;display:inline-block}
+    .safety-link-primary{background:var(--plum);color:#fff}
+    .safety-link-secondary{background:transparent;border:1.5px solid rgba(59,31,58,.25);color:var(--text-soft)}
+    .safety-crisis{background:rgba(232,112,90,.08);border-radius:8px;padding:.6rem .9rem;font-size:.78rem;display:flex;flex-direction:column;gap:.2rem;margin-bottom:.8rem}
+    .safety-crisis strong{color:var(--coral);font-weight:500}
+    .safety-dismiss{background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;text-decoration:underline}
   </style>
 </head>
 <body>
@@ -116,7 +110,7 @@
       </a>
     </div>
     <div class="aside-bottom">
-      <button class="signout-btn" id="signout-btn">Sign out</button>
+      <button class="signout-btn" id="signoutBtn">Sign out</button>
       <div class="profile-pill">
         <div class="profile-avatar" id="profile-avatar">?</div>
         <div>
@@ -129,18 +123,22 @@
 
   <div class="chat-wrap">
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-      <div class="paywall-banner" id="convo-paywall" style="margin:1rem 2rem 0;display:none;">
-        <div class="paywall-text">You've used your <strong>3 free conversations</strong> this month. After Hours+ gives you unlimited access.</div>
-        <a class="paywall-cta" href="upgrade.html">Unlock →</a>
+      <div id="convo-paywall" style="display:none;margin:1rem 2rem 0;background:rgba(232,112,90,.07);border:1.5px solid rgba(232,112,90,.2);border-radius:14px;padding:1.2rem 1.5rem;display:none;align-items:center;justify-content:space-between;gap:1rem">
+        <div style="font-size:.87rem;color:var(--text-soft);font-weight:300">You've used your <strong>3 free conversations</strong> this month. After Hours+ gives you unlimited access.</div>
+        <a href="upgrade.html" style="flex-shrink:0;background:var(--coral);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:.55rem 1.2rem;border-radius:100px;cursor:pointer;text-decoration:none">Unlock →</a>
       </div>
       <div class="messages" id="messages">
         <div class="msg msg-ai"><div class="bubble">Hi. You wanted to talk this through. There's no agenda here — just space to think out loud. What's sitting heavy right now?</div></div>
         <div class="msg-spacer"></div>
       </div>
-      <div class="typing" id="typing"><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+      <div class="typing" id="typing">
+        <div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+      </div>
       <div class="input-area">
         <textarea class="chat-input" id="chatInput" rows="1" placeholder="Say whatever comes to mind..."></textarea>
-        <button class="send-btn" id="sendBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        <button class="send-btn" id="sendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
       <p class="input-hint" style="padding:.4rem 2rem .8rem;flex-shrink:0">This conversation is private. It's saved for the duration of your session.</p>
     </div>
@@ -158,17 +156,199 @@
       <div class="sidebar-section">
         <p class="sidebar-label">If you need more</p>
         <p class="sidebar-note" style="margin-bottom:.7rem">988 Suicide &amp; Crisis Lifeline — call or text 988</p>
-        <p class="sidebar-note">Crisis Text Line — text HOME to 741741</p>
-        <p class="sidebar-note">Veterans Crisis Line — call 988 then press 1 or text 838255</p>
+        <p class="sidebar-note" style="margin-bottom:.7rem">Crisis Text Line — text HOME to 741741</p>
+        <p class="sidebar-note">Veterans Crisis Line — call 988 then press 1</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Scripts at bottom of body, NO defer, loaded in order after DOM is ready -->
+<!-- main.js loaded first so getUser/checkFreeLimit are available -->
 <script src="main.js"></script>
 <script src="stripe.js"></script>
+
+<script>
+// ============================================================
+// CONVERSATION — fully inline, zero external dependencies
+// ============================================================
+(function () {
+
+  // Sidebar init (profile pill, sign out, upgrade link)
+  var u = (typeof getUser === 'function') ? getUser() : {};
+  if (!u || !u.name) { window.location.href = 'quiz.html'; return; }
+
+  var av = document.getElementById('profile-avatar');
+  var pn = document.getElementById('profile-name');
+  var pt = document.getElementById('profile-tag');
+  if (av) av.textContent = u.name.charAt(0).toUpperCase();
+  if (pn) pn.textContent = u.name;
+  if (pt) pt.textContent = u.profile || '—';
+
+  var sb = document.getElementById('signoutBtn');
+  if (sb) sb.addEventListener('click', function () {
+    sessionStorage.removeItem('uah_user');
+    window.location.href = 'index.html';
+  });
+
+  var ul = document.getElementById('upgrade-nav-link');
+  if (ul) ul.style.display = u.plus ? 'none' : 'flex';
+
+  // Theme
+  if (typeof applyTheme === 'function') applyTheme(u, document.getElementById('sidebar'));
+
+  // System prompt
+  var profile = u.profile || '';
+  var profileNote = profile ? (' User profile: "' + profile + '".') : '';
+  var SYSTEM =
+    'You are the conversational guide inside "Unfinished, After Hours," a burnout support platform.' +
+    ' Help people unpack feelings — not fix them. Reflect, ask, sit with them.' +
+    ' Keep responses to 2–4 sentences. Always end with exactly one question.' +
+    ' Validate first, then explore gently. Mirror their exact words back.' +
+    ' No advice, no lists, no headers, no affirmations, no silver linings.' +
+    ' If they mention self-harm or crisis: warmth first, then share 988 and Crisis Text Line (text HOME to 741741).' +
+    ' Tone: honest, warm, unhurried.' + profileNote;
+
+  // State
+  var history = [{ role: 'assistant', content: "Hi. You wanted to talk this through. There\u2019s no agenda here \u2014 just space to think out loud. What\u2019s sitting heavy right now?" }];
+  var started = false;
+  var safetyShown = false;
+  var convoId = 'convo_' + Date.now();
+
+  // DOM
+  var inputEl  = document.getElementById('chatInput');
+  var sendBtn  = document.getElementById('sendBtn');
+  var msgsEl   = document.getElementById('messages');
+  var typingEl = document.getElementById('typing');
+
+  // Wire up send button
+  sendBtn.addEventListener('click', send);
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  inputEl.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 130) + 'px';
+  });
+
+  function send() {
+    var text = inputEl.value.trim();
+    if (!text) return;
+
+    // Free limit check (once per session)
+    if (!started) {
+      var isPlus = u.plus || false;
+      if (!isPlus) {
+        var monthKey = new Date().toISOString().slice(0, 7);
+        var storageKey = 'uah_limits_monthly_' + monthKey;
+        var bucket = {};
+        try { bucket = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch (e) {}
+        var count = (bucket.convos || 0) + 1;
+        bucket.convos = count;
+        try { localStorage.setItem(storageKey, JSON.stringify(bucket)); } catch (e) {}
+        if (count > 3) {
+          var paywall = document.getElementById('convo-paywall');
+          if (paywall) paywall.style.display = 'flex';
+          return;
+        }
+      }
+      started = true;
+    }
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+    setTyping(true);
+    scroll();
+
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        system: SYSTEM,
+        messages: history
+      })
+    })
+    .then(function (r) {
+      return r.json().then(function (d) {
+        if (!r.ok) throw new Error((d && d.error) ? d.error : 'HTTP ' + r.status);
+        return d;
+      });
+    })
+    .then(function (data) {
+      var reply = (data.content && data.content[0] && data.content[0].text) || "I'm here. Take your time.";
+      setTyping(false);
+      history.push({ role: 'assistant', content: reply });
+      try { localStorage.setItem(convoId, JSON.stringify({ messages: history, updatedAt: Date.now() })); } catch (e) {}
+      addMsg('ai', reply);
+    })
+    .catch(function (err) {
+      setTyping(false);
+      console.error('Chat fetch error:', err);
+      addMsg('ai', 'Something went quiet on my end — want to try again?');
+    });
+  }
+
+  function addMsg(role, text) {
+    var div = document.createElement('div');
+    div.className = 'msg msg-' + role;
+    div.innerHTML = '<div class="bubble">' + esc(text).replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>') + '</div>';
+    msgsEl.appendChild(div);
+    var sp = document.createElement('div'); sp.className = 'msg-spacer'; msgsEl.appendChild(sp);
+    if (role === 'user') checkSafety(text);
+    scroll();
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function setTyping(show) {
+    if (typingEl) typingEl.classList.toggle('visible', show);
+  }
+
+  function scroll() {
+    setTimeout(function () { msgsEl.scrollTop = msgsEl.scrollHeight; }, 50);
+  }
+
+  // Safety card
+  var CRISIS = ['therapist','therapy','professional help','psychiatrist','counselor','counselling',
+    'counseling','cant cope','can\'t cope','falling apart','breaking down','not okay','not ok',
+    'hopeless','worthless','nobody cares','give up','no point','end it','hurt myself',
+    'self harm','self-harm','suicidal','want to die','988','crisis line'];
+
+  function checkSafety(text) {
+    if (safetyShown) return;
+    var low = text.toLowerCase();
+    var hit = CRISIS.some(function (w) { return low.indexOf(w) !== -1; });
+    if (!hit) return;
+    safetyShown = true;
+    setTimeout(function () {
+      if (document.getElementById('safety-card')) return;
+      var card = document.createElement('div');
+      card.id = 'safety-card';
+      card.className = 'safety-card';
+      card.innerHTML =
+        '<div class="safety-card-inner">' +
+          '<div class="safety-card-title">You don\'t have to do this alone</div>' +
+          '<p class="safety-card-body">What you\'re carrying sounds heavy. A real therapist can offer something I can\'t — consistent, professional support over time.</p>' +
+          '<div class="safety-card-links">' +
+            '<a class="safety-link safety-link-primary" href="https://www.psychologytoday.com/us/therapists" target="_blank" rel="noopener">Find a therapist near me</a>' +
+            '<a class="safety-link safety-link-secondary" href="https://www.betterhelp.com" target="_blank" rel="noopener">Try online therapy</a>' +
+          '</div>' +
+          '<div class="safety-crisis"><strong>If you\'re in crisis:</strong><span>Call or text 988 &nbsp;·&nbsp; Text HOME to 741741</span></div>' +
+          '<button class="safety-dismiss" onclick="document.getElementById(\'safety-card\').remove()">Keep talking here</button>' +
+        '</div>';
+      msgsEl.appendChild(card);
+      scroll();
+    }, 800);
+  }
+
+})();
+</script>
+
 <script src="mobile-nav.js"></script>
-<script src="page-conversation.js"></script>
 </body>
 </html>
