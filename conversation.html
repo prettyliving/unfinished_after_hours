@@ -9,11 +9,6 @@
   <link rel="stylesheet" href="base.css" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <!-- Scripts loaded with defer: execute after HTML parsed, in order, no conflicts -->
-  <script src="main.js" defer></script>
-  <script src="stripe.js" defer></script>
-  <script src="mobile-nav.js" defer></script>
-  <script src="page-conversation.js" defer></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text);height:100vh;overflow:hidden}
@@ -76,7 +71,6 @@
     .send-btn:hover{background:var(--coral-hover);transform:scale(1.05)}
     .input-hint{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem 0 0}
     @media(max-width:768px){.chat-sidebar{display:none}.msg{padding:.5rem 1.2rem}.tool-suggest{padding:0 1.2rem}.input-area{padding:1rem 1.2rem}.typing{padding:.5rem 1.2rem}}
-    /* Therapist Safety Card */
     .therapist-safety-card{margin:.5rem auto 1rem;width:100%;max-width:720px;padding:0 2.5rem;box-sizing:border-box}
     .tsc-inner{background:linear-gradient(135deg,rgba(59,31,58,.06) 0%,rgba(232,112,90,.06) 100%);border:1.5px solid rgba(59,31,58,.15);border-radius:14px;padding:1.4rem 1.5rem}
     .tsc-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;color:var(--plum);font-weight:500;font-size:.9rem}
@@ -85,14 +79,11 @@
     .tsc-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.9rem}
     .tsc-btn{font-size:.75rem;letter-spacing:.04em;padding:.5rem 1rem;border-radius:100px;text-decoration:none;font-weight:400;transition:all .2s;display:inline-block;white-space:nowrap}
     .tsc-btn-primary{background:var(--plum);color:#fff}
-    .tsc-btn-primary:hover{background:var(--plum-mid)}
     .tsc-btn-secondary{background:transparent;border:1.5px solid rgba(59,31,58,.25);color:var(--text-soft)}
-    .tsc-btn-secondary:hover{border-color:var(--plum);color:var(--plum)}
     .tsc-crisis{background:rgba(232,112,90,.08);border-radius:8px;padding:.6rem .9rem;font-size:.78rem;display:flex;flex-direction:column;gap:.2rem;margin-bottom:.8rem}
     .tsc-crisis strong{color:var(--coral);font-weight:500}
     .tsc-crisis span{color:var(--text-soft);font-weight:300}
     .tsc-dismiss{background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;padding:.3rem 0;text-decoration:underline;text-underline-offset:2px}
-    .tsc-dismiss:hover{color:var(--text-soft)}
     @media(max-width:768px){.therapist-safety-card{padding:0 1.2rem}.tsc-actions{flex-direction:column}.tsc-btn{text-align:center}}
   </style>
 </head>
@@ -138,7 +129,6 @@
 
   <div class="chat-wrap">
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-      <!-- Free tier paywall banner -->
       <div class="paywall-banner" id="convo-paywall" style="margin:1rem 2rem 0;display:none;">
         <div class="paywall-text">You've used your <strong>3 free conversations</strong> this month. After Hours+ gives you unlimited access.</div>
         <a class="paywall-cta" href="upgrade.html">Unlock →</a>
@@ -149,8 +139,8 @@
       </div>
       <div class="typing" id="typing"><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
       <div class="input-area">
-        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Say whatever comes to mind..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" onclick="sendMessage()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Say whatever comes to mind..."></textarea>
+        <button class="send-btn" id="sendBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
       </div>
       <p class="input-hint" style="padding:.4rem 2rem .8rem;flex-shrink:0">This conversation is private. It's saved for the duration of your session.</p>
     </div>
@@ -173,7 +163,12 @@
       </div>
     </div>
   </div>
-</div><!-- /app-layout -->
+</div>
 
+<!-- Scripts at bottom of body, NO defer, loaded in order after DOM is ready -->
+<script src="main.js"></script>
+<script src="stripe.js"></script>
+<script src="mobile-nav.js"></script>
+<script src="page-conversation.js"></script>
 </body>
 </html>
