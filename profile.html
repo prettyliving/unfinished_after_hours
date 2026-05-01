@@ -178,7 +178,7 @@
       <div class="profile-avatar-lg" id="hero-avatar">?</div>
       <div class="profile-hero-info">
         <div class="profile-hero-name" id="hero-name">—</div>
-        <div class="profile-hero-email" id="hero-email">—</div>
+        <div class="profile-hero-email" id="hero-email" style="display:none"></div>
         <div class="profile-hero-type" id="hero-type-badge">
           <span id="hero-type-text">Free</span>
         </div>
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (heroAvatar) heroAvatar.textContent = u.name ? u.name.charAt(0).toUpperCase() : '?';
   if (heroName) heroName.textContent = u.name || 'Anonymous';
-  if (heroEmail) heroEmail.textContent = u.email || 'No email saved';
+  if (heroEmail) heroEmail.style.display = 'none'; // email not collected
   if (heroBadge) {
     if (isPlus) {
       heroBadge.classList.add('plus');
