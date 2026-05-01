@@ -102,5 +102,10 @@ function activatePlusMembership() {
   var u = getUser();
   u.plus = true;
   u.plusActivatedAt = Date.now();
+  // Save to sessionStorage (current tab)
   if (typeof setUser === 'function') setUser(u);
+  // Also persist to localStorage so Plus status survives tab close / Stripe redirect
+  try {
+    localStorage.setItem('uah_plus', JSON.stringify({ plus: true, activatedAt: u.plusActivatedAt }));
+  } catch(e) {}
 }

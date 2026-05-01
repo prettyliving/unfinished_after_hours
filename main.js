@@ -41,7 +41,23 @@ function lum(rgb) {
 function contrast(a,b) { var l1=lum(a),l2=lum(b); return (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05); }
 
 // ── Session ─────────────────────────────────────────────────
-function getUser() { try { return JSON.parse(sessionStorage.getItem('uah_user')||'{}'); } catch(e) { return {}; } }
+function getUser() {
+  var u = {};
+  try { u = JSON.parse(sessionStorage.getItem('uah_user') || '{}'); } catch(e) {}
+  // Restore Plus status from localStorage if session was lost (e.g. after Stripe redirect)
+  if (!u.plus) {
+    try {
+      var plusData = JSON.parse(localStorage.getItem('uah_plus') || '{}');
+      if (plusData && plusData.plus) {
+        u.plus = true;
+        u.plusActivatedAt = plusData.activatedAt;
+        // Write back to session so subsequent calls are fast
+        try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {}
+      }
+    } catch(e) {}
+  }
+  return u;
+}
 function setUser(u) { try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {} }
 function isPlusMember(u) { u = u||getUser(); return !!(u.plus); }
 function getAccounts() { try { return JSON.parse(localStorage.getItem('uah_accounts')||'{}'); } catch(e) { return {}; } }

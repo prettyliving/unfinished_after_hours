@@ -28,9 +28,19 @@ const PRICE_IDS = {
 const SUBSCRIPTION_PRODUCTS = ['plus_monthly', 'plus_yearly'];
 
 // Your site's base URL — used for success/cancel redirects
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL
-  ? 'https://' + (process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL)
-  : 'https://your-domain.com'; // fallback — replace with your actual domain
+// Handles whether the env var includes https:// or not
+function buildBaseUrl() {
+  var raw = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || '';
+  if (!raw) return 'https://www.unfinshedafter.com'; // hardcoded fallback
+  // Strip any trailing slash
+  raw = raw.replace(/\/+$/, '');
+  // Add https:// if not already present
+  if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
+    raw = 'https://' + raw;
+  }
+  return raw;
+}
+const BASE_URL = buildBaseUrl();
 // ─────────────────────────────────────────────────────────────
 
 module.exports = async function handler(req, res) {
