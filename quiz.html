@@ -1209,6 +1209,9 @@ document.addEventListener('DOMContentLoaded', function() {
       avoidColor:      fresh ? (fresh.avoidColor || null): null
     });
 
+    // Save last-used email so getUser() can restore sessions across tabs / mobile
+    try { localStorage.setItem('uah_last_email', email.toLowerCase().trim()); } catch(e) {}
+
     if (fresh && fresh.profile) {
       showReturningGate(fresh);
     } else {

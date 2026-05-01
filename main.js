@@ -5,15 +5,17 @@
 'use strict';
 
 // ── One-time privacy wipe ────────────────────────────────────
-// Clears all stored emails, account records, and remembered
-// login info. Runs once per browser, keyed by version flag.
+// Clears stored account records from old schema versions.
+// Runs once per browser, keyed by version flag.
+// NOTE: uah_last_email and uah_last_profile are intentionally NOT wiped —
+// they are needed to restore sessions across tabs and mobile navigations.
 (function () {
   var WIPE_KEY = 'uah_privacy_wipe_v1';
   if (localStorage.getItem(WIPE_KEY)) return;
   var toRemove = [];
   for (var i = 0; i < localStorage.length; i++) {
     var k = localStorage.key(i);
-    if (k && (k === 'uah_accounts' || k === 'uah_last_email' || k === 'uah_plus')) {
+    if (k && (k === 'uah_accounts' || k === 'uah_plus')) {
       toRemove.push(k);
     }
   }
@@ -44,8 +46,54 @@ function contrast(a,b) { var l1=lum(a),l2=lum(b); return (Math.max(l1,l2)+.05)/(
 function getUser() {
   var u = {};
   try { u = JSON.parse(sessionStorage.getItem('uah_user') || '{}'); } catch(e) {}
-  // Restore Plus status from localStorage if session was lost (e.g. after Stripe redirect)
-  // Keyed by email so Plus only applies to the account that paid — not the whole browser
+
+  // ── Session lost (new tab, mobile navigation, etc.) ──────────
+  // Try to restore from localStorage so users aren't forced to re-login
+  // every time they open a new tab or navigate back on mobile.
+  if (!u || !u.name) {
+    try {
+      // 1. Try account-keyed profile (most complete — has email + profile)
+      var lastEmail = localStorage.getItem('uah_last_email');
+      if (lastEmail) {
+        var acctKey  = 'uah_profile_' + lastEmail.toLowerCase().trim();
+        var acctData = JSON.parse(localStorage.getItem(acctKey) || 'null');
+        if (acctData && acctData.name) {
+          u = {
+            name:            acctData.name,
+            email:           lastEmail.toLowerCase().trim(),
+            profile:         acctData.profile  || null,
+            profileComplete: !!(acctData.profile),
+            swatches:        acctData.swatches  || null,
+            avoidColor:      acctData.avoidColor|| null
+          };
+        }
+      }
+    } catch(e) {}
+
+    // 2. Fall back to the no-email last_profile key (quiz-without-account path)
+    if (!u || !u.name) {
+      try {
+        var last = JSON.parse(localStorage.getItem('uah_last_profile') || 'null');
+        if (last && last.name) {
+          u = {
+            name:            last.name,
+            email:           last.email || null,
+            profile:         last.profile  || null,
+            profileComplete: !!(last.profile),
+            swatches:        last.swatches  || null,
+            avoidColor:      last.avoidColor|| null
+          };
+        }
+      } catch(e) {}
+    }
+
+    // Persist the restored session so subsequent calls are instant
+    if (u && u.name) {
+      try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {}
+    }
+  }
+
+  // ── Restore Plus status from localStorage ────────────────────
   if (!u.plus && u.email) {
     try {
       var key = 'uah_plus_' + u.email.toLowerCase().trim();
@@ -57,6 +105,7 @@ function getUser() {
       }
     } catch(e) {}
   }
+
   return u;
 }
 function setUser(u) { try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {} }
