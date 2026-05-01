@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio Packs — Unfinished, After Hours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text)}
+    .wrap{max-width:680px;margin:0 auto;padding:4rem 2rem 6rem}
+    .eyebrow{font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);font-weight:500;margin-bottom:1rem}
+    .title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3rem);font-weight:400;color:var(--plum);line-height:1.15;margin-bottom:1.2rem}
+    .tagline{font-size:1.05rem;color:var(--text-soft);font-weight:300;line-height:1.7;margin-bottom:2.5rem;max-width:520px}
+    .divider{height:1px;background:rgba(59,31,58,.1);margin:2.5rem 0}
+    .section-label{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:1.2rem}
+    .tracks{display:flex;flex-direction:column;gap:.75rem;margin-bottom:2.5rem}
+    .track{display:flex;align-items:center;gap:1.1rem;padding:1.1rem 1.3rem;background:var(--cream);border:1px solid rgba(59,31,58,.08);border-radius:13px;transition:border-color .2s}
+    .track:hover{border-color:rgba(59,31,58,.18)}
+    .track-num{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--muted);width:24px;flex-shrink:0;text-align:center}
+    .track-info{flex:1}
+    .track-name{font-size:.9rem;font-weight:400;color:var(--plum);margin-bottom:.2rem}
+    .track-desc{font-size:.78rem;color:var(--muted);font-weight:300;line-height:1.5}
+    .track-dur{font-size:.75rem;color:var(--muted);font-weight:300;flex-shrink:0}
+    .waveform{display:flex;align-items:center;gap:2px;height:20px;flex-shrink:0}
+    .waveform span{display:block;width:3px;border-radius:2px;background:var(--coral);opacity:.35}
+    .buy-box{background:rgba(232,112,90,.05);border:1.5px solid rgba(232,112,90,.18);border-radius:16px;padding:1.8rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+    .price{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:400;color:var(--plum);line-height:1}
+    .price-note{font-size:.78rem;color:var(--muted);font-weight:300;margin-top:.2rem}
+    .buy-btn{background:var(--coral);color:#fff;border:none;border-radius:100px;padding:.85rem 2rem;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .buy-btn:hover{background:var(--coral-hover)}
+    .buy-btn:disabled{opacity:.6;cursor:default}
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);text-decoration:none;margin-bottom:2.5rem;transition:color .2s}
+    .back-link:hover{color:var(--plum)}
+    .note{font-size:.8rem;color:var(--muted);font-weight:300;line-height:1.6;margin-top:1.2rem}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="upgrade.html">← Back to all products</a>
+  <p class="eyebrow">Add-on · $5 one-time</p>
+  <h1 class="title">Audio Packs</h1>
+  <p class="tagline">Short guided audio sessions for the moments when reading feels like too much effort. Nothing performative. No background music. Just a voice that doesn't need anything from you.</p>
+
+  <div class="divider"></div>
+
+  <p class="section-label">What's included — 8 sessions</p>
+  <div class="tracks">
+    <div class="track">
+      <div class="track-num">1</div>
+      <div class="track-info">
+        <div class="track-name">Enough for Today</div>
+        <div class="track-desc">For the end of a day where you're not sure you did enough — and you're tired of having that argument with yourself.</div>
+      </div>
+      <div class="track-dur">6 min</div>
+    </div>
+    <div class="track">
+      <div class="track-num">2</div>
+      <div class="track-info">
+        <div class="track-name">Stop Optimizing Your Rest</div>
+        <div class="track-desc">For when you're trying to rest "efficiently" and it's making everything worse.</div>
+      </div>
+      <div class="track-dur">5 min</div>
+    </div>
+    <div class="track">
+      <div class="track-num">3</div>
+      <div class="track-info">
+        <div class="track-name">Quiet Mornings</div>
+        <div class="track-desc">A slow start for days when the to-do list is already louder than the alarm.</div>
+      </div>
+      <div class="track-dur">8 min</div>
+    </div>
+    <div class="track">
+      <div class="track-num">4</div>
+      <div class="track-info">
+        <div class="track-name">The Guilt Can Wait</div>
+        <div class="track-desc">Permission to set down what you're carrying — just for right now. You can pick it up later if you want to.</div>
+      </div>
+      <div class="track-dur">4 min</div>
+    </div>
+    <div class="track">
+      <div class="track-num">5</div>
+      <div class="track-info">
+        <div class="track-name">Body Scan for the Overworked</div>
+        <div class="track-desc">Not a meditation. Just a slow check-in with the parts of you that have been holding tension without telling you.</div>
+      </div>
+      <div class="track-dur">10 min</div>
+    </div>
+    <div class="track">
+      <div class="track-num">6</div>
+      <div class="track-info">
+        <div class="track-name">Nothing Is on Fire</div>
+        <div class="track-desc">For the 3am spiral where everything feels urgent and irreversible. It probably isn't.</div>
+      </div>
+      <div class="track-dur">7 min</div>
+    </div>
+    <div class="track">
+      <div class="track-num">7</div>
+      <div class="track-info">
+        <div class="track-name">After the Hard Conversation</div>
+        <div class="track-desc">Wind down after something that took a lot out of you — without replaying it on loop.</div>
+      </div>
+      <div class="track-dur">6 min</div>
+    </div>
+    <div class="track">
+      <div class="track-num">8</div>
+      <div class="track-info">
+        <div class="track-name">Just This</div>
+        <div class="track-desc">Three minutes. No goal. No outcome. Just existing for a moment without it meaning anything.</div>
+      </div>
+      <div class="track-dur">3 min</div>
+    </div>
+  </div>
+
+  <div class="buy-box">
+    <div>
+      <div class="price">$5</div>
+      <div class="price-note">One-time · 8 sessions · ~49 minutes total</div>
+    </div>
+    <button class="buy-btn" id="buyBtn">Get the audio pack →</button>
+  </div>
+  <p class="note">Sessions unlock inside the platform under Resets → Audio. They're also available as MP3 downloads if you'd prefer to listen offline.</p>
+</div>
+<script src="main.js"></script>
+<script src="stripe.js"></script>
+<script>
+  document.getElementById('buyBtn').addEventListener('click', function() {
+    this.textContent = 'Loading…';
+    this.disabled = true;
+    buyAudioPack('');
+  });
+</script>
+</body>
+</html>

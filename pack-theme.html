@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Theme Packs — Unfinished, After Hours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text)}
+    .wrap{max-width:680px;margin:0 auto;padding:4rem 2rem 6rem}
+    .eyebrow{font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);font-weight:500;margin-bottom:1rem}
+    .title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3rem);font-weight:400;color:var(--plum);line-height:1.15;margin-bottom:1.2rem}
+    .tagline{font-size:1.05rem;color:var(--text-soft);font-weight:300;line-height:1.7;margin-bottom:2.5rem;max-width:520px}
+    .divider{height:1px;background:rgba(59,31,58,.1);margin:2.5rem 0}
+    .section-label{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:1.2rem}
+    .themes-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:2.5rem}
+    @media(max-width:500px){.themes-grid{grid-template-columns:1fr}}
+    .theme-card{border-radius:14px;overflow:hidden;border:1px solid rgba(59,31,58,.08)}
+    .theme-preview{height:90px;display:flex;align-items:flex-end;padding:.8rem 1rem}
+    .theme-preview-label{font-size:.72rem;font-weight:500;letter-spacing:.04em}
+    .theme-info{padding:.85rem 1rem;background:var(--cream)}
+    .theme-name{font-size:.88rem;font-weight:400;color:var(--plum);margin-bottom:.25rem}
+    .theme-desc{font-size:.78rem;color:var(--muted);font-weight:300;line-height:1.5}
+    .theme-midnight .theme-preview{background:linear-gradient(135deg,#0d0d1a,#1a1535);border-bottom:1px solid rgba(255,255,255,.06)}
+    .theme-midnight .theme-preview-label{color:rgba(180,160,240,.7)}
+    .theme-neutral .theme-preview{background:linear-gradient(135deg,#f5f0ea,#e8e0d5)}
+    .theme-neutral .theme-preview-label{color:rgba(80,65,55,.5)}
+    .theme-academia .theme-preview{background:linear-gradient(135deg,#1c1a14,#2d2618)}
+    .theme-academia .theme-preview-label{color:rgba(200,180,120,.6)}
+    .theme-dusk .theme-preview{background:linear-gradient(135deg,#2d1f3d,#4a2040)}
+    .theme-dusk .theme-preview-label{color:rgba(220,160,180,.6)}
+    .theme-moss .theme-preview{background:linear-gradient(135deg,#1a2618,#2a3d26)}
+    .theme-moss .theme-preview-label{color:rgba(140,190,120,.6)}
+    .theme-ash .theme-preview{background:linear-gradient(135deg,#1e1e1e,#2d2d2d)}
+    .theme-ash .theme-preview-label{color:rgba(180,180,180,.5)}
+    .buy-box{background:rgba(232,112,90,.05);border:1.5px solid rgba(232,112,90,.18);border-radius:16px;padding:1.8rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+    .price{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:400;color:var(--plum);line-height:1}
+    .price-note{font-size:.78rem;color:var(--muted);font-weight:300;margin-top:.2rem}
+    .buy-btn{background:var(--coral);color:#fff;border:none;border-radius:100px;padding:.85rem 2rem;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .buy-btn:hover{background:var(--coral-hover)}
+    .buy-btn:disabled{opacity:.6;cursor:default}
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);text-decoration:none;margin-bottom:2.5rem;transition:color .2s}
+    .back-link:hover{color:var(--plum)}
+    .note{font-size:.8rem;color:var(--muted);font-weight:300;line-height:1.6;margin-top:1.2rem}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="upgrade.html">← Back to all products</a>
+  <p class="eyebrow">Add-on · $4 one-time</p>
+  <h1 class="title">Theme Packs</h1>
+  <p class="tagline">The space should feel like yours. Six colour themes designed around how different kinds of tired actually look — not just aesthetics for the sake of it.</p>
+
+  <div class="divider"></div>
+
+  <p class="section-label">The six themes</p>
+  <div class="themes-grid">
+    <div class="theme-card theme-midnight">
+      <div class="theme-preview"><span class="theme-preview-label">MIDNIGHT STATIC</span></div>
+      <div class="theme-info"><div class="theme-name">Midnight Static</div><div class="theme-desc">Deep navy and violet. For late nights when the quiet is the only thing holding you together.</div></div>
+    </div>
+    <div class="theme-card theme-neutral">
+      <div class="theme-preview"><span class="theme-preview-label">SOFT NEUTRAL</span></div>
+      <div class="theme-info"><div class="theme-name">Soft Neutral</div><div class="theme-desc">Warm linen and sand. For days when everything feels like too much colour.</div></div>
+    </div>
+    <div class="theme-card theme-academia">
+      <div class="theme-preview"><span class="theme-preview-label">DARK ACADEMIA</span></div>
+      <div class="theme-info"><div class="theme-name">Dark Academia Burnout</div><div class="theme-desc">Aged parchment on near-black. For the ones who burned out in a library.</div></div>
+    </div>
+    <div class="theme-card theme-dusk">
+      <div class="theme-preview"><span class="theme-preview-label">LATE DUSK</span></div>
+      <div class="theme-info"><div class="theme-name">Late Dusk</div><div class="theme-desc">Dusty plum and rose. For the hours just after everything goes quiet.</div></div>
+    </div>
+    <div class="theme-card theme-moss">
+      <div class="theme-preview"><span class="theme-preview-label">OVERGROWN</span></div>
+      <div class="theme-info"><div class="theme-name">Overgrown</div><div class="theme-desc">Forest and moss. For when you need to feel like something is still growing.</div></div>
+    </div>
+    <div class="theme-card theme-ash">
+      <div class="theme-preview"><span class="theme-preview-label">ASH</span></div>
+      <div class="theme-info"><div class="theme-name">Ash</div><div class="theme-desc">Charcoal and grey. For when you just want everything to step back.</div></div>
+    </div>
+  </div>
+
+  <div class="buy-box">
+    <div>
+      <div class="price">$4</div>
+      <div class="price-note">One-time · All 6 themes · Applied instantly</div>
+    </div>
+    <button class="buy-btn" id="buyBtn">Get all themes →</button>
+  </div>
+  <p class="note">Themes apply across the entire platform — conversation, journal, resets, and to-do. Switch between them any time in your profile settings.</p>
+</div>
+<script src="main.js"></script>
+<script src="stripe.js"></script>
+<script>
+  document.getElementById('buyBtn').addEventListener('click', function() {
+    this.textContent = 'Loading…';
+    this.disabled = true;
+    buyThemePack('');
+  });
+</script>
+</body>
+</html>
