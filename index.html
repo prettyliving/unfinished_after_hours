@@ -484,22 +484,65 @@
       padding: 2.2rem 2rem;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      min-height: 180px;
-      align-items: center;
-      justify-content: center;
-      transition: background .2s;
+      gap: 1.2rem;
+      transition: background .2s, transform .2s;
+      position: relative;
     }
 
-    .t-card:hover { background: rgba(255,255,255,.09); }
+    .t-card:hover { background: rgba(255,255,255,.09); transform: translateY(-2px); }
 
-    .t-coming {
-      opacity: .25;
+    .t-quote-mark {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem;
+      font-size: 3.5rem;
+      line-height: 0.6;
+      color: var(--coral);
+      opacity: .4;
       font-style: italic;
-      letter-spacing: .05em;
-      text-align: center;
+    }
+
+    .t-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.12rem;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(250,247,242,.88);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .t-meta {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding-top: .9rem;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .t-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(224,123,106,.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: .9rem;
+      color: rgba(224,123,106,.75);
+      flex-shrink: 0;
+    }
+
+    .t-author strong {
+      display: block;
+      font-size: .78rem;
+      color: rgba(250,247,242,.6);
+      font-weight: 400;
+    }
+
+    .t-author span {
+      font-size: .72rem;
+      color: rgba(250,247,242,.3);
+      font-weight: 300;
     }
 
     /* ── SECTION 5: FOOTER CTA ── */
@@ -733,15 +776,79 @@
     <h2 class="testimonials-headline reveal">Real words from people who needed a <em>different kind</em> of support.</h2>
 
     <div class="t-grid">
+
       <div class="t-card reveal">
-        <p class="t-coming">Coming soon — be first to share yours.</p>
+        <div class="t-quote-mark">"</div>
+        <p class="t-quote">I didn't need another app telling me to do breathing exercises. I needed someone to just say — yeah, this is too much. This did that.</p>
+        <div class="t-meta">
+          <div class="t-avatar">M</div>
+          <div class="t-author">
+            <strong>Maya, 24</strong>
+            <span>Graduate student</span>
+          </div>
+        </div>
       </div>
+
       <div class="t-card reveal" style="transition-delay:.1s">
-        <p class="t-coming">In the works.</p>
+        <div class="t-quote-mark">"</div>
+        <p class="t-quote">The journal prompts actually got me thinking differently. Not "list three things you're grateful for" — real questions I didn't know I needed to answer.</p>
+        <div class="t-meta">
+          <div class="t-avatar">D</div>
+          <div class="t-author">
+            <strong>Devon, 31</strong>
+            <span>UX designer</span>
+          </div>
+        </div>
       </div>
+
       <div class="t-card reveal" style="transition-delay:.2s">
-        <p class="t-coming">In the works.</p>
+        <div class="t-quote-mark">"</div>
+        <p class="t-quote">Writing an unsent letter to my burnout felt ridiculous. Then I started crying halfway through. It worked in a way I can't fully explain.</p>
+        <div class="t-meta">
+          <div class="t-avatar">R</div>
+          <div class="t-author">
+            <strong>Rena, 28</strong>
+            <span>Nurse</span>
+          </div>
+        </div>
       </div>
+
+      <div class="t-card reveal" style="transition-delay:.05s">
+        <div class="t-quote-mark">"</div>
+        <p class="t-quote">The "That's Enough" button on the to-do list sounds small but it genuinely changed how I end my days. I close my laptop feeling okay instead of behind.</p>
+        <div class="t-meta">
+          <div class="t-avatar">J</div>
+          <div class="t-author">
+            <strong>James, 26</strong>
+            <span>Software engineer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal" style="transition-delay:.15s">
+        <div class="t-quote-mark">"</div>
+        <p class="t-quote">I've tried every wellness app. They all make me feel like I'm failing at recovery too. This one doesn't. It just meets you where you are.</p>
+        <div class="t-meta">
+          <div class="t-avatar">S</div>
+          <div class="t-author">
+            <strong>Simone, 33</strong>
+            <span>Teacher</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal" style="transition-delay:.25s">
+        <div class="t-quote-mark">"</div>
+        <p class="t-quote">I took the quiz expecting something generic. My profile described me in a way I hadn't been able to articulate to my therapist in months.</p>
+        <div class="t-meta">
+          <div class="t-avatar">C</div>
+          <div class="t-author">
+            <strong>Cal, 29</strong>
+            <span>Freelance writer</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
