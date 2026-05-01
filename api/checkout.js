@@ -31,7 +31,7 @@ const SUBSCRIPTION_PRODUCTS = ['plus_monthly', 'plus_yearly'];
 // Handles whether the env var includes https:// or not
 function buildBaseUrl() {
   var raw = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || '';
-  if (!raw) return 'https://www.unfinshedafter.com'; // hardcoded fallback
+  if (!raw) return 'https://www.unfinishedafter.com'; // hardcoded fallback
   // Strip any trailing slash
   raw = raw.replace(/\/+$/, '');
   // Add https:// if not already present
