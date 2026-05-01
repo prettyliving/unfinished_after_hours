@@ -1047,12 +1047,34 @@ document.addEventListener('DOMContentLoaded', function() {
     try { localStorage.setItem('uah_accounts', JSON.stringify(a)); } catch(e) {}
   }
   function getAccount(email) {
-    return getAccounts()[email.toLowerCase()] || null;
+    var key = email.toLowerCase().trim();
+    // Try uah_accounts first (in-session, full record)
+    var acct = getAccounts()[key] || null;
+    if (acct) return acct;
+    // Fall back to wipe-safe credential key — survives the uah_accounts wipe
+    try {
+      var credKey = 'uah_creds_' + key;
+      var creds = JSON.parse(localStorage.getItem(credKey) || 'null');
+      if (creds) {
+        // Restore into uah_accounts so subsequent calls are fast
+        var a = getAccounts();
+        a[key] = { name: creds.name || 'Friend', password: creds.password || null, profile: creds.profile || null, createdAt: creds.createdAt || Date.now() };
+        saveAccounts(a);
+        return a[key];
+      }
+    } catch(e) {}
+    return null;
   }
   function createAccount(email, password, name) {
     var a = getAccounts();
     a[email.toLowerCase()] = { name: name || 'Friend', password: password || null, profile: null, createdAt: Date.now() };
-    saveAccounts(a); return a[email.toLowerCase()];
+    saveAccounts(a);
+    // Also save credentials to a wipe-safe key so sign-in survives the uah_accounts wipe
+    try {
+      var credKey = 'uah_creds_' + email.toLowerCase().trim();
+      localStorage.setItem(credKey, JSON.stringify({ password: password || null, name: name || 'Friend', createdAt: Date.now() }));
+    } catch(e) {}
+    return a[email.toLowerCase()];
   }
   function touchLastSeen(email) {
     var a = getAccounts();
@@ -1066,7 +1088,15 @@ document.addEventListener('DOMContentLoaded', function() {
     a[email.toLowerCase()].profile = profileName;
     saveAccounts(a);
     touchLastSeen(email);
-    // Also save to a wipe-safe key so the returning gate survives the privacy wipe
+    // Keep the wipe-safe credential key in sync with profile
+    try {
+      var credKey = 'uah_creds_' + email.toLowerCase().trim();
+      var creds = JSON.parse(localStorage.getItem(credKey) || '{}');
+      creds.profile = profileName;
+      creds.name    = a[email.toLowerCase()].name || creds.name || 'Friend';
+      localStorage.setItem(credKey, JSON.stringify(creds));
+    } catch(e) {}
+    // Also save to uah_profile_ key so the returning gate survives the privacy wipe
     try {
       var safeKey = 'uah_profile_' + email.toLowerCase().trim();
       var existing = {};
