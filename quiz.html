@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <script src="mobile-nav.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -363,6 +362,7 @@
       min-height: 100vh;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 6rem 1.5rem 4rem;
+      opacity: 1;
       animation: authFadeIn .5s ease both;
     }
     @keyframes authFadeIn {
@@ -1012,14 +1012,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ══════════════════════════════════════════════════════
   // ONE-TIME DATA WIPE
-  // Clears any previously stored emails/passwords from
-  // localStorage on first visit after this deploy.
-  // The flag 'uah_wiped_v1' ensures it only runs once.
+  // Clears old-schema account records on first visit.
+  // Does NOT clear uah_last_email — needed for session restore.
   // ══════════════════════════════════════════════════════
   try {
     if (!localStorage.getItem('uah_wiped_v1')) {
       localStorage.removeItem('uah_accounts');
-      localStorage.removeItem('uah_last_email');
       localStorage.setItem('uah_wiped_v1', '1');
     }
   } catch(e) {}
