@@ -20,6 +20,20 @@
 
     /* ── Plus tier cards ── */
     .pricing-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:3.5rem; }
+    .coupon-row { margin-bottom:2rem; }
+    .coupon-wrap { display:flex; gap:.6rem; max-width:360px; margin:0 auto; }
+    .coupon-input { flex:1; background:var(--cream); border:1.5px solid rgba(59,31,58,.12); border-radius:10px; padding:.7rem 1rem; font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:300; color:var(--text); outline:none; transition:border-color .2s; letter-spacing:.06em; text-transform:uppercase; }
+    .coupon-input::placeholder { text-transform:none; letter-spacing:0; }
+    .coupon-input:focus { border-color:var(--plum-light); }
+    .coupon-input.valid   { border-color:#4a8f63; background:rgba(123,174,142,.07); }
+    .coupon-input.invalid { border-color:rgba(200,60,60,.4); background:rgba(200,60,60,.04); }
+    .coupon-apply { background:var(--plum); color:rgba(250,247,242,.9); border:none; border-radius:10px; padding:.7rem 1.1rem; font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:400; cursor:pointer; transition:background .2s; white-space:nowrap; }
+    .coupon-apply:hover { background:var(--plum-mid); }
+    .coupon-msg { text-align:center; font-size:.78rem; margin-top:.5rem; min-height:1.1rem; font-weight:400; }
+    .coupon-msg.valid   { color:#4a8f63; }
+    .coupon-msg.invalid { color:rgba(180,50,50,.8); }
+    .discount-badge { display:none; text-align:center; background:rgba(74,143,99,.1); border:1px solid rgba(74,143,99,.25); border-radius:100px; padding:.35rem 1rem; font-size:.78rem; color:#4a8f63; font-weight:500; margin:.6rem auto 0; width:fit-content; }
+    .discount-badge.show { display:block; }
     .pricing-card {
       border-radius:18px; padding:2.4rem 2rem;
       border:1.5px solid rgba(59,31,58,.1); background:var(--cream);
@@ -221,7 +235,7 @@
             <li>All theme packs included</li>
             <li>Mood &amp; energy tracking (no streaks)</li>
           </ul>
-          <button class="btn-upgrade primary" onclick="buyPlusMonthly()">Start After Hours+</button>
+          <button class="btn-upgrade primary" onclick="buyPlusMonthly(getAppliedCoupon())">Start After Hours+</button>
         </div>
         <div class="pricing-card featured">
           <div class="pricing-badge">Best value</div>
@@ -234,9 +248,19 @@
             <li>Early access to new features</li>
             <li>Priority support</li>
           </ul>
-          <button class="btn-upgrade secondary" onclick="buyPlusYearly()">Get yearly access</button>
+          <button class="btn-upgrade secondary" onclick="buyPlusYearly(getAppliedCoupon())">Get yearly access</button>
         </div>
       </div>
+      <!-- Coupon code field -->
+      <div class="coupon-row">
+        <div class="coupon-wrap">
+          <input class="coupon-input" type="text" id="couponInput" placeholder="Have a coupon code?" maxlength="50" autocomplete="off" spellcheck="false" />
+          <button class="coupon-apply" id="couponApply">Apply</button>
+        </div>
+        <div class="coupon-msg" id="couponMsg"></div>
+        <div class="discount-badge" id="discountBadge"></div>
+      </div>
+
       <p style="text-align:center;font-size:.78rem;color:var(--muted);margin-bottom:3.5rem;">Free tier always available. No credit card required to start.</p>
 
       <!-- Digital Toolkits -->
@@ -343,7 +367,62 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Hide upgrade pricing if already a Plus member
+  // ── Coupon gate ────────────────────────────────────────────────
+  // Add your valid coupon codes here. Each entry maps a code
+  // (uppercase) to its Stripe Coupon ID and a display label.
+  // The user must enter the code to get the discount.
+  // Create coupon IDs in Stripe Dashboard → Coupons.
+  var VALID_COUPONS = {
+    // 'CODE':    { stripeId: 'STRIPE_COUPON_ID', label: 'X% off' }
+    // Example:
+    // 'WELCOME20': { stripeId: 'coupon_abc123', label: '20% off' },
+    // 'FRIEND50':  { stripeId: 'coupon_def456', label: '50% off first month' },
+  };
+
+  var appliedCouponId = '';   // the Stripe coupon ID to pass at checkout
+
+  window.getAppliedCoupon = function() { return appliedCouponId; };
+
+  var couponInput = document.getElementById('couponInput');
+  var couponApply = document.getElementById('couponApply');
+  var couponMsg   = document.getElementById('couponMsg');
+  var discountBadge = document.getElementById('discountBadge');
+
+  function applyCode() {
+    var code = (couponInput.value || '').trim().toUpperCase();
+    if (!code) return;
+
+    var match = VALID_COUPONS[code];
+    if (match) {
+      appliedCouponId = match.stripeId;
+      couponInput.classList.add('valid');
+      couponInput.classList.remove('invalid');
+      couponMsg.textContent = 'Code applied!';
+      couponMsg.className = 'coupon-msg valid';
+      discountBadge.textContent = match.label + ' applied';
+      discountBadge.classList.add('show');
+    } else {
+      appliedCouponId = '';
+      couponInput.classList.add('invalid');
+      couponInput.classList.remove('valid');
+      couponMsg.textContent = 'That code isn't valid.';
+      couponMsg.className = 'coupon-msg invalid';
+      discountBadge.classList.remove('show');
+    }
+  }
+
+  if (couponApply) couponApply.addEventListener('click', applyCode);
+  if (couponInput) couponInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') applyCode();
+    // Clear error state on typing
+    if (couponInput.classList.contains('invalid')) {
+      couponInput.classList.remove('invalid');
+      couponMsg.textContent = '';
+      couponMsg.className = 'coupon-msg';
+    }
+  });
+
+  // ── Hide upgrade pricing if already a Plus member
   if (isPlus) {
     var hero = document.querySelector('.upgrade-hero');
     if (hero) {
