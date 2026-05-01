@@ -68,6 +68,14 @@
     .send-btn:hover{background:var(--coral-hover);transform:scale(1.05)}
     .input-hint{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem 0 0}
     @media(max-width:768px){.chat-sidebar{display:none}.msg{padding:.5rem 1.2rem}.tool-suggest{padding:0 1.2rem}.input-area{padding:1rem 1.2rem}.typing{padding:.5rem 1.2rem}}
+    @media(max-width:480px){
+      .msg{padding:.5rem .9rem}
+      .input-area{padding:.8rem .9rem;gap:.6rem}
+      .chat-input{font-size:.85rem;padding:.7rem .9rem}
+      .send-btn{width:40px;height:40px}
+      .msg-bubble{font-size:.88rem;padding:.75rem 1rem}
+      .safety-card{padding:0 .9rem}
+    }
     .safety-card{margin:.5rem auto 1rem;width:100%;max-width:720px;padding:0 2.5rem;box-sizing:border-box}
     .safety-card-inner{background:linear-gradient(135deg,rgba(59,31,58,.06),rgba(232,112,90,.06));border:1.5px solid rgba(59,31,58,.15);border-radius:14px;padding:1.4rem 1.5rem}
     .safety-card-title{font-size:.9rem;font-weight:500;color:var(--plum);margin-bottom:.6rem}

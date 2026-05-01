@@ -573,12 +573,24 @@
       .prob-col--arrow { border: none; border-top: 1px solid rgba(59,31,58,.07); border-bottom: 1px solid rgba(59,31,58,.07); padding: 1.2rem 2rem; }
       .how-steps { grid-template-columns: 1fr; }
       .t-grid { grid-template-columns: 1fr; }
+      .prob-col { padding: 2rem 1.8rem; }
     }
 
     @media (max-width: 640px) {
       .nav-links { display: none; }
       .hero-ctas { flex-direction: column; align-items: center; }
       footer { flex-direction: column; gap: .5rem; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      nav { padding: 1rem 5vw; }
+      .hero { padding: 6rem 5vw 4rem; }
+      .hero-ctas { width: 100%; }
+      .hero-ctas a, .hero-ctas button { width: 100%; justify-content: center; }
+      .prob-col { padding: 1.5rem 1.2rem; }
+      .how-step { padding: 1.8rem 1.5rem; }
+      .t-card { padding: 1.5rem 1.3rem; }
+      section { padding: 4rem 5vw !important; }
     }
   
     /* ── HERO TAGS (blush pills) ── */
