@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bundle: All 3 Kits — Unfinished, After Hours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text)}
+    .kit-wrap{max-width:680px;margin:0 auto;padding:4rem 2rem 6rem}
+    .kit-eyebrow{font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);font-weight:500;margin-bottom:1rem}
+    .kit-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3rem);font-weight:400;color:var(--plum);line-height:1.15;margin-bottom:1.2rem}
+    .kit-tagline{font-size:1.05rem;color:var(--text-soft);font-weight:300;line-height:1.7;margin-bottom:2.5rem;max-width:520px}
+    .kit-divider{height:1px;background:rgba(59,31,58,.1);margin:2.5rem 0}
+    .kit-section-label{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:1.2rem}
+    .kit-includes{display:flex;flex-direction:column;gap:.75rem;margin-bottom:2.5rem}
+    .kit-item{display:flex;align-items:flex-start;gap:.9rem;padding:1rem 1.2rem;background:var(--cream);border:1px solid rgba(59,31,58,.08);border-radius:12px}
+    .kit-item-icon{font-size:1.1rem;flex-shrink:0;margin-top:.05rem}
+    .kit-item-text{font-size:.88rem;color:var(--text-soft);font-weight:300;line-height:1.6}
+    .kit-item-text strong{color:var(--plum);font-weight:500;display:block;margin-bottom:.15rem}
+    .kit-item-text .kit-item-price{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+    .savings-badge{display:inline-block;background:rgba(74,143,99,.1);border:1px solid rgba(74,143,99,.25);border-radius:100px;padding:.35rem 1rem;font-size:.78rem;color:#4a8f63;font-weight:500;margin-bottom:2rem}
+    .kit-buy-box{background:rgba(232,112,90,.05);border:1.5px solid rgba(232,112,90,.18);border-radius:16px;padding:1.8rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+    .kit-price-block .kit-price{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:400;color:var(--plum);line-height:1}
+    .kit-price-block .kit-price-was{font-size:.82rem;color:var(--muted);font-weight:300;text-decoration:line-through;margin-top:.1rem}
+    .kit-price-block .kit-price-note{font-size:.78rem;color:var(--muted);font-weight:300;margin-top:.2rem}
+    .kit-buy-btn{background:var(--coral);color:#fff;border:none;border-radius:100px;padding:.85rem 2rem;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .kit-buy-btn:hover{background:var(--coral-hover)}
+    .kit-buy-btn:disabled{opacity:.6;cursor:default}
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);text-decoration:none;margin-bottom:2.5rem;transition:color .2s}
+    .back-link:hover{color:var(--plum)}
+    .individual-links{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem}
+    .individual-link{font-size:.75rem;color:var(--muted);text-decoration:none;border:1px solid rgba(59,31,58,.12);border-radius:100px;padding:.3rem .8rem;transition:border-color .2s,color .2s}
+    .individual-link:hover{border-color:var(--plum);color:var(--plum)}
+  </style>
+</head>
+<body>
+<div class="kit-wrap">
+  <a class="back-link" href="upgrade.html">← Back to all products</a>
+  <p class="kit-eyebrow">Bundle · All 3 kits · Save $9</p>
+  <h1 class="kit-title">Everything,<br><em>for when you need it.</em></h1>
+  <p class="kit-tagline">All three digital toolkits in one. For different seasons, different kinds of tired, different versions of the same problem.</p>
+
+  <div class="savings-badge">✓ Save $9 vs buying individually</div>
+
+  <div class="kit-divider"></div>
+
+  <p class="kit-section-label">What's included</p>
+  <div class="kit-includes">
+    <div class="kit-item">
+      <div class="kit-item-icon">🪬</div>
+      <div class="kit-item-text">
+        <strong>Productivity Guilt Survival Kit</strong>
+        5–7 exercises, 10 prompts, and a soft reset plan for the guilt that never quite goes away.
+        <div class="kit-item-price">$7 individually</div>
+      </div>
+    </div>
+    <div class="kit-item">
+      <div class="kit-item-icon">🌊</div>
+      <div class="kit-item-text">
+        <strong>Deadline Season Mode</strong>
+        Body resets, planning prompts, and permission tools for getting through crunch time without collapsing after.
+        <div class="kit-item-price">$10 individually</div>
+      </div>
+    </div>
+    <div class="kit-item">
+      <div class="kit-item-icon">🪨</div>
+      <div class="kit-item-text">
+        <strong>The Burnout Plateau</strong>
+        Deep, slow, deliberate tools for when you've been tired so long that tired doesn't feel like anything anymore.
+        <div class="kit-item-price">$12 individually</div>
+      </div>
+    </div>
+    <div class="kit-item">
+      <div class="kit-item-icon">📄</div>
+      <div class="kit-item-text">
+        <strong>Three standalone PDFs</strong>
+        All downloadable. All yours to keep. Work outside the app, no login needed.
+      </div>
+    </div>
+  </div>
+
+  <div class="kit-buy-box">
+    <div class="kit-price-block">
+      <div class="kit-price">$20</div>
+      <div class="kit-price-was">$29 individually</div>
+      <div class="kit-price-note">One-time · All 3 kits · Instant access</div>
+    </div>
+    <button class="kit-buy-btn" id="buyBtn">Get the bundle →</button>
+  </div>
+
+  <div class="individual-links">
+    <span style="font-size:.75rem;color:var(--muted);font-weight:300;line-height:2">Or buy individually:</span>
+    <a class="individual-link" href="kit-guilt.html">Guilt Kit $7</a>
+    <a class="individual-link" href="kit-deadline.html">Deadline Mode $10</a>
+    <a class="individual-link" href="kit-plateau.html">Burnout Plateau $12</a>
+  </div>
+</div>
+<script src="main.js"></script>
+<script src="stripe.js"></script>
+<script>
+  document.getElementById('buyBtn').addEventListener('click', function() {
+    this.textContent = 'Loading…';
+    this.disabled = true;
+    buyBundleKits('');
+  });
+</script>
+</body>
+</html>

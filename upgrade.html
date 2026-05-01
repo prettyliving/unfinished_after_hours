@@ -232,7 +232,6 @@
             <li>Full journaling vault — all prompts</li>
             <li>Advanced soft to-do (unlimited tasks)</li>
             <li>Export transcripts &amp; journal entries as PDF</li>
-            <li>All theme packs included</li>
             <li>Mood &amp; energy tracking (no streaks)</li>
           </ul>
           <button class="btn-upgrade primary" onclick="buyPlusMonthly(getAppliedCoupon())">Start After Hours+</button>
@@ -274,25 +273,25 @@
             <div class="product-name">Productivity Guilt Survival Kit</div>
             <div class="product-desc">5–7 guided exercises + 10 prompts + a soft reset plan for the guilt that never quite goes away.</div>
             <div class="product-price">$7</div>
-            <button class="btn-buy" onclick="buyKitGuilt()">Get this kit →</button>
+            <button class="btn-buy" onclick="location.href='kit-guilt.html'">Get this kit →</button>
           </div>
           <div class="product-card">
             <div class="product-icon">🌊</div>
             <div class="product-name">Deadline Season Mode</div>
             <div class="product-desc">A gentler way through crunch time — without collapsing after. Includes body resets, planning prompts, and permission tools.</div>
             <div class="product-price">$10</div>
-            <button class="btn-buy" onclick="buyKitDeadline()">Get this kit →</button>
+            <button class="btn-buy" onclick="location.href='kit-deadline.html'">Get this kit →</button>
           </div>
           <div class="product-card">
             <div class="product-icon">🪨</div>
             <div class="product-name">The Burnout Plateau</div>
             <div class="product-desc">For when you've been tired for so long that tired doesn't even feel like anything anymore. Deep, slow, deliberate tools.</div>
             <div class="product-price">$12</div>
-            <button class="btn-buy" onclick="buyKitPlateau()">Get this kit →</button>
+            <button class="btn-buy" onclick="location.href='kit-plateau.html'">Get this kit →</button>
           </div>
         </div>
         <div style="text-align:center;margin-top:1.2rem;">
-          <button class="btn-buy" style="font-size:.82rem;padding:.65rem 1.6rem;" onclick="buyBundleKits()">
+          <button class="btn-buy" style="font-size:.82rem;padding:.65rem 1.6rem;" onclick="location.href='kit-bundle.html'">
             Bundle all three — $20 (save $9) →
           </button>
         </div>
@@ -309,9 +308,9 @@
               <div class="pack-name">🎨 Theme Packs</div>
               <div class="pack-desc">Midnight Static · Soft Neutral · Dark Academia Burnout · and more</div>
             </div>
-            <div class="pack-right">
-              <div class="pack-price">$3–5</div>
-              <button class="btn-buy" onclick="buyThemePack()">Browse →</button>
+            <div class="pack-right" id="theme-pack-action">
+              <div class="pack-price">$4</div>
+              <button class="btn-buy" onclick="buyThemePack(getAppliedCoupon())">Buy →</button>
             </div>
           </div>
           <div class="pack-card">
@@ -319,9 +318,9 @@
               <div class="pack-name">🎧 Audio Packs</div>
               <div class="pack-desc">Enough for Today · Stop Optimizing Your Rest · Quiet Mornings</div>
             </div>
-            <div class="pack-right">
-              <div class="pack-price">$4–6</div>
-              <button class="btn-buy" onclick="buyAudioPack()">Browse →</button>
+            <div class="pack-right" id="audio-pack-action">
+              <div class="pack-price">$5</div>
+              <button class="btn-buy" onclick="buyAudioPack(getAppliedCoupon())">Buy →</button>
             </div>
           </div>
         </div>
@@ -420,6 +419,14 @@ document.addEventListener('DOMContentLoaded', function() {
       couponMsg.className = 'coupon-msg';
     }
   });
+
+  // ── Mark theme/audio packs as included if Plus ──
+  if (isPlus) {
+    ['theme-pack-action', 'audio-pack-action'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<span style="font-size:.75rem;font-weight:500;color:#4a8f63;background:rgba(74,143,99,.1);border:1px solid rgba(74,143,99,.25);border-radius:100px;padding:.3rem .8rem;">✓ Included with Plus</span>';
+    });
+  }
 
   // ── Hide upgrade pricing if already a Plus member
   if (isPlus) {
