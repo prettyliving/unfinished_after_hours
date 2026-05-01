@@ -1173,22 +1173,31 @@ document.addEventListener('DOMContentLoaded', function() {
     var fresh = getAccount(email);
 
     // If the account has no profile (e.g. after a privacy wipe),
-    // check the wipe-safe profile key before assuming they are new
+    // check wipe-safe keys before assuming they are new user
     if (fresh && !fresh.profile) {
       try {
+        // 1. Check email-keyed profile
         var safeKey = 'uah_profile_' + email.toLowerCase().trim();
-        var saved = JSON.parse(localStorage.getItem(safeKey) || '{}');
+        var saved = JSON.parse(localStorage.getItem(safeKey) || 'null');
+        // 2. Fallback: last-saved profile (no-email path)
+        if (!saved || !saved.profile) {
+          saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null');
+        }
         if (saved && saved.profile) {
-          fresh.profile = saved.profile;
+          fresh.profile    = saved.profile;
+          fresh.swatches   = saved.swatches   || fresh.swatches;
+          fresh.avoidColor = saved.avoidColor  || fresh.avoidColor;
           if (saved.name && !fresh.name) fresh.name = saved.name;
-          // Restore into accounts so future reads are fast
+          // Write back to accounts so future reads skip this fallback
           var a = getAccounts();
           if (a[email.toLowerCase()]) {
-            a[email.toLowerCase()].profile = saved.profile;
+            a[email.toLowerCase()].profile    = fresh.profile;
+            a[email.toLowerCase()].swatches   = fresh.swatches;
+            a[email.toLowerCase()].avoidColor = fresh.avoidColor;
             saveAccounts(a);
           }
         }
-      } catch(e) {}
+      } catch(e) { console.error('Profile restore error:', e); }
     }
 
     setSession({
@@ -1520,24 +1529,41 @@ document.addEventListener('DOMContentLoaded', function() {
     el('resultScreen').classList.add('active');
 
     // Save to session + localStorage
+    var avoidHex = colorAvoided ? (colorAvoided.dataset.hex || colorAvoided.style.background || null) : null;
     try {
       var u = JSON.parse(sessionStorage.getItem('uah_user') || '{}');
       u.profile         = p.name;
       u.profileComplete = true;
       u.swatches        = swatches;
-      u.avoidColor      = colorAvoided ? (colorAvoided.dataset.hex || colorAvoided.style.background) : null;
+      u.avoidColor      = avoidHex;
       setSession(u);
-      if (u.email) {
-        persistProfile(u.email, p.name);
-        // Also persist swatches + avoidColor so the theme survives future logins
-        var accts = getAccounts();
-        if (accts[u.email.toLowerCase()]) {
-          accts[u.email.toLowerCase()].swatches   = u.swatches;
-          accts[u.email.toLowerCase()].avoidColor = u.avoidColor;
-          saveAccounts(accts);
-        }
+
+      // Save profile directly to uah_accounts by email
+      var allAccts = getAccounts();
+      var emailKey = u.email ? u.email.toLowerCase().trim() : null;
+      if (emailKey && allAccts[emailKey]) {
+        allAccts[emailKey].profile    = p.name;
+        allAccts[emailKey].swatches   = swatches;
+        allAccts[emailKey].avoidColor = avoidHex;
+        saveAccounts(allAccts);
       }
-    } catch(e) {}
+
+      // Also save to wipe-safe key — keyed by email
+      if (emailKey) {
+        localStorage.setItem('uah_profile_' + emailKey, JSON.stringify({
+          profile: p.name, name: u.name || '', swatches: swatches,
+          avoidColor: avoidHex, savedAt: Date.now()
+        }));
+      }
+
+      // Fallback: save to a no-email key so even quiz-without-account users
+      // get the returning gate on next visit
+      localStorage.setItem('uah_last_profile', JSON.stringify({
+        profile: p.name, name: u.name || '', swatches: swatches,
+        avoidColor: avoidHex, savedAt: Date.now()
+      }));
+
+    } catch(e) { console.error('Profile save error:', e); }
   }
 
   window.showResult = showOnboardingResult;
