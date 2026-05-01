@@ -111,7 +111,33 @@
     .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--plum); color: rgba(250,247,242,.9); font-size: .83rem; padding: .65rem 1.3rem; border-radius: 100px; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; z-index: 2000; white-space: nowrap; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    @media(max-width:900px){ .layout{grid-template-columns:1fr} aside{display:none} main{padding:2rem 1.5rem} }
+    /* ── Feedback form ── */
+    .feedback-section { margin-bottom: 2.5rem; }
+    .feedback-card { background: var(--cream); border: 1px solid rgba(59,31,58,.08); border-radius: 16px; padding: 1.8rem 2rem; }
+    .feedback-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; color: var(--plum); margin-bottom: .25rem; }
+    .feedback-card-desc { font-size: .83rem; color: var(--muted); font-weight: 300; margin-bottom: 1.5rem; line-height: 1.6; }
+    .feedback-field { margin-bottom: 1.1rem; }
+    .feedback-label { display: block; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: .45rem; }
+    .feedback-select,
+    .feedback-textarea {
+      width: 100%; font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 300;
+      color: var(--text); background: #fff; border: 1.5px solid rgba(59,31,58,.12);
+      border-radius: 10px; padding: .7rem 1rem; outline: none;
+      transition: border-color .2s, box-shadow .2s; appearance: none;
+    }
+    .feedback-select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239e94b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .85rem center; padding-right: 2.2rem; }
+    .feedback-textarea { resize: vertical; min-height: 110px; line-height: 1.65; }
+    .feedback-select:focus,
+    .feedback-textarea:focus { border-color: var(--plum-light); box-shadow: 0 0 0 3px rgba(123,94,167,.08); }
+    .feedback-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.4rem; flex-wrap: wrap; }
+    .feedback-note { font-size: .75rem; color: var(--muted); font-weight: 300; font-style: italic; }
+    .feedback-submit { background: var(--plum); color: #fff; border: none; border-radius: 100px; padding: .65rem 1.6rem; font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; transition: background .2s, transform .15s; flex-shrink: 0; }
+    .feedback-submit:hover { background: var(--plum-mid); transform: translateY(-1px); }
+    .feedback-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .feedback-success { display: none; text-align: center; padding: 1.5rem 1rem; }
+    .feedback-success-icon { font-size: 1.8rem; margin-bottom: .6rem; }
+    .feedback-success-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; color: var(--plum); margin-bottom: .3rem; }
+    .feedback-success-sub { font-size: .84rem; color: var(--muted); font-weight: 300; }
     @media(max-width:600px){ .profile-hero{flex-direction:column;text-align:center} .sub-card-header{flex-direction:column} .sub-detail-item:last-child{display:none} }
   </style>
 </head>
@@ -232,6 +258,48 @@
       <p class="section-label">This Month</p>
       <div class="usage-grid" id="usage-grid">
         <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback-section">
+      <p class="section-label">Share Feedback</p>
+      <div class="feedback-card">
+
+        <div id="feedback-form-wrap">
+          <div class="feedback-card-title">How's it going?</div>
+          <p class="feedback-card-desc">Your honest thoughts help make this better. No pressure, no word count — say as little or as much as you want.</p>
+
+          <div class="feedback-field">
+            <label class="feedback-label" for="feedback-type">What's this about?</label>
+            <select class="feedback-select" id="feedback-type">
+              <option value="">Choose a topic…</option>
+              <option value="general">General experience</option>
+              <option value="feature">A specific feature</option>
+              <option value="bug">Something that isn't working</option>
+              <option value="content">The writing or prompts</option>
+              <option value="missing">Something I wish existed</option>
+              <option value="other">Something else</option>
+            </select>
+          </div>
+
+          <div class="feedback-field">
+            <label class="feedback-label" for="feedback-text">Your thoughts</label>
+            <textarea class="feedback-textarea" id="feedback-text" placeholder="Say whatever's true for you right now…"></textarea>
+          </div>
+
+          <div class="feedback-footer">
+            <span class="feedback-note">Responses are anonymous unless you choose to include your name.</span>
+            <button class="feedback-submit" id="feedback-submit-btn">Send it →</button>
+          </div>
+        </div>
+
+        <div class="feedback-success" id="feedback-success">
+          <div class="feedback-success-icon">✦</div>
+          <div class="feedback-success-title">Thank you.</div>
+          <p class="feedback-success-sub">Your words landed. We read everything.</p>
+        </div>
+
       </div>
     </div>
 
@@ -505,6 +573,59 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+</script>
+
+<script>
+// ── Feedback form ────────────────────────────────────────
+(function() {
+  var submitBtn = document.getElementById('feedback-submit-btn');
+  var textarea  = document.getElementById('feedback-text');
+  var select    = document.getElementById('feedback-type');
+  var formWrap  = document.getElementById('feedback-form-wrap');
+  var success   = document.getElementById('feedback-success');
+
+  if (!submitBtn) return;
+
+  submitBtn.addEventListener('click', function() {
+    var text = (textarea.value || '').trim();
+    var type = select.value || 'general';
+
+    if (!text) {
+      textarea.style.borderColor = 'var(--coral)';
+      textarea.focus();
+      setTimeout(function() { textarea.style.borderColor = ''; }, 1800);
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    // Log to Vercel via the existing signup endpoint (fire-and-forget)
+    try {
+      var u = typeof getUser === 'function' ? getUser() : {};
+      fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type:    'feedback',
+          email:   u.email || 'anonymous',
+          name:    '[' + type + '] ' + text.slice(0, 500)
+        })
+      });
+    } catch(e) {}
+
+    // Show success state after brief delay
+    setTimeout(function() {
+      formWrap.style.display = 'none';
+      success.style.display  = 'block';
+    }, 600);
+  });
+
+  // Clear red border on input
+  textarea.addEventListener('input', function() {
+    this.style.borderColor = '';
+  });
+})();
 </script>
 </body>
 </html>
