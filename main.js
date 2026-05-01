@@ -13,7 +13,7 @@
   var toRemove = [];
   for (var i = 0; i < localStorage.length; i++) {
     var k = localStorage.key(i);
-    if (k && (k === 'uah_accounts' || k === 'uah_last_email')) {
+    if (k && (k === 'uah_accounts' || k === 'uah_last_email' || k === 'uah_plus')) {
       toRemove.push(k);
     }
   }
@@ -45,13 +45,14 @@ function getUser() {
   var u = {};
   try { u = JSON.parse(sessionStorage.getItem('uah_user') || '{}'); } catch(e) {}
   // Restore Plus status from localStorage if session was lost (e.g. after Stripe redirect)
-  if (!u.plus) {
+  // Keyed by email so Plus only applies to the account that paid — not the whole browser
+  if (!u.plus && u.email) {
     try {
-      var plusData = JSON.parse(localStorage.getItem('uah_plus') || '{}');
+      var key = 'uah_plus_' + u.email.toLowerCase().trim();
+      var plusData = JSON.parse(localStorage.getItem(key) || '{}');
       if (plusData && plusData.plus) {
         u.plus = true;
         u.plusActivatedAt = plusData.activatedAt;
-        // Write back to session so subsequent calls are fast
         try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {}
       }
     } catch(e) {}

@@ -104,8 +104,14 @@ function activatePlusMembership() {
   u.plusActivatedAt = Date.now();
   // Save to sessionStorage (current tab)
   if (typeof setUser === 'function') setUser(u);
-  // Also persist to localStorage so Plus status survives tab close / Stripe redirect
+  // Persist Plus to localStorage keyed by email — so only the paying account gets Plus
+  // If no email (quiz-only user), fall back to a session-only flag
   try {
-    localStorage.setItem('uah_plus', JSON.stringify({ plus: true, activatedAt: u.plusActivatedAt }));
+    if (u.email) {
+      var key = 'uah_plus_' + u.email.toLowerCase().trim();
+      localStorage.setItem(key, JSON.stringify({ plus: true, activatedAt: u.plusActivatedAt }));
+    }
+    // Also clear any old unkeyed uah_plus so it doesn't bleed across accounts
+    localStorage.removeItem('uah_plus');
   } catch(e) {}
 }
