@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Theme Test — Unfinished, After Hours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Theme definitions ── */
+    /* Each theme sets these 8 CSS vars + sidebar/bg */
+    :root {
+      --plum:        #3B1F3A;
+      --plum-mid:    #5a2f58;
+      --plum-light:  #7a4a78;
+      --coral:       #E8705A;
+      --coral-hover: #d45e48;
+      --warm-white:  #FAF7F2;
+      --cream:       #F5F1EB;
+      --muted:       #9B8A9A;
+      --text:        #2d1e2c;
+      --text-soft:   #5a4058;
+      --sidebar-bg:  #3B1F3A;
+      --sidebar-text:rgba(250,247,242,.6);
+      --card-border: rgba(59,31,58,.08);
+      transition: background .35s, color .35s;
+    }
+
+    /* ── Midnight Static ── */
+    [data-theme="midnight"] {
+      --plum:        #c8c0f0;   /* light lavender — readable on dark bg */
+      --plum-mid:    #a898e0;
+      --plum-light:  #9080d0;
+      --coral:       #a090e8;   /* soft violet accent */
+      --coral-hover: #8878d4;
+      --warm-white:  #0d0d1a;   /* page background — very dark navy */
+      --cream:       #161528;   /* card background — slightly lighter */
+      --muted:       #9890c0;   /* muted text — bright enough to read */
+      --text:        #f0eeff;   /* primary text — near white with blue tint */
+      --text-soft:   #ccc4f0;   /* body text — light lavender */
+      --sidebar-bg:  #09091a;
+      --sidebar-text:rgba(200,192,240,.75);  /* much more legible */
+      --card-border: rgba(160,144,232,.18);
+    }
+    /* ── Soft Neutral ── */
+    [data-theme="neutral"] {
+      --plum:        #5c4a3a;
+      --plum-mid:    #7a6450;
+      --plum-light:  #9a8470;
+      --coral:       #c4845a;
+      --coral-hover: #b07248;
+      --warm-white:  #f5f0ea;
+      --cream:       #ede8e0;
+      --muted:       #a09080;
+      --text:        #3a2e24;
+      --text-soft:   #6a5848;
+      --sidebar-bg:  #4a3a2c;
+      --sidebar-text:rgba(240,230,215,.6);
+      --card-border: rgba(92,74,58,.08);
+    }
+    /* ── Dark Academia ── */
+    [data-theme="academia"] {
+      --plum:        #c8b87a;
+      --plum-mid:    #d4c890;
+      --plum-light:  #e0d8a8;
+      --coral:       #c47840;
+      --coral-hover: #b06830;
+      --warm-white:  #1c1a14;
+      --cream:       #242018;
+      --muted:       #7a7050;
+      --text:        #e8e0c0;
+      --text-soft:   #c0b890;
+      --sidebar-bg:  #141210;
+      --sidebar-text:rgba(200,184,122,.5);
+      --card-border: rgba(200,184,122,.1);
+    }
+    /* ── Late Dusk ── */
+    [data-theme="dusk"] {
+      --plum:        #6b3060;
+      --plum-mid:    #8a4078;
+      --plum-light:  #aa5898;
+      --coral:       #e0788a;
+      --coral-hover: #cc6478;
+      --warm-white:  #1e1020;
+      --cream:       #281428;
+      --muted:       #8a6080;
+      --text:        #f0d8e8;
+      --text-soft:   #d4a8c4;
+      --sidebar-bg:  #150c18;
+      --sidebar-text:rgba(220,160,200,.55);
+      --card-border: rgba(107,48,96,.2);
+    }
+    /* ── Overgrown ── */
+    [data-theme="moss"] {
+      --plum:        #2a4a28;
+      --plum-mid:    #3a6438;
+      --plum-light:  #4e8048;
+      --coral:       #8ab860;
+      --coral-hover: #78a450;
+      --warm-white:  #111a10;
+      --cream:       #182018;
+      --muted:       #608060;
+      --text:        #d4e8c8;
+      --text-soft:   #a4c890;
+      --sidebar-bg:  #0c1208;
+      --sidebar-text:rgba(140,184,96,.55);
+      --card-border: rgba(42,74,40,.25);
+    }
+    /* ── Ash ── */
+    [data-theme="ash"] {
+      --plum:        #c0c0c0;
+      --plum-mid:    #a8a8a8;
+      --plum-light:  #909090;
+      --coral:       #909090;
+      --coral-hover: #787878;
+      --warm-white:  #1a1a1a;
+      --cream:       #222222;
+      --muted:       #686868;
+      --text:        #e8e8e8;
+      --text-soft:   #b8b8b8;
+      --sidebar-bg:  #111111;
+      --sidebar-text:rgba(180,180,180,.5);
+      --card-border: rgba(255,255,255,.06);
+    }
+
+    /* ── Layout ── */
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--warm-white);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background .35s, color .35s;
+    }
+
+    /* ── Theme switcher bar ── */
+    .switcher {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(0,0,0,.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; align-items: center; gap: .6rem;
+      padding: .7rem 1.4rem;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .switcher-label {
+      font-size: .65rem; letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(255,255,255,.4); font-weight: 500; margin-right: .4rem; white-space: nowrap;
+    }
+    .theme-btn {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .38rem .85rem; border-radius: 100px; border: 1.5px solid transparent;
+      font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 400;
+      cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    .theme-btn .swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .theme-btn.active { border-color: rgba(255,255,255,.5); color: #fff; }
+    .theme-btn:not(.active) { color: rgba(255,255,255,.45); border-color: rgba(255,255,255,.1); background: transparent; }
+    .theme-btn:not(.active):hover { border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.75); }
+
+    /* swatches per theme */
+    .theme-btn[data-t="default"] .swatch { background: #3B1F3A; }
+    .theme-btn[data-t="midnight"] .swatch { background: #7c6fc4; }
+    .theme-btn[data-t="neutral"]  .swatch { background: #c4845a; }
+    .theme-btn[data-t="academia"] .swatch { background: #c8b87a; }
+    .theme-btn[data-t="dusk"]     .swatch { background: #e0788a; }
+    .theme-btn[data-t="moss"]     .swatch { background: #8ab860; }
+    .theme-btn[data-t="ash"]      .swatch { background: #909090; }
+
+    /* ── App layout ── */
+    .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; padding-top: 46px; }
+
+    /* ── Sidebar ── */
+    aside {
+      background: var(--sidebar-bg);
+      padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 2rem;
+      position: sticky; top: 46px; height: calc(100vh - 46px);
+      overflow-y: auto;
+      transition: background .35s;
+    }
+    .aside-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; font-weight: 500;
+      color: rgba(250,247,242,.85); text-decoration: none; line-height: 1.3;
+    }
+    .nav-section { display: flex; flex-direction: column; gap: .3rem; }
+    .nav-section-label {
+      font-size: .6rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--sidebar-text); opacity: .55;
+      padding: .5rem .6rem .3rem; font-weight: 500;
+    }
+    .nav-link {
+      display: flex; align-items: center; gap: .7rem; padding: .6rem .8rem;
+      border-radius: 8px; font-size: .85rem; color: var(--sidebar-text);
+      text-decoration: none; transition: background .2s, color .2s; font-weight: 300; cursor: pointer;
+    }
+    .nav-link:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.9); }
+    .nav-link.active { background: rgba(255,255,255,.12); color: rgba(255,255,255,1); font-weight: 400; }
+    .nav-link svg { opacity: .7; flex-shrink: 0; }
+    .nav-link.active svg { opacity: 1; }
+    .nav-link.upgrade-link {
+      color: var(--coral); border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.05); margin-top: .4rem; opacity: .9;
+    }
+    .aside-bottom { margin-top: auto; display: flex; flex-direction: column; gap: .35rem; }
+    .profile-pill {
+      display: flex; align-items: center; gap: .7rem; padding: .7rem .8rem;
+      border-radius: 10px; background: rgba(255,255,255,.07);
+    }
+    .profile-avatar {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--coral);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 500; color: #fff; flex-shrink: 0;
+      transition: background .35s;
+    }
+    .profile-name { font-size: .82rem; color: rgba(255,255,255,.7); font-weight: 300; }
+    .profile-tag { font-size: .68rem; color: var(--sidebar-text); letter-spacing: .04em; }
+
+    /* ── Main content ── */
+    main { padding: 3rem 3.5rem; overflow-y: auto; transition: background .35s; }
+
+    .page-header { margin-bottom: 2.5rem; }
+    .page-eyebrow {
+      font-size: .65rem; letter-spacing: .16em; text-transform: uppercase;
+      color: var(--coral); font-weight: 500; margin-bottom: .5rem;
+      transition: color .35s;
+    }
+    .page-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 400;
+      color: var(--plum); line-height: 1.2;
+      transition: color .35s;
+    }
+    .page-sub { font-size: .88rem; color: var(--muted); font-weight: 300; margin-top: .4rem; transition: color .35s; }
+
+    /* ── Cards grid ── */
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--cream); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 1.3rem 1.4rem;
+      transition: background .35s, border-color .35s;
+    }
+    .stat-label {
+      font-size: .65rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); font-weight: 500; margin-bottom: .6rem;
+      transition: color .35s;
+    }
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 400;
+      color: var(--plum); line-height: 1;
+      transition: color .35s;
+    }
+    .stat-sub { font-size: .75rem; color: var(--muted); font-weight: 300; margin-top: .3rem; transition: color .35s; }
+
+    /* ── Tools grid ── */
+    .tools-label {
+      font-size: .65rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted); font-weight: 500; margin-bottom: 1rem;
+      transition: color .35s;
+    }
+    .tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .85rem; margin-bottom: 2rem; }
+    .tool-card {
+      background: var(--cream); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 1.4rem 1.5rem;
+      cursor: pointer; transition: background .35s, border-color .2s, transform .15s;
+      display: flex; flex-direction: column; gap: .6rem;
+    }
+    .tool-card:hover { border-color: var(--plum-light); transform: translateY(-2px); }
+    .tool-card-icon { font-size: 1.3rem; }
+    .tool-card-name {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
+      font-weight: 400; color: var(--plum);
+      transition: color .35s;
+    }
+    .tool-card-desc { font-size: .8rem; color: var(--muted); font-weight: 300; line-height: 1.55; transition: color .35s; }
+    .tool-card-cta {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .72rem; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--coral); font-weight: 500; margin-top: .3rem;
+      transition: color .35s;
+    }
+
+    /* ── Profile banner ── */
+    .profile-banner {
+      background: var(--cream); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 1.4rem 1.6rem;
+      display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2rem;
+      transition: background .35s, border-color .35s;
+    }
+    .profile-banner-avatar {
+      width: 48px; height: 48px; border-radius: 50%; background: var(--coral);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: #fff; flex-shrink: 0;
+      transition: background .35s;
+    }
+    .profile-banner-label {
+      font-size: .65rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: .25rem; transition: color .35s;
+    }
+    .profile-banner-name {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
+      font-weight: 500; color: var(--plum); transition: color .35s;
+    }
+    .profile-banner-focus {
+      font-size: .78rem; color: var(--text-soft); font-weight: 300;
+      margin-top: .2rem; font-style: italic; transition: color .35s;
+    }
+
+    /* ── Conversation preview ── */
+    .convo-label { font-size: .65rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 1rem; transition: color .35s; }
+    .convo-card {
+      background: var(--cream); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 1.4rem 1.5rem; margin-bottom: 2rem;
+      transition: background .35s, border-color .35s;
+    }
+    .bubble-ai {
+      background: var(--warm-white); border: 1px solid var(--card-border);
+      border-radius: 0 12px 12px 12px; padding: .9rem 1.1rem;
+      font-size: .88rem; line-height: 1.7; color: var(--text-soft);
+      font-weight: 300; max-width: 80%; display: inline-block; margin-bottom: .75rem;
+      transition: background .35s, border-color .35s, color .35s;
+    }
+    .bubble-user-wrap { display: flex; justify-content: flex-end; }
+    .bubble-user {
+      background: var(--plum); color: rgba(255,255,255,.88);
+      border-radius: 12px 0 12px 12px; padding: .9rem 1.1rem;
+      font-size: .88rem; line-height: 1.7; font-weight: 300;
+      max-width: 75%; display: inline-block;
+      transition: background .35s;
+    }
+    .typing-row { display: flex; gap: 4px; align-items: center; padding: .6rem 0 0 0; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: pulse 1.2s infinite; transition: background .35s; }
+    .dot:nth-child(2) { animation-delay: .2s; }
+    .dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes pulse { 0%,60%,100%{opacity:.3;transform:scale(1)} 30%{opacity:1;transform:scale(1.2)} }
+
+    /* ── Input bar ── */
+    .input-bar {
+      display: flex; gap: .75rem; align-items: center;
+      background: var(--cream); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: .7rem .8rem .7rem 1.1rem; margin-top: 1rem;
+      transition: background .35s, border-color .35s;
+    }
+    .input-mock {
+      flex: 1; font-size: .88rem; color: var(--muted);
+      font-weight: 300; font-family: 'DM Sans', sans-serif; transition: color .35s;
+    }
+    .send-mock {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--coral);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: background .35s;
+    }
+
+    /* ── Theme name overlay ── */
+    .theme-name-badge {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: rgba(255,255,255,.8); font-size: .75rem; font-weight: 400;
+      padding: .5rem 1rem; border-radius: 100px;
+      letter-spacing: .04em; pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    @media(max-width:900px) { .app{grid-template-columns:1fr} aside{display:none} main{padding:2rem 1.5rem} }
+    @media(max-width:600px) { .cards-grid{grid-template-columns:1fr} .tools-grid{grid-template-columns:1fr} .switcher{gap:.4rem} .theme-btn{padding:.3rem .6rem;font-size:.68rem} }
+  </style>
+</head>
+<body>
+
+<!-- Theme switcher -->
+<div class="switcher">
+  <span class="switcher-label">Theme</span>
+  <button class="theme-btn active" data-t="default"><span class="swatch"></span>Default</button>
+  <button class="theme-btn" data-t="midnight"><span class="swatch"></span>Midnight Static</button>
+  <button class="theme-btn" data-t="neutral"><span class="swatch"></span>Soft Neutral</button>
+  <button class="theme-btn" data-t="academia"><span class="swatch"></span>Dark Academia</button>
+  <button class="theme-btn" data-t="dusk"><span class="swatch"></span>Late Dusk</button>
+  <button class="theme-btn" data-t="moss"><span class="swatch"></span>Overgrown</button>
+  <button class="theme-btn" data-t="ash"><span class="swatch"></span>Ash</button>
+</div>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside>
+    <a class="aside-logo" href="#">Unfinished,<br>After Hours</a>
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-link active" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Have a Conversation
+      </a>
+      <a class="nav-link" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Resets
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-link" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Soft To-Do
+      </a>
+      <a class="nav-link" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Journal Space
+      </a>
+      <a class="nav-link" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Unsent Letters
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Account</div>
+      <a class="nav-link upgrade-link" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        After Hours+
+      </a>
+      <a class="nav-link" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+      </a>
+    </div>
+    <div class="aside-bottom">
+      <div class="profile-pill">
+        <div class="profile-avatar">A</div>
+        <div>
+          <div class="profile-name">Alex</div>
+          <div class="profile-tag">The Over-Functioner</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+    <div class="page-header">
+      <p class="page-eyebrow">Good evening</p>
+      <h1 class="page-title">What needs space<br><em>tonight?</em></h1>
+      <p class="page-sub">No pressure. Pick whatever feels right.</p>
+    </div>
+
+    <!-- Profile banner -->
+    <div class="profile-banner">
+      <div class="profile-banner-avatar">A</div>
+      <div>
+        <div class="profile-banner-label">Your profile</div>
+        <div class="profile-banner-name">The Over-Functioner</div>
+        <div class="profile-banner-focus">Focus: releasing pressure without losing your footing.</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="cards-grid">
+      <div class="stat-card">
+        <div class="stat-label">Conversations</div>
+        <div class="stat-value">12</div>
+        <div class="stat-sub">this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Resets used</div>
+        <div class="stat-value">8</div>
+        <div class="stat-sub">last 7 days</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Journal entries</div>
+        <div class="stat-value">5</div>
+        <div class="stat-sub">this week</div>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <p class="tools-label">Your tools</p>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-card-icon">💬</div>
+        <div class="tool-card-name">Have a Conversation</div>
+        <div class="tool-card-desc">No agenda. Just space to think out loud and unpack what's sitting heavy.</div>
+        <div class="tool-card-cta">Start talking →</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-card-icon">⏱</div>
+        <div class="tool-card-name">Resets</div>
+        <div class="tool-card-desc">Three minutes to interrupt whatever loop you're stuck in. No commitment.</div>
+        <div class="tool-card-cta">Try a reset →</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-card-icon">✍️</div>
+        <div class="tool-card-name">Journal Space</div>
+        <div class="tool-card-desc">Guided prompts for when you need to put something down somewhere.</div>
+        <div class="tool-card-cta">Open journal →</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-card-icon">✉️</div>
+        <div class="tool-card-name">Unsent Letters</div>
+        <div class="tool-card-desc">Write the thing you've been carrying. You never have to send it.</div>
+        <div class="tool-card-cta">Write a letter →</div>
+      </div>
+    </div>
+
+    <!-- Conversation preview -->
+    <p class="convo-label">Last conversation</p>
+    <div class="convo-card">
+      <div class="bubble-ai">Hi. You wanted to talk this through. There's no agenda here — just space to think out loud. What's sitting heavy right now?</div>
+      <div class="bubble-user-wrap">
+        <div class="bubble-user">I feel like I can't stop, even when I know I should. Like stopping would mean something bad about me.</div>
+      </div>
+      <div class="typing-row">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="input-bar">
+        <div class="input-mock">Say whatever comes to mind...</div>
+        <div class="send-mock">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Theme name badge -->
+<div class="theme-name-badge" id="themeBadge">Default</div>
+
+<script>
+  const NAMES = {
+    default:  'Default',
+    midnight: 'Midnight Static',
+    neutral:  'Soft Neutral',
+    academia: 'Dark Academia Burnout',
+    dusk:     'Late Dusk',
+    moss:     'Overgrown',
+    ash:      'Ash'
+  };
+
+  const root  = document.documentElement;
+  const badge = document.getElementById('themeBadge');
+  let current = 'default';
+
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.t;
+      if (t === current) return;
+
+      // Remove old theme attribute
+      if (current !== 'default') root.removeAttribute('data-theme');
+      // Apply new
+      if (t !== 'default') root.setAttribute('data-theme', t);
+
+      // Update button states
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      badge.textContent = NAMES[t];
+      current = t;
+    });
+  });
+</script>
+</body>
+</html>

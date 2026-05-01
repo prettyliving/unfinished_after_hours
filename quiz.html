@@ -1068,6 +1068,16 @@ document.addEventListener('DOMContentLoaded', function() {
     a[email.toLowerCase()].profile = profileName;
     saveAccounts(a);
     touchLastSeen(email);
+    // Also save to a wipe-safe key so the returning gate survives the privacy wipe
+    try {
+      var safeKey = 'uah_profile_' + email.toLowerCase().trim();
+      var existing = {};
+      try { existing = JSON.parse(localStorage.getItem(safeKey) || '{}'); } catch(e) {}
+      existing.profile  = profileName;
+      existing.name     = a[email.toLowerCase()].name || '';
+      existing.savedAt  = Date.now();
+      localStorage.setItem(safeKey, JSON.stringify(existing));
+    } catch(e) {}
   }
 
   // ══════════════════════════════════════════════════════
@@ -1159,19 +1169,38 @@ document.addEventListener('DOMContentLoaded', function() {
   // ROUTING AFTER AUTH
   // ══════════════════════════════════════════════════════
   function afterAuth(account, email) {
-    // account = the stored account object
     touchLastSeen(email);
-    var fresh = getAccount(email); // re-read to get updated lastSeen
-    setSession({
-      name:            fresh.name,
-      profile:         fresh.profile    || null,
-      profileComplete: !!(fresh.profile),
-      swatches:        fresh.swatches   || null,
-      avoidColor:      fresh.avoidColor || null
-    });
-    // email not stored for privacy
+    var fresh = getAccount(email);
 
-    if (fresh.profile) {
+    // If the account has no profile (e.g. after a privacy wipe),
+    // check the wipe-safe profile key before assuming they are new
+    if (fresh && !fresh.profile) {
+      try {
+        var safeKey = 'uah_profile_' + email.toLowerCase().trim();
+        var saved = JSON.parse(localStorage.getItem(safeKey) || '{}');
+        if (saved && saved.profile) {
+          fresh.profile = saved.profile;
+          if (saved.name && !fresh.name) fresh.name = saved.name;
+          // Restore into accounts so future reads are fast
+          var a = getAccounts();
+          if (a[email.toLowerCase()]) {
+            a[email.toLowerCase()].profile = saved.profile;
+            saveAccounts(a);
+          }
+        }
+      } catch(e) {}
+    }
+
+    setSession({
+      name:            fresh ? fresh.name              : '',
+      email:           email.toLowerCase().trim(),      // needed so persistProfile works after quiz
+      profile:         fresh ? (fresh.profile || null)  : null,
+      profileComplete: !!(fresh && fresh.profile),
+      swatches:        fresh ? (fresh.swatches || null)  : null,
+      avoidColor:      fresh ? (fresh.avoidColor || null): null
+    });
+
+    if (fresh && fresh.profile) {
       showReturningGate(fresh);
     } else {
       launchOnboarding();
