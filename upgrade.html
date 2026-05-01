@@ -373,11 +373,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // The user must enter the code to get the discount.
   // Create coupon IDs in Stripe Dashboard → Coupons.
   var VALID_COUPONS = {
-    // 'CODE':    { stripeId: 'STRIPE_COUPON_ID', label: 'X% off' }
-    // Example:
-    // 'WELCOME20': { stripeId: 'coupon_abc123', label: '20% off' },
-    // 'FRIEND50':  { stripeId: 'coupon_def456', label: '50% off first month' }
-    // 'TEST0513' : { stripeId: 'promo_1TS11mBJGgufx8YqiTqKX7pX', label: '100% off' }
+    'TEST0513': { stripeId: 'promo_1TS11mBJGgufx8YqiTqKX7pX', label: '100% off' },
+    // Add more codes here:
+    // 'CODE': { stripeId: 'promo_...', label: 'X% off' },
   };
 
   var appliedCouponId = '';   // the Stripe coupon ID to pass at checkout

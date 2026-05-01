@@ -72,16 +72,18 @@ module.exports = async function handler(req, res) {
   params.append('success_url',           BASE_URL + '/upgrade.html?success=1');
   params.append('cancel_url',            BASE_URL + '/upgrade.html?cancelled=1');
 
-  // Attach coupon if provided
+  // Attach coupon/promotion code if provided
+  // Stripe uses different keys depending on ID prefix:
+  //   promo_... = promotion code  → discounts[][promotion_code]
+  //   coupon ID (no prefix)       → discounts[][coupon]
   if (coupon && typeof coupon === 'string' && coupon.trim()) {
     const cleanCoupon = coupon.trim();
-    if (isRecurring) {
-      params.append('discounts[][coupon]', cleanCoupon);
+    if (cleanCoupon.startsWith('promo_')) {
+      params.append('discounts[][promotion_code]', cleanCoupon);
     } else {
-      // One-time payments use discounts too
       params.append('discounts[][coupon]', cleanCoupon);
     }
-    console.log(`[checkout] coupon applied: "${cleanCoupon}" for product "${product}"`);
+    console.log(`[checkout] discount applied: "${cleanCoupon}" for product "${product}"`);
   }
 
   // Pre-fill email if we have it
