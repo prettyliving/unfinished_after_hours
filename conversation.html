@@ -86,6 +86,15 @@
     .safety-link-secondary{background:transparent;border:1.5px solid rgba(59,31,58,.25);color:var(--text-soft)}
     .safety-crisis{background:rgba(232,112,90,.08);border-radius:8px;padding:.6rem .9rem;font-size:.78rem;display:flex;flex-direction:column;gap:.2rem;margin-bottom:.8rem}
     .safety-crisis strong{color:var(--coral);font-weight:500}
+    /* ── Past conversations ── */
+    .past-convo-item{display:block;padding:.65rem .8rem;border-radius:9px;background:var(--cream);border:1px solid rgba(59,31,58,.07);margin-bottom:.45rem;text-decoration:none;transition:border-color .2s,background .2s;cursor:pointer}
+    .past-convo-item:hover{border-color:rgba(59,31,58,.18);background:#fff}
+    .past-convo-title{font-size:.82rem;color:var(--plum);font-weight:400;line-height:1.35;margin-bottom:.2rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .past-convo-meta{font-size:.7rem;color:var(--muted);font-weight:300}
+    .past-convo-empty{font-size:.78rem;color:var(--muted);font-weight:300;font-style:italic;line-height:1.55}
+    .new-convo-btn{display:block;width:100%;text-align:center;margin-top:.7rem;padding:.5rem;border-radius:9px;border:1.5px dashed rgba(59,31,58,.15);background:none;font-family:'DM Sans',sans-serif;font-size:.75rem;color:var(--muted);cursor:pointer;transition:border-color .2s,color .2s;letter-spacing:.04em}
+    .new-convo-btn:hover{border-color:var(--plum-light);color:var(--plum)}
+
     .safety-dismiss{background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;text-decoration:underline}
   </style>
 </head>
@@ -151,6 +160,11 @@
       <p class="input-hint" style="padding:.4rem 2rem .8rem;flex-shrink:0">This conversation is private. It's saved for the duration of your session.</p>
     </div>
     <div class="chat-sidebar">
+      <div class="sidebar-section">
+        <p class="sidebar-label">Past conversations</p>
+        <div id="past-convos-list"><p class="past-convo-empty">Your past conversations will appear here.</p></div>
+        <button class="new-convo-btn" id="new-convo-btn">+ Start a new conversation</button>
+      </div>
       <div class="sidebar-section">
         <p class="sidebar-label">About this space</p>
         <p class="sidebar-note">This isn't therapy — it's a thought-unpacking tool. Ask questions, sit with things, notice patterns. No pressure to fix anything.</p>
@@ -220,7 +234,76 @@
   var history = [{ role: 'assistant', content: "Hi. You wanted to talk this through. There\u2019s no agenda here \u2014 just space to think out loud. What\u2019s sitting heavy right now?" }];
   var started = false;
   var safetyShown = false;
-  var convoId = 'convo_' + Date.now();
+  // Load or create conversation ID — allows resuming from sidebar
+  var _urlConvoId = new URLSearchParams(window.location.search).get('resume');
+  var convoId = _urlConvoId || ('convo_' + Date.now());
+
+  // Restore conversation if resuming
+  if (_urlConvoId) {
+    try {
+      var saved = JSON.parse(localStorage.getItem(_urlConvoId) || 'null');
+      if (saved && saved.messages && saved.messages.length > 1) {
+        history = saved.messages;
+        // Re-render all messages
+        history.forEach(function(m, i) {
+          if (i === 0) return; // skip opening AI message, it's in static HTML
+          addMsg(m.role === 'user' ? 'user' : 'ai', m.content);
+        });
+        started = true;
+      }
+    } catch(e) {}
+  }
+
+  // Render past conversations in right sidebar
+  function renderPastConvos() {
+    var listEl = document.getElementById('past-convos-list');
+    if (!listEl) return;
+    var convos = [];
+    try {
+      Object.keys(localStorage).forEach(function(k) {
+        if (k.indexOf('convo_') !== 0) return;
+        var data = JSON.parse(localStorage.getItem(k) || 'null');
+        if (!data || !data.messages || data.messages.length < 3) return;
+        // Find first user message as title
+        var firstUser = data.messages.find(function(m) { return m.role === 'user'; });
+        if (!firstUser) return;
+        var title = firstUser.content.slice(0, 60) + (firstUser.content.length > 60 ? '…' : '');
+        var ago = data.updatedAt ? timeAgo(data.updatedAt) : 'Recent';
+        convos.push({ id: k, title: title, ago: ago, updatedAt: data.updatedAt || 0 });
+      });
+    } catch(e) {}
+    convos.sort(function(a, b) { return b.updatedAt - a.updatedAt; });
+    if (!convos.length) {
+      listEl.innerHTML = '<p class="past-convo-empty">Your conversations will appear here once you start chatting.</p>';
+      return;
+    }
+    listEl.innerHTML = convos.slice(0, 6).map(function(c) {
+      var isActive = c.id === convoId;
+      return '<a class="past-convo-item' + (isActive ? '" style="border-color:var(--coral);background:rgba(224,123,106,.04)"' : '"') +
+        ' href="conversation.html?resume=' + c.id + '">' +
+        '<div class="past-convo-title">' + esc(c.title) + '</div>' +
+        '<div class="past-convo-meta">' + c.ago + '</div></a>';
+    }).join('');
+  }
+
+  function timeAgo(ts) {
+    var diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return Math.floor(diff/60) + ' min ago';
+    if (diff < 86400) return Math.floor(diff/3600) + ' hr ago';
+    if (diff < 604800) return Math.floor(diff/86400) + ' day' + (Math.floor(diff/86400)>1?'s':'') + ' ago';
+    return Math.floor(diff/604800) + ' week' + (Math.floor(diff/604800)>1?'s':'') + ' ago';
+  }
+
+  // New conversation button
+  var newConvoBtn = document.getElementById('new-convo-btn');
+  if (newConvoBtn) {
+    newConvoBtn.addEventListener('click', function() {
+      window.location.href = 'conversation.html';
+    });
+  }
+
+  renderPastConvos();
 
   // DOM
   var inputEl  = document.getElementById('chatInput');
@@ -289,7 +372,10 @@
       var reply = (data.content && data.content[0] && data.content[0].text) || "I'm here. Take your time.";
       setTyping(false);
       history.push({ role: 'assistant', content: reply });
-      try { localStorage.setItem(convoId, JSON.stringify({ messages: history, updatedAt: Date.now() })); } catch (e) {}
+      try {
+        localStorage.setItem(convoId, JSON.stringify({ messages: history, updatedAt: Date.now() }));
+        renderPastConvos();
+      } catch (e) {}
       addMsg('ai', reply);
     })
     .catch(function (err) {

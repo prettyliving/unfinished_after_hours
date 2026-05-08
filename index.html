@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Unfinished, After Hours — Burnout Support for Real People</title>
-<meta name="description" content="Unfinished, After Hours helps students and workers untangle burnout without turning rest into another task. No hustle. No streaks. Just space.">
+  <meta name="description" content="Unfinished, After Hours helps students and workers untangle burnout without turning rest into another task. No hustle. No streaks. Just space.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="canonical" href="https://unfinishedafter.com/">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -36,7 +37,6 @@
       overflow-x: hidden;
     }
 
-    /* ── GLOBAL GRAIN + RADIAL BG ── */
     body::before {
       content: '';
       position: fixed; inset: 0; z-index: 0;
@@ -53,7 +53,6 @@
       pointer-events: none; opacity: 0.6;
     }
 
-    /* ── FLOATING ORBS ── */
     .orb { position: fixed; border-radius: 50%; pointer-events: none; filter: blur(60px); z-index: 0; }
     .orb-1 { width: 320px; height: 320px; background: var(--lavender); top: -80px; left: -80px; opacity: .35; animation: drift 12s ease-in-out infinite alternate; }
     .orb-2 { width: 200px; height: 200px; background: var(--coral); bottom: 5%; right: 8%; opacity: .18; animation: drift 9s ease-in-out 2s infinite alternate-reverse; }
@@ -63,9 +62,8 @@
       to   { transform: translate(30px, 20px) scale(1.08); }
     }
 
-    nav, section, footer, .hero { position: relative; z-index: 1; }
+    nav, section, footer, .hero, .validation-strip { position: relative; z-index: 1; }
 
-    /* ── NAV ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -109,7 +107,6 @@
     }
     .nav-cta:hover { background: var(--plum-mid) !important; }
 
-    /* ── SHARED ── */
     .section-label {
       font-size: .7rem;
       letter-spacing: .16em;
@@ -158,7 +155,6 @@
     }
     .btn-outline:hover { border-color: var(--plum); background: rgba(59,31,58,.04); }
 
-    /* scroll reveal */
     .reveal {
       opacity: 0;
       transform: translateY(20px);
@@ -166,7 +162,7 @@
     }
     .reveal.visible { opacity: 1; transform: none; }
 
-    /* ── SECTION 1: HERO ── */
+    /* HERO */
     .hero {
       min-height: 100svh;
       display: flex;
@@ -185,15 +181,6 @@
         radial-gradient(ellipse 55% 50% at 10% 25%, rgba(59,31,58,.07) 0%, transparent 70%),
         radial-gradient(ellipse 45% 45% at 90% 75%, rgba(232,112,90,.07) 0%, transparent 65%),
         radial-gradient(ellipse 60% 40% at 50% 105%, rgba(59,31,58,.04) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .hero::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-      opacity: .5;
       pointer-events: none;
     }
 
@@ -229,10 +216,7 @@
       animation: fadeUp .8s .3s ease forwards;
     }
 
-    .hero-headline em {
-      font-style: italic;
-      color: var(--coral);
-    }
+    .hero-headline em { font-style: italic; color: var(--coral); }
 
     .hero-sub {
       font-size: 1.05rem;
@@ -240,10 +224,30 @@
       line-height: 1.75;
       color: var(--text-soft);
       max-width: 500px;
-      margin: 0 auto 2.6rem;
+      margin: 0 auto 2rem;
       opacity: 0;
       animation: fadeUp .8s .45s ease forwards;
     }
+
+    /* Reassurance bar — validates before asking anything */
+    .hero-reassurance {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .4rem 1.2rem;
+      margin-bottom: 2.2rem;
+      opacity: 0;
+      animation: fadeUp .7s .58s ease forwards;
+    }
+    .hero-reassurance-item {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .79rem;
+      color: var(--text-soft);
+      font-weight: 300;
+    }
+    .hero-reassurance-item svg { color: var(--sage); flex-shrink: 0; }
 
     .hero-ctas {
       display: flex;
@@ -251,37 +255,103 @@
       justify-content: center;
       flex-wrap: wrap;
       opacity: 0;
-      animation: fadeUp .7s .6s ease forwards;
+      animation: fadeUp .7s .7s ease forwards;
+    }
+
+    /* Low-effort entry paths */
+    .hero-paths {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      justify-content: center;
+      margin-top: 1.4rem;
+      opacity: 0;
+      animation: fadeUp .7s .85s ease forwards;
+    }
+    .hero-path {
+      background: transparent;
+      border: 1px solid rgba(45,27,78,.13);
+      color: var(--text-soft);
+      font-size: .78rem;
+      font-weight: 300;
+      padding: .38rem 1rem;
+      border-radius: 100px;
+      letter-spacing: .02em;
+      text-decoration: none;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .hero-path:hover {
+      border-color: var(--plum-light);
+      color: var(--plum);
+      background: rgba(45,27,78,.04);
     }
 
     .hero-browse {
       display: block;
-      margin-top: 1.2rem;
-      font-size: .82rem;
+      margin-top: .9rem;
+      font-size: .78rem;
       color: var(--muted);
       text-decoration: none;
       letter-spacing: .03em;
       opacity: 0;
-      animation: fadeUp .7s .75s ease forwards;
+      animation: fadeUp .7s .95s ease forwards;
       transition: color .2s;
     }
     .hero-browse:hover { color: var(--plum); }
 
     .hero-microcopy {
-      margin-top: 3.8rem;
+      margin-top: 3.5rem;
       font-size: .74rem;
       letter-spacing: .1em;
       text-transform: uppercase;
       color: var(--muted);
       opacity: 0;
-      animation: fadeUp .7s .88s ease forwards;
+      animation: fadeUp .7s 1.05s ease forwards;
     }
 
-    /* ── SECTION 2: THE PROBLEM ── */
-    .problem {
-      padding: 7rem 5vw;
+    /* VALIDATION STRIP */
+    .validation-strip {
+      padding: 5rem 5vw;
       background: var(--blush);
+      border-top: 1px solid rgba(45,27,78,.06);
+      border-bottom: 1px solid rgba(45,27,78,.06);
     }
+    .validation-strip-inner {
+      max-width: 780px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .validation-strip blockquote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--plum);
+      line-height: 1.55;
+      margin-bottom: 1.2rem;
+      position: relative;
+      padding: 0 1rem;
+    }
+    .validation-strip blockquote::before {
+      content: '\201C';
+      font-size: 5rem;
+      line-height: 0;
+      position: absolute;
+      top: 1.4rem;
+      left: -0.5rem;
+      color: var(--lavender);
+      opacity: .4;
+      font-style: normal;
+    }
+    .validation-strip-sub {
+      font-size: .82rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* PROBLEM */
+    .problem { padding: 7rem 5vw; }
 
     .problem-inner {
       max-width: 1100px;
@@ -295,96 +365,87 @@
       line-height: 1.25;
       color: var(--plum);
       max-width: 640px;
-      margin-bottom: 4rem;
+      margin-bottom: 3.5rem;
     }
-
     .problem-headline em { font-style: italic; }
 
-    .problem-cols {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      background: var(--warm-white);
-      border: 1px solid rgba(59,31,58,.09);
-      border-radius: 18px;
-      overflow: hidden;
-    }
-
-    .prob-col { padding: 3rem 3.2rem; }
-
-    .prob-col--arrow {
-      padding: 2rem 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(59,31,58,.025);
-      border-left: 1px solid rgba(59,31,58,.07);
-      border-right: 1px solid rgba(59,31,58,.07);
-      align-self: stretch;
-    }
-
-    .prob-col--arrow svg { color: var(--coral); opacity: .55; }
-
-    .prob-label {
-      font-size: .68rem;
-      letter-spacing: .14em;
-      text-transform: uppercase;
+    .feelings-intro {
+      font-size: .82rem;
       color: var(--muted);
-      margin-bottom: 1.6rem;
-      font-weight: 500;
-    }
-
-    .prob-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .prob-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: .75rem;
-      font-size: .95rem;
-      line-height: 1.5;
       font-weight: 300;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      margin-bottom: 1.4rem;
     }
 
-    .prob-col--them .prob-list li {
+    .feelings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: .75rem;
+      margin-bottom: 3rem;
+    }
+
+    .feeling-card {
+      background: var(--warm-white);
+      border: 1px solid rgba(45,27,78,.08);
+      border-radius: 14px;
+      padding: 1.4rem 1.5rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .feeling-card:hover { border-color: var(--lavender); transform: translateY(-2px); }
+    .feeling-card-icon { font-size: 1.3rem; margin-bottom: .55rem; display: block; }
+    .feeling-card-text {
+      font-size: .9rem;
       color: var(--text-soft);
       font-style: italic;
-    }
-
-    .prob-col--them .prob-list li::before {
-      content: '"';
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      color: var(--muted);
-      line-height: 1;
-      flex-shrink: 0;
-      opacity: .45;
+      font-weight: 300;
+      line-height: 1.45;
     }
 
-    .prob-col--us .prob-list li { color: var(--text); font-weight: 400; }
-
-    .prob-col--us .prob-list li .dot {
-      width: 6px;
-      height: 6px;
+    .problem-response {
+      background: rgba(196,181,232,.1);
+      border: 1px solid rgba(196,181,232,.35);
+      border-radius: 18px;
+      padding: 2.6rem 3rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+    .problem-response-icon {
+      width: 46px; height: 46px;
       border-radius: 50%;
-      background: var(--coral);
+      background: rgba(196,181,232,.22);
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      margin-top: .44rem;
+      color: var(--plum-light);
+      margin-top: .2rem;
+    }
+    .problem-response-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 300;
+      line-height: 1.6;
+      color: var(--plum);
+    }
+    .problem-response-text strong {
+      font-weight: 400;
+      display: block;
+      font-size: .9rem;
+      margin-top: .9rem;
+      color: var(--text-soft);
+      font-family: 'DM Sans', sans-serif;
+      font-style: normal;
+      line-height: 1.65;
     }
 
-    /* ── SECTION 3: HOW IT WORKS ── */
+    /* HOW IT WORKS */
     .how {
       padding: 7rem 5vw;
       max-width: 1100px;
       margin: 0 auto;
     }
-
     .how-header { margin-bottom: 4rem; }
-
     .how-headline {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(2rem, 3.5vw, 2.8rem);
@@ -392,13 +453,17 @@
       color: var(--plum);
       line-height: 1.2;
     }
-
+    .how-sub {
+      margin-top: .6rem;
+      font-size: .88rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
     .how-steps {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 2rem;
     }
-
     .how-step {
       padding: 2.4rem 2.2rem;
       background: var(--blush);
@@ -406,12 +471,7 @@
       border-radius: 16px;
       transition: transform .2s, box-shadow .2s;
     }
-
-    .how-step:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 14px 40px rgba(59,31,58,.07);
-    }
-
+    .how-step:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(59,31,58,.07); }
     .step-number {
       font-family: 'Cormorant Garamond', serif;
       font-size: 3.5rem;
@@ -421,7 +481,6 @@
       margin-bottom: 1rem;
       letter-spacing: -.02em;
     }
-
     .step-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.4rem;
@@ -430,14 +489,12 @@
       margin-bottom: .6rem;
       line-height: 1.2;
     }
-
     .step-body {
       font-size: .88rem;
       line-height: 1.72;
       color: var(--text-soft);
       font-weight: 300;
     }
-
     .step-tag {
       display: inline-block;
       margin-top: 1.2rem;
@@ -450,140 +507,136 @@
       border-radius: 100px;
     }
 
-    /* ── SECTION 4: TESTIMONIALS ── */
+    /* TESTIMONIALS — lighter background */
     .testimonials {
       padding: 7rem 5vw;
-      background: var(--plum);
-      color: var(--cream);
+      background: linear-gradient(165deg, rgba(237,232,247,.65) 0%, var(--warm-white) 100%);
+      border-top: 1px solid rgba(196,181,232,.28);
+      border-bottom: 1px solid rgba(196,181,232,.28);
     }
-
     .testimonials-inner { max-width: 1100px; margin: 0 auto; }
-
-    .testimonials .section-label { color: rgba(232,112,90,.7); }
-
+    .testimonials .section-label { color: var(--coral); }
     .testimonials-headline {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(1.8rem, 3vw, 2.5rem);
       font-weight: 300;
       line-height: 1.2;
+      color: var(--plum);
       margin-bottom: 3.5rem;
     }
-
-    .testimonials-headline em { font-style: italic; color: rgba(232,112,90,.8); }
+    .testimonials-headline em { font-style: italic; color: var(--coral); }
 
     .t-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
     }
-
     .t-card {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(250,248,255,.92);
+      border: 1px solid rgba(196,181,232,.38);
       border-radius: 14px;
       padding: 2.2rem 2rem;
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
-      transition: background .2s, transform .2s;
-      position: relative;
+      transition: background .2s, transform .2s, box-shadow .2s;
     }
-
-    .t-card:hover { background: rgba(255,255,255,.09); transform: translateY(-2px); }
-
+    .t-card:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 12px 36px rgba(45,27,78,.06); }
     .t-quote-mark {
       font-family: 'Cormorant Garamond', serif;
       font-size: 3.5rem;
       line-height: 0.6;
       color: var(--coral);
-      opacity: .4;
+      opacity: .32;
       font-style: italic;
     }
-
     .t-quote {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.12rem;
+      font-size: 1.1rem;
       font-weight: 300;
       font-style: italic;
-      color: rgba(250,247,242,.88);
+      color: var(--text-soft);
       line-height: 1.7;
       flex: 1;
     }
-
     .t-meta {
       display: flex;
       align-items: center;
       gap: .75rem;
       padding-top: .9rem;
-      border-top: 1px solid rgba(255,255,255,.08);
+      border-top: 1px solid rgba(196,181,232,.28);
     }
-
     .t-avatar {
-      width: 30px;
-      height: 30px;
+      width: 30px; height: 30px;
       border-radius: 50%;
-      background: rgba(224,123,106,.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: rgba(224,123,106,.1);
+      display: flex; align-items: center; justify-content: center;
       font-family: 'Cormorant Garamond', serif;
       font-size: .9rem;
-      color: rgba(224,123,106,.75);
+      color: var(--coral);
       flex-shrink: 0;
     }
+    .t-author strong { display: block; font-size: .78rem; color: var(--text-soft); font-weight: 400; }
+    .t-author span { font-size: .72rem; color: var(--muted); font-weight: 300; }
 
-    .t-author strong {
-      display: block;
-      font-size: .78rem;
-      color: rgba(250,247,242,.6);
-      font-weight: 400;
-    }
-
-    .t-author span {
-      font-size: .72rem;
-      color: rgba(250,247,242,.3);
-      font-weight: 300;
-    }
-
-    /* ── SECTION 5: FOOTER CTA ── */
+    /* FOOTER CTA */
     .footer-cta {
       padding: 8rem 5vw;
       text-align: center;
       position: relative;
       overflow: hidden;
     }
-
     .footer-cta::before {
       content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse 50% 70% at 50% 100%, rgba(59,31,58,.06) 0%, transparent 60%);
+      background: radial-gradient(ellipse 50% 70% at 50% 100%, rgba(59,31,58,.05) 0%, transparent 60%);
       pointer-events: none;
     }
-
     .footer-cta-inner {
       position: relative;
       z-index: 1;
-      max-width: 500px;
+      max-width: 560px;
       margin: 0 auto;
     }
-
     .footer-cta-headline {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
       font-weight: 300;
       color: var(--plum);
       line-height: 1.15;
-      margin-bottom: 2.4rem;
+      margin-bottom: 1rem;
     }
-
-    .footer-cta-fine {
-      margin-top: 1.2rem;
-      font-size: .78rem;
-      color: var(--muted);
-      letter-spacing: .04em;
+    .footer-cta-sub {
+      font-size: .92rem;
+      color: var(--text-soft);
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 2.6rem;
     }
+    .entry-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      justify-content: center;
+      margin-bottom: 1.6rem;
+    }
+    .entry-choice {
+      background: var(--blush);
+      border: 1px solid rgba(196,181,232,.45);
+      border-radius: 14px;
+      padding: 1.2rem 1.6rem;
+      text-decoration: none;
+      text-align: left;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      min-width: 130px;
+    }
+    .entry-choice:hover { border-color: var(--plum-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,27,78,.06); }
+    .entry-choice-emoji { font-size: 1.4rem; display: block; margin-bottom: .5rem; }
+    .entry-choice-title { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--plum); font-weight: 500; display: block; margin-bottom: .2rem; }
+    .entry-choice-desc { font-size: .75rem; color: var(--muted); font-weight: 300; }
 
-    /* ── FOOTER ── */
+    .footer-cta-fine { margin-top: 1.2rem; font-size: .78rem; color: var(--muted); letter-spacing: .04em; }
+
     footer {
       padding: 2rem 5vw;
       display: flex;
@@ -591,16 +644,9 @@
       justify-content: space-between;
       border-top: 1px solid rgba(59,31,58,.08);
     }
-
-    .footer-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: .95rem;
-      color: var(--plum-mid);
-    }
-
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: .95rem; color: var(--plum-mid); }
     .footer-note { font-size: .73rem; color: var(--muted); }
 
-    /* ── ANIMATIONS ── */
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-8px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -610,64 +656,46 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      .problem-cols { grid-template-columns: 1fr; }
-      .prob-col--arrow { border: none; border-top: 1px solid rgba(59,31,58,.07); border-bottom: 1px solid rgba(59,31,58,.07); padding: 1.2rem 2rem; }
       .how-steps { grid-template-columns: 1fr; }
       .t-grid { grid-template-columns: 1fr; }
-      .prob-col { padding: 2rem 1.8rem; }
+      .feelings-grid { grid-template-columns: repeat(2, 1fr); }
+      .problem-response { flex-direction: column; gap: 1rem; padding: 2rem; }
     }
-
     @media (max-width: 640px) {
       .nav-links { display: none; }
       .hero-ctas { flex-direction: column; align-items: center; }
       footer { flex-direction: column; gap: .5rem; text-align: center; }
+      .feelings-grid { grid-template-columns: 1fr; }
+      .entry-choices { flex-direction: column; align-items: center; }
+      .entry-choice { width: 100%; }
     }
-
     @media (max-width: 480px) {
       nav { padding: 1rem 5vw; }
       .hero { padding: 6rem 5vw 4rem; }
       .hero-ctas { width: 100%; }
       .hero-ctas a, .hero-ctas button { width: 100%; justify-content: center; }
-      .prob-col { padding: 1.5rem 1.2rem; }
       .how-step { padding: 1.8rem 1.5rem; }
       .t-card { padding: 1.5rem 1.3rem; }
       section { padding: 4rem 5vw !important; }
     }
-  
-    /* ── HERO TAGS (blush pills) ── */
-    .hero-tags {
-      display: flex; flex-wrap: wrap; gap: .55rem; justify-content: center;
-      margin-top: 2.5rem;
-      opacity: 0; animation: fadeUp .9s 1.05s ease forwards;
-    }
-    .hero-tag {
-      background: var(--blush); border: 1px solid var(--lavender);
-      color: var(--plum); font-size: .75rem; font-weight: 400;
-      padding: .38rem .95rem; border-radius: 100px; letter-spacing: .02em;
-    }
-  
   </style>
-<link rel="canonical" href="https://unfinishedafter.com/">
 </head>
 <body>
 
-<!-- ORBS -->
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
 
-<!-- NAV -->
 <nav>
   <a class="nav-logo" href="index.html">Unfinished, <em style="font-style:italic;color:var(--coral);">After Hours</em></a>
   <ul class="nav-links">
     <li><a href="#how">How it works</a></li>
-    <li><a href="quiz.html" class="nav-cta">Sign in</a></li>
+    <li><a href="quiz.html" class="nav-cta">Get started</a></li>
   </ul>
 </nav>
 
-<!-- ── SECTION 1: HERO ── -->
+<!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
     <p class="hero-eyebrow"><span></span> Burnout support without the hustle talk <span></span></p>
@@ -680,76 +708,120 @@
       Unfinished, After Hours helps you untangle burnout without turning rest into another task.
     </p>
 
+    <!-- Validates before asking anything -->
+    <div class="hero-reassurance">
+      <span class="hero-reassurance-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
+        No streaks or scores
+      </span>
+      <span class="hero-reassurance-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
+        No toxic positivity
+      </span>
+      <span class="hero-reassurance-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
+        No hustle slogans
+      </span>
+      <span class="hero-reassurance-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
+        Free to start
+      </span>
+    </div>
+
     <div class="hero-ctas">
-      <a href="quiz.html" class="btn-primary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        Take the quiz
-      </a>
-      <a href="quiz.html?next=conversation" class="btn-outline">Have a conversation</a>
+      <a href="quiz.html" class="btn-primary">Find my space</a>
+      <a href="quiz.html?next=conversation" class="btn-outline">Talk it through</a>
     </div>
 
-    <a href="quiz.html?next=browse" class="hero-browse">or browse quietly →</a>
-
-    <p class="hero-microcopy">No yelling. &nbsp;&nbsp;No hustle slogans. &nbsp;&nbsp;Just truth.</p>
-    <div class="hero-tags">
-      <span class="hero-tag">Burnout validation</span>
-      <span class="hero-tag">Not toxic positivity</span>
-      <span class="hero-tag">For students &amp; workers</span>
-      <span class="hero-tag">Actually human</span>
+    <!-- Low-effort paths for depleted people -->
+    <div class="hero-paths">
+      <a href="resets.html" class="hero-path">I need a 2-min reset</a>
+      <a href="journal.html" class="hero-path">I want to write</a>
+      <a href="letters.html" class="hero-path">I need to say something</a>
     </div>
+
+    <a href="quiz.html?next=browse" class="hero-browse">or look around quietly →</a>
+
+    <p class="hero-microcopy">No yelling. &nbsp;&nbsp;No fixing. &nbsp;&nbsp;Just space.</p>
   </div>
 </section>
 
-<!-- ── SECTION 2: THE PROBLEM ── -->
+<!-- VALIDATION STRIP -->
+<div class="validation-strip">
+  <div class="validation-strip-inner reveal">
+    <blockquote>
+      Burnout isn't a character flaw. It's what happens when you've been carrying too much for too long — and nobody noticed.
+    </blockquote>
+    <p class="validation-strip-sub">This is a space that knows the difference.</p>
+  </div>
+</div>
+
+<!-- PROBLEM — reframed as feelings recognition -->
 <section class="problem">
   <div class="problem-inner">
     <div class="reveal">
-      <p class="section-label">The problem</p>
+      <p class="section-label">If any of this sounds familiar</p>
       <h2 class="problem-headline">
         Most burnout tools treat you like a <em>productivity problem.</em><br>This one treats you like a person.
       </h2>
     </div>
 
-    <div class="problem-cols reveal">
-      <div class="prob-col prob-col--them">
-        <p class="prob-label">Other tools say:</p>
-        <ul class="prob-list">
-          <li>Optimize your morning routine</li>
-          <li>Build better habits</li>
-          <li>You've got this!</li>
-        </ul>
-      </div>
+    <p class="feelings-intro reveal">You might be feeling —</p>
 
-      <div class="prob-col prob-col--arrow">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
+    <div class="feelings-grid reveal">
+      <div class="feeling-card">
+        <span class="feeling-card-icon">😶‍🌫️</span>
+        <p class="feeling-card-text">"I can't tell if I'm burnt out or just lazy."</p>
       </div>
+      <div class="feeling-card">
+        <span class="feeling-card-icon">📋</span>
+        <p class="feeling-card-text">"I took a week off and still don't feel rested."</p>
+      </div>
+      <div class="feeling-card">
+        <span class="feeling-card-icon">🔇</span>
+        <p class="feeling-card-text">"I don't want advice. I want someone to just get it."</p>
+      </div>
+      <div class="feeling-card">
+        <span class="feeling-card-icon">⚖️</span>
+        <p class="feeling-card-text">"Every wellness app makes me feel like I'm failing at recovery too."</p>
+      </div>
+      <div class="feeling-card">
+        <span class="feeling-card-icon">🕐</span>
+        <p class="feeling-card-text">"I'm behind on everything. Even resting feels like a task."</p>
+      </div>
+      <div class="feeling-card">
+        <span class="feeling-card-icon">🌫️</span>
+        <p class="feeling-card-text">"I used to care about this. Now I can't remember why."</p>
+      </div>
+    </div>
 
-      <div class="prob-col prob-col--us">
-        <p class="prob-label">We say:</p>
-        <ul class="prob-list">
-          <li><span class="dot"></span>You're not broken</li>
-          <li><span class="dot"></span>You're overloaded</li>
-          <li><span class="dot"></span>And that's not your fault</li>
-        </ul>
+    <div class="problem-response reveal">
+      <div class="problem-response-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div>
+        <p class="problem-response-text">
+          <em>You're not broken. You're overloaded. And that's not your fault.</em>
+          <strong>We don't optimize you. We just make space for where you actually are.</strong>
+        </p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── SECTION 3: HOW IT WORKS ── -->
+<!-- HOW IT WORKS -->
 <section class="how" id="how">
   <div class="how-header reveal">
     <p class="section-label">How it works</p>
     <h2 class="how-headline">Three steps. No pressure.</h2>
+    <p class="how-sub">Skip any step. Come back later. There's no wrong way to use this.</p>
   </div>
 
   <div class="how-steps">
     <div class="how-step reveal">
       <div class="step-number">01</div>
-      <h3 class="step-title">Take the quiz</h3>
-      <p class="step-body">Get your burnout profile — not a diagnosis, just clarity. Understand what kind of exhausted you actually are right now.</p>
+      <h3 class="step-title">Find your space</h3>
+      <p class="step-body">Answer five quiet questions. Get a burnout profile that actually sounds like you — not a diagnosis, just a place to start.</p>
       <span class="step-tag">5 questions</span>
     </div>
 
@@ -762,30 +834,26 @@
 
     <div class="how-step reveal" style="transition-delay:.24s">
       <div class="step-number">03</div>
-      <h3 class="step-title">Rest without making it a task</h3>
-      <p class="step-body">No streaks. No shame. No "productivity hacks." You don't earn rest here. You're just allowed to have it.</p>
+      <h3 class="step-title">Rest without earning it</h3>
+      <p class="step-body">No streaks. No shame. No "productivity hacks." You don't earn rest here — you're just allowed to have it. That's it.</p>
       <span class="step-tag">No pressure</span>
     </div>
   </div>
 </section>
 
-<!-- ── SECTION 4: TESTIMONIALS ── -->
+<!-- TESTIMONIALS — lighter background, not heavy plum -->
 <section class="testimonials">
   <div class="testimonials-inner">
     <p class="section-label">What people say</p>
     <h2 class="testimonials-headline reveal">Real words from people who needed a <em>different kind</em> of support.</h2>
 
     <div class="t-grid">
-
       <div class="t-card reveal">
         <div class="t-quote-mark">"</div>
         <p class="t-quote">I didn't need another app telling me to do breathing exercises. I needed someone to just say — yeah, this is too much. This did that.</p>
         <div class="t-meta">
           <div class="t-avatar">M</div>
-          <div class="t-author">
-            <strong>Maya, 24</strong>
-            <span>Graduate student</span>
-          </div>
+          <div class="t-author"><strong>Maya, 24</strong><span>Graduate student</span></div>
         </div>
       </div>
 
@@ -794,10 +862,7 @@
         <p class="t-quote">The journal prompts actually got me thinking differently. Not "list three things you're grateful for" — real questions I didn't know I needed to answer.</p>
         <div class="t-meta">
           <div class="t-avatar">D</div>
-          <div class="t-author">
-            <strong>Devon, 31</strong>
-            <span>UX designer</span>
-          </div>
+          <div class="t-author"><strong>Devon, 31</strong><span>UX designer</span></div>
         </div>
       </div>
 
@@ -806,10 +871,7 @@
         <p class="t-quote">Writing an unsent letter to my burnout felt ridiculous. Then I started crying halfway through. It worked in a way I can't fully explain.</p>
         <div class="t-meta">
           <div class="t-avatar">R</div>
-          <div class="t-author">
-            <strong>Rena, 28</strong>
-            <span>Nurse</span>
-          </div>
+          <div class="t-author"><strong>Rena, 28</strong><span>Nurse</span></div>
         </div>
       </div>
 
@@ -818,10 +880,7 @@
         <p class="t-quote">The "That's Enough" button on the to-do list sounds small but it genuinely changed how I end my days. I close my laptop feeling okay instead of behind.</p>
         <div class="t-meta">
           <div class="t-avatar">J</div>
-          <div class="t-author">
-            <strong>James, 26</strong>
-            <span>Software engineer</span>
-          </div>
+          <div class="t-author"><strong>James, 26</strong><span>Software engineer</span></div>
         </div>
       </div>
 
@@ -830,10 +889,7 @@
         <p class="t-quote">I've tried every wellness app. They all make me feel like I'm failing at recovery too. This one doesn't. It just meets you where you are.</p>
         <div class="t-meta">
           <div class="t-avatar">S</div>
-          <div class="t-author">
-            <strong>Simone, 33</strong>
-            <span>Teacher</span>
-          </div>
+          <div class="t-author"><strong>Simone, 33</strong><span>Teacher</span></div>
         </div>
       </div>
 
@@ -842,28 +898,43 @@
         <p class="t-quote">I took the quiz expecting something generic. My profile described me in a way I hadn't been able to articulate to my therapist in months.</p>
         <div class="t-meta">
           <div class="t-avatar">C</div>
-          <div class="t-author">
-            <strong>Cal, 29</strong>
-            <span>Freelance writer</span>
-          </div>
+          <div class="t-author"><strong>Cal, 29</strong><span>Freelance writer</span></div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ── SECTION 5: FOOTER CTA ── -->
+<!-- FOOTER CTA — choice-based, not single funneled CTA -->
 <section class="footer-cta" id="footer-cta">
   <div class="footer-cta-inner reveal">
     <p class="section-label">Ready when you are</p>
-    <h2 class="footer-cta-headline">Try it.<br>No account required.</h2>
-    <a href="quiz.html" class="btn-primary" style="font-size:.9rem; padding:.9rem 2.2rem;">Sign in</a>
+    <h2 class="footer-cta-headline">Start wherever feels like least.</h2>
+    <p class="footer-cta-sub">No account required. No commitment. Just pick the door that sounds least like work right now.</p>
+
+    <div class="entry-choices">
+      <a href="quiz.html" class="entry-choice">
+        <span class="entry-choice-emoji">🧭</span>
+        <span class="entry-choice-title">Find my space</span>
+        <span class="entry-choice-desc">5-question profile</span>
+      </a>
+      <a href="quiz.html?next=conversation" class="entry-choice">
+        <span class="entry-choice-emoji">💬</span>
+        <span class="entry-choice-title">Talk it through</span>
+        <span class="entry-choice-desc">AI conversation</span>
+      </a>
+      <a href="resets.html" class="entry-choice">
+        <span class="entry-choice-emoji">🌿</span>
+        <span class="entry-choice-title">2-min reset</span>
+        <span class="entry-choice-desc">Quick relief</span>
+      </a>
+    </div>
+
+    <a href="quiz.html?next=browse" class="btn-outline" style="font-size:.82rem; border-color:rgba(45,27,78,.14);">or look around quietly →</a>
     <p class="footer-cta-fine">Always free. &nbsp;Upgrade only if it helps.</p>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <span class="footer-logo">Unfinished, After Hours</span>
   <span class="footer-note">You're allowed to be a work in progress.</span>
@@ -871,6 +942,30 @@
 </footer>
 
 <script>
+  // ── "Browse quietly" — guest session, no quiz required ────────
+  // If the user arrived here via ?next=browse, create a lightweight
+  // guest session and send them straight to dashboard.html.
+  (function() {
+    try {
+      var p = new URLSearchParams(window.location.search).get('next');
+      if (p === 'browse') {
+        var guest = {
+          name: 'Guest',
+          email: null,
+          profile: null,
+          profileComplete: false,
+          swatches: null,
+          avoidColor: null,
+          guest: true
+        };
+        sessionStorage.setItem('uah_user', JSON.stringify(guest));
+        window.location.replace('dashboard.html');
+        return;
+      }
+    } catch(e) {}
+  })();
+
+  // ── Scroll reveal ───────────────────────────────────────────
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }

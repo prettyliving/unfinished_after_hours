@@ -147,18 +147,26 @@ function initSidebar() {
   var sb = document.getElementById('sidebar');
   applyTheme(u, sb);
   var av=document.getElementById('profile-avatar'),pn=document.getElementById('profile-name'),pt=document.getElementById('profile-tag');
-  if (av) av.textContent = u.name ? u.name.charAt(0).toUpperCase() : '?';
-  if (pn) pn.textContent = u.name||'You';
-  if (pt) pt.textContent = u.profile||'—';
+  if (av) av.textContent = u.guest ? '~' : (u.name ? u.name.charAt(0).toUpperCase() : '?');
+  if (pn) pn.textContent = u.guest ? 'Browsing quietly' : (u.name||'You');
+  if (pt) pt.textContent = u.profile||'Complete the quiz to set your profile';
   var soBtn = document.getElementById('signout-btn');
   if (soBtn) {
-    soBtn.addEventListener('click', function() {
-      sessionStorage.removeItem('uah_user');
-      try { localStorage.removeItem('uah_last_email'); } catch(e) {}
-      window.location.href = 'index.html';
-    });
+    if (u.guest) {
+      soBtn.textContent = '← Back to home';
+      soBtn.addEventListener('click', function() {
+        sessionStorage.removeItem('uah_user');
+        window.location.href = 'index.html';
+      });
+    } else {
+      soBtn.addEventListener('click', function() {
+        sessionStorage.removeItem('uah_user');
+        try { localStorage.removeItem('uah_last_email'); } catch(e) {}
+        window.location.href = 'index.html';
+      });
+    }
   }
-  // Show upgrade link for free users
+  // Show upgrade link for free users (not guests)
   var ul = document.getElementById('upgrade-nav-link');
   if (ul) ul.style.display = isPlusMember(u) ? 'none' : 'flex';
 }
@@ -203,14 +211,16 @@ function checkFreeLimit(key, limit, bannerId) {
   if (isPlusMember(u)) return true;
   var period = MONTHLY_KEYS.indexOf(key) >= 0 ? 'monthly' : 'daily';
   var data   = _getLimitBucket(period);
-  var count  = (data.bucket[key] || 0) + 1;
-  data.bucket[key] = count;
-  try { localStorage.setItem(data.storageKey, JSON.stringify(data.bucket)); } catch(e) {}
-  if (count > limit) {
+  var current = data.bucket[key] || 0;
+  // Check BEFORE incrementing — don't penalise the user before they've done anything
+  if (current >= limit) {
     var el = document.getElementById(bannerId);
     if (el) el.classList.add('show');
     return false;
   }
+  // Increment only after confirming they're within limit
+  data.bucket[key] = current + 1;
+  try { localStorage.setItem(data.storageKey, JSON.stringify(data.bucket)); } catch(e) {}
   return true;
 }
 
@@ -233,8 +243,27 @@ function requirePlus(bannerId) {
   return false;
 }
 
+// ── Guest browse session ──────────────────────────────────────
+// Creates a lightweight anonymous session so users can explore
+// the app without signing in or completing the quiz.
+function createGuestSession() {
+  var guest = {
+    name:            'Guest',
+    email:           null,
+    profile:         null,
+    profileComplete: false,
+    swatches:        null,
+    avoidColor:      null,
+    guest:           true
+  };
+  try { sessionStorage.setItem('uah_user', JSON.stringify(guest)); } catch(e) {}
+  return guest;
+}
+
 // ── Auth guard ───────────────────────────────────────────────
 // Call on any authenticated page. Redirects to quiz.html if no session.
+// Guest sessions (guest:true) are allowed through — they can explore
+// all tools with the default theme and profile-agnostic content.
 function requireAuth() {
   var u = getUser();
   if (!u || !u.name) {

@@ -71,6 +71,22 @@
     .entry-prompt-ref{font-size:.75rem;color:var(--coral);font-style:italic}
     .entry-date{font-size:.72rem;color:var(--muted)}
     .entry-preview{font-size:.9rem;color:var(--text-soft);font-weight:300;line-height:1.6}
+
+    /* ── Entry read-back modal ── */
+    .entry-modal-overlay{position:fixed;inset:0;background:rgba(45,27,78,.55);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:1.5rem}
+    .entry-modal-overlay.open{display:flex}
+    .entry-modal{background:var(--warm-white);border-radius:18px;max-width:620px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(45,27,78,.2)}
+    .entry-modal-header{padding:1.6rem 2rem 1.2rem;border-bottom:1px solid rgba(59,31,58,.07);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-shrink:0}
+    .entry-modal-prompt{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--plum);font-weight:300;line-height:1.35;flex:1}
+    .entry-modal-date{font-size:.72rem;color:var(--muted);white-space:nowrap;margin-top:.15rem}
+    .entry-modal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.3rem;line-height:1;padding:.2rem;flex-shrink:0;transition:color .2s}
+    .entry-modal-close:hover{color:var(--plum)}
+    .entry-modal-body{padding:1.6rem 2rem 2rem;overflow-y:auto;flex:1}
+    .entry-modal-text{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;line-height:1.85;color:var(--text);white-space:pre-wrap}
+    .entry-card{cursor:pointer}
+    .entry-card:hover .entry-preview{color:var(--text)}
+    .entry-read-hint{font-size:.68rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:.5rem}
+
     @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .fade-in{animation:fadeUp .3s ease}
     .save-toast{position:fixed;bottom:2rem;right:2rem;background:var(--plum);color:var(--cream);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:.7rem 1.3rem;border-radius:100px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
@@ -167,6 +183,21 @@
     </div>
   </div>
 </div>
+
+<!-- Entry read-back modal -->
+<div class="entry-modal-overlay" id="entryModal">
+  <div class="entry-modal">
+    <div class="entry-modal-header">
+      <span class="entry-modal-prompt" id="modal-prompt"></span>
+      <span class="entry-modal-date" id="modal-date"></span>
+      <button class="entry-modal-close" id="modalClose">&#x2715;</button>
+    </div>
+    <div class="entry-modal-body">
+      <p class="entry-modal-text" id="modal-text"></p>
+    </div>
+  </div>
+</div>
+
 <div class="save-toast" id="toast">Entry saved ✓</div>
 
 <script>
@@ -259,7 +290,9 @@
   function saveEntry(){
     var text=document.getElementById('journalText').value.trim();
     if(!text)return;
-    entries.unshift({prompt:prompts[currentPrompt],date:'Just now',preview:text.slice(0,160)+(text.length>160?'...':'')});
+    var now=new Date();
+    var dateStr=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    entries.unshift({prompt:prompts[currentPrompt],date:dateStr,preview:text.slice(0,160)+(text.length>160?'...':''),full:text});
     try{sessionStorage.setItem('uah_journal',JSON.stringify(entries));}catch(e){}
     document.getElementById('journalText').value='';
     document.getElementById('wordCount').textContent='0 words';
@@ -275,8 +308,28 @@
       list.innerHTML='<p style="font-size:.88rem;color:var(--muted);font-style:italic;text-align:center;padding:2rem 0;">No entries yet. Write something — even one line.</p>';
       return;
     }
-    list.innerHTML=entries.map(function(e){return'<div class="entry-card"><div class="entry-meta"><span class="entry-prompt-ref">'+e.prompt+'</span><span class="entry-date">'+e.date+'</span></div><p class="entry-preview">'+e.preview+'</p></div>';}).join('');
+    list.innerHTML=entries.map(function(e,i){
+      return '<div class="entry-card" data-idx="'+i+'"><div class="entry-meta"><span class="entry-prompt-ref">'+e.prompt+'</span><span class="entry-date">'+e.date+'</span></div><p class="entry-preview">'+e.preview+'</p><p class="entry-read-hint">Tap to read in full</p></div>';
+    }).join('');
+    list.querySelectorAll('.entry-card').forEach(function(card){
+      card.addEventListener('click',function(){openEntry(parseInt(card.dataset.idx));});
+    });
   }
+
+  function openEntry(i){
+    var e=entries[i];if(!e)return;
+    document.getElementById('modal-prompt').textContent=e.prompt;
+    document.getElementById('modal-date').textContent=e.date;
+    document.getElementById('modal-text').textContent=e.full||e.preview;
+    document.getElementById('entryModal').classList.add('open');
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    var closeBtn=document.getElementById('modalClose');
+    var overlay=document.getElementById('entryModal');
+    if(closeBtn)closeBtn.addEventListener('click',function(){overlay.classList.remove('open');});
+    if(overlay)overlay.addEventListener('click',function(ev){if(ev.target===overlay)overlay.classList.remove('open');});
+  });
 
   renderEntries();
 </script>

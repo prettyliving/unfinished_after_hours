@@ -55,7 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!checkFreeLimit('journal_saves', 1, 'journal-paywall')) return;
     var text = document.getElementById('journalText').value.trim();
     if (!text) return;
-    entries.unshift({ prompt: prompts[currentPrompt], date: 'Just now', preview: text.slice(0,160)+(text.length>160?'...':'') });
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    entries.unshift({ prompt: prompts[currentPrompt], date: dateStr, preview: text.slice(0,160)+(text.length>160?'...':''), full: text });
     try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries)); } catch(e) {}
     document.getElementById('journalText').value = '';
     var wc = document.getElementById('wordCount'); if(wc) wc.textContent='0 words';

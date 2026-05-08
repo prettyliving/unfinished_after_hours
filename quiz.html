@@ -120,6 +120,11 @@
       animation: stepOut .28s cubic-bezier(.4,0,.2,1) both;
     }
 
+
+    /* Skip option */
+    .skip-link{display:block;text-align:center;margin-top:1.4rem;font-size:.76rem;color:var(--muted);text-decoration:none;letter-spacing:.04em;transition:color .2s;cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;width:100%}
+    .skip-link:hover{color:var(--plum-light)}
+
     @keyframes stepIn {
       from { opacity: 0; transform: translateX(24px); }
       to   { opacity: 1; transform: translateX(0); }
@@ -720,6 +725,7 @@
       <div class="step-actions">
         <button class="btn-back" disabled onclick="goBack(1)">← Back</button>
         <button class="btn-next" id="next-1" onclick="advance(1)">Continue →</button>
+        <button class="skip-link" id="skip-quiz-btn" onclick="skipQuiz()">I just want to look around — skip quiz →</button>
       </div>
     </div>
 
@@ -1613,6 +1619,17 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#quizShell .step').forEach(function(s){ s.classList.remove('active','exit'); });
     el('step-1').classList.add('active');
     updateProgress(1); currentStep = 1;
+
+  // Skip quiz — create guest session and go straight to dashboard
+  window.skipQuiz = function() {
+    try {
+      sessionStorage.setItem('uah_user', JSON.stringify({
+        name: 'Guest', email: null, profile: null,
+        profileComplete: false, swatches: null, avoidColor: null, guest: true
+      }));
+    } catch(e) {}
+    window.location.href = 'dashboard.html';
+  };
   };
 
   // Handle ?next= param from index.html hero CTAs

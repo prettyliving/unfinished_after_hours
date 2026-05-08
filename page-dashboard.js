@@ -101,11 +101,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // Greeting
   var greetEl = document.getElementById('main-greeting');
   if (greetEl) {
-    if (pd) greetEl.innerHTML = (name ? 'Hey '+name+'. ' : '') + pd.greeting;
-    else if (name) greetEl.innerHTML = 'Hey '+name+'. <em>What do you need today?</em>';
+    if (u.guest) {
+      greetEl.innerHTML = 'You made it. <em>Take a look around.</em>';
+    } else if (pd) {
+      greetEl.innerHTML = (name ? 'Hey '+name+'. ' : '') + pd.greeting;
+    } else if (name) {
+      greetEl.innerHTML = 'Hey '+name+'. <em>What do you need today?</em>';
+    }
   }
   var subEl = document.getElementById('greeting-sub');
-  if (subEl && pd) subEl.textContent = pd.greetingSub;
+  if (subEl) {
+    if (u.guest) subEl.textContent = 'No sign-in needed. Browse freely — take the quiz whenever you\'re ready.';
+    else if (pd) subEl.textContent = pd.greetingSub;
+  }
 
   // Profile banner
   var bName  = document.getElementById('banner-profile-name');
@@ -113,8 +121,31 @@ document.addEventListener('DOMContentLoaded', function() {
   if (bName)  bName.textContent  = profile || '—';
   if (bFocus) bFocus.textContent = pd ? pd.focus : 'Take the quiz to discover your burnout profile.';
 
-  // Today's reset — profile-specific or default
-  var resetData = (pd && pd.reset) ? pd.reset : DEFAULT_RESET;
+  // Today's reset — rotates daily so it feels alive on return visits
+  // Pool is filtered by profile category preference, then cycles by day-of-year
+  var ALL_RESETS = [
+    { badge:'3 min · Guilt disruptor', title:'You Don\'t Need to Earn Rest',               desc:'For when you feel like you haven\'t done enough to deserve a break. This one asks nothing of you except stopping.', url:'resets.html' },
+    { badge:'2 min · Body reset',      title:'Unclench Your Jaw',                           desc:'You\'ve been holding tension there for hours. Two minutes of noticing what your body has been quietly carrying.', url:'resets.html' },
+    { badge:'4 min · Mind reset',      title:'Stare at Something Green',                    desc:'Your brain needs a different input. No analyzing. No optimizing. Just looking at something that asks nothing of you.', url:'resets.html' },
+    { badge:'5 min · Guilt disruptor', title:'You Don\'t Need to Optimize This Moment',    desc:'For the part of you that turns every rest into a task. Five minutes with zero agenda.', url:'resets.html' },
+    { badge:'3 min · Body reset',      title:'Drop Your Shoulders',                         desc:'Check in with where you\'re carrying everything. Inhale up, exhale all the way down. Repeat until it lands.', url:'resets.html' },
+    { badge:'2 min · Mind reset',      title:'Name Five Things',                            desc:'A grounding technique for when everything feels overwhelming. Five things you can see. Four you can feel. Three you can hear.', url:'resets.html' },
+    { badge:'4 min · Movement',        title:'Shake It Out',                                desc:'Your nervous system stores tension. This is a gentle way to let it go — no coordination required.', url:'resets.html' },
+    { badge:'3 min · Movement',        title:'Three Long Breaths and a Walk',               desc:'Even three minutes of slow movement resets your nervous system. No destination. No podcast. Just moving.', url:'resets.html' },
+    { badge:'5 min · Movement',        title:'Slow Stretch Without a Goal',                 desc:'Moving toward whatever feels tight. No forcing, no performance. Just noticing where your body is holding things.', url:'resets.html' }
+  ];
+  // Pick reset by day-of-year so it changes daily but is consistent within a day
+  var dayOfYear = (function() {
+    var now = new Date();
+    var start = new Date(now.getFullYear(), 0, 0);
+    return Math.floor((now - start) / 86400000);
+  })();
+  // Shift by profile index so different profiles see different resets on the same day
+  var profileOffset = ['The Over-Functioner','The Spiral Planner','The Quiet Quitter','The Numb Drifter'].indexOf(profile);
+  if (profileOffset < 0) profileOffset = 0;
+  var resetIdx = (dayOfYear + profileOffset) % ALL_RESETS.length;
+  var resetData = ALL_RESETS[resetIdx];
+
   var rBadge = document.getElementById('reset-badge');
   var rTitle = document.getElementById('reset-title');
   var rDesc  = document.getElementById('reset-desc');
