@@ -15,12 +15,62 @@ document.addEventListener('DOMContentLoaded', function() {
     {id:9,category:'exercise',label:'Movement',time:'5',title:'Slow Stretch Without a Goal',desc:'Just noticing where your body is holding things.',timerMsg:'Move toward whatever feels tight. No forcing.',steps:['Sit or stand — whichever feels easier.','Slowly roll your neck side to side. Pause where it\'s tight.','Bring one arm across your chest, hold gently for 20 seconds.','Reach both arms overhead and let your spine lengthen.','Let your body lead. No performance. Just moving through it.']}
   ];
 
+  var audioSessions = [
+    { id:'a1', num:1, title:'Enough for Today',           desc:'For the end of a day where you\'re not sure you did enough.',              dur:'6 min' },
+    { id:'a2', num:2, title:'Stop Optimizing Your Rest',  desc:'For when you\'re trying to rest "efficiently" and it\'s making everything worse.', dur:'5 min' },
+    { id:'a3', num:3, title:'Quiet Mornings',             desc:'A slow start for days when the to-do list is already louder than the alarm.', dur:'8 min' },
+    { id:'a4', num:4, title:'The Guilt Can Wait',         desc:'Permission to set down what you\'re carrying — just for right now.',       dur:'4 min' },
+    { id:'a5', num:5, title:'Body Scan for the Overworked', desc:'A slow check-in with the parts of you that have been holding tension.',   dur:'10 min' },
+    { id:'a6', num:6, title:'Nothing Is on Fire',         desc:'For the 3am spiral where everything feels urgent and irreversible.',        dur:'7 min' },
+    { id:'a7', num:7, title:'After the Hard Conversation', desc:'Wind down after something that took a lot out of you.',                   dur:'6 min' },
+    { id:'a8', num:8, title:'Just This',                  desc:'Three minutes. No goal. No outcome. Just existing for a moment.',          dur:'3 min' }
+  ];
+
   var currentReset = null, timerInterval = null, secondsLeft = 0;
 
   window.filterResets = function(cat, btn) {
     document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-    btn.classList.add('active'); renderResets(cat);
+    btn.classList.add('active');
+    var resetsGrid  = document.getElementById('resetsGrid');
+    var audioSection = document.getElementById('audioSection');
+    if (cat === 'audio') {
+      if (resetsGrid)   resetsGrid.style.display   = 'none';
+      if (audioSection) { audioSection.style.display = 'block'; renderAudio(); }
+    } else {
+      if (resetsGrid)   resetsGrid.style.display   = '';
+      if (audioSection) audioSection.style.display = 'none';
+      renderResets(cat);
+    }
   };
+
+  function renderAudio() {
+    var section = document.getElementById('audioSection');
+    if (!section) return;
+    var u = getUser();
+    var unlocked = !!(u && u.audioPackUnlocked);
+
+    var banner = '';
+    if (!unlocked) {
+      banner = '<div class="audio-unlock-banner">' +
+        '<div class="audio-unlock-text"><strong>Audio Pack</strong> — 8 guided sessions for when reading feels like too much. $5 one-time.</div>' +
+        '<a href="pack-audio.html" style="flex-shrink:0;background:var(--coral);color:#fff;border:none;font-family:\'DM Sans\',sans-serif;font-size:.76rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:.55rem 1.2rem;border-radius:100px;cursor:pointer;text-decoration:none">Get Audio Pack →</a>' +
+        '</div>';
+    }
+
+    var cards = audioSessions.map(function(s) {
+      var playerHtml = unlocked
+        ? '<div class="audio-player"><audio controls preload="none" src=""><source src="" type="audio/mpeg"></audio></div>'
+        : '<div class="audio-locked"><span>🔒</span><span>Unlock to listen — <a href="pack-audio.html">$5 one-time</a></span></div>';
+      return '<div class="audio-card">' +
+        '<div class="audio-num">' + s.num + '</div>' +
+        '<div class="audio-info"><div class="audio-title">' + s.title + '</div><div class="audio-desc">' + s.desc + '</div></div>' +
+        '<div class="audio-dur">' + s.dur + '</div>' +
+        playerHtml +
+        '</div>';
+    }).join('');
+
+    section.innerHTML = banner + '<div class="audio-grid">' + cards + '</div>';
+  }
 
   function renderResets(cat) {
     cat = cat||'all';

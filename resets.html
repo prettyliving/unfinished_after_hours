@@ -83,6 +83,26 @@
     @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
     @media(max-width:700px){.resets-grid{grid-template-columns:1fr}}
     @media(max-width:480px){.resets-grid{gap:.8rem}}
+    /* Audio section */
+    .audio-section{margin-top:1rem}
+    .audio-grid{display:flex;flex-direction:column;gap:.75rem}
+    .audio-card{display:flex;align-items:center;gap:1.1rem;padding:1.1rem 1.3rem;background:var(--cream);border:1px solid rgba(59,31,58,.08);border-radius:13px;transition:border-color .2s;position:relative}
+    .audio-card:hover{border-color:rgba(59,31,58,.18)}
+    .audio-num{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--muted);width:24px;flex-shrink:0;text-align:center}
+    .audio-info{flex:1;min-width:0}
+    .audio-title{font-size:.9rem;font-weight:400;color:var(--plum);margin-bottom:.15rem}
+    .audio-desc{font-size:.78rem;color:var(--muted);font-weight:300;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .audio-dur{font-size:.75rem;color:var(--muted);font-weight:300;flex-shrink:0;margin-right:.5rem}
+    .audio-player{flex-shrink:0;width:200px}
+    .audio-player audio{width:100%;height:28px;outline:none}
+    .audio-locked{position:absolute;inset:0;border-radius:13px;background:rgba(237,232,247,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;gap:.7rem;font-size:.82rem;color:var(--text-soft);font-weight:300}
+    .dark-mode .audio-locked{background:rgba(26,16,37,.88)}
+    .audio-locked a{color:var(--coral);font-weight:500;text-decoration:none}
+    .audio-locked a:hover{text-decoration:underline}
+    .audio-unlock-banner{background:rgba(232,112,90,.06);border:1.5px solid rgba(232,112,90,.18);border-radius:14px;padding:1.2rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+    .audio-unlock-text{font-size:.87rem;color:var(--text-soft);font-weight:300}
+    .audio-unlock-text strong{color:var(--text);font-weight:500}
+    @media(max-width:600px){.audio-player{display:none}.audio-dur{display:none}}
   </style>
 </head>
 <body>
@@ -138,8 +158,10 @@
         <button class="tab" onclick="filterResets('mind',this)">Mind</button>
         <button class="tab" onclick="filterResets('guilt',this)">Guilt disruptors</button>
         <button class="tab" onclick="filterResets('exercise',this)">Movement</button>
+        <button class="tab" id="audio-tab" onclick="filterResets('audio',this)">🎧 Audio</button>
       </div>
       <div class="resets-grid" id="resetsGrid"></div>
+      <div class="audio-section" id="audioSection" style="display:none"></div>
     </div>
   </div>
 </div>

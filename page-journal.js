@@ -76,7 +76,33 @@ document.addEventListener('DOMContentLoaded', function() {
   renderPrompt();
   renderEntries();
 
-  // Show export button for Plus members
+  // Show export buttons for Plus members
   var exportBtn = document.getElementById('exportBtn');
   if (exportBtn && isPlusMember(u)) exportBtn.style.display = 'inline-flex';
+
+  var exportTxtBtn = document.getElementById('exportTxtBtn');
+  if (exportTxtBtn && isPlusMember(u)) {
+    exportTxtBtn.style.display = 'inline-flex';
+    exportTxtBtn.addEventListener('click', exportJournal);
+  }
+
+  function exportJournal() {
+    var lines = ['Unfinished, After Hours — Journal Export',
+      'Exported: ' + new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }),
+      '---', ''];
+    if (!entries.length) { lines.push('No journal entries saved yet.'); }
+    entries.forEach(function(e, i) {
+      lines.push('Entry ' + (i + 1) + ' — ' + e.date);
+      lines.push('Prompt: ' + e.prompt);
+      lines.push('');
+      lines.push(e.full);
+      lines.push('', '---', '');
+    });
+    var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'journal-' + new Date().toISOString().slice(0,10) + '.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
 });

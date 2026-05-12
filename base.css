@@ -22,6 +22,59 @@
   --sage:        #7BAE8E;
 }
 
+/* ── Dark mode overrides ────────────────────────────────────── */
+/* Applied via .dark-mode class (manual toggle) or system preference */
+.dark-mode {
+  --plum:        #C4B5E8;
+  --plum-mid:    #9B8BC9;
+  --plum-light:  #b8acd4;
+  --warm-white:  #1a1025;
+  --bg:          #1a1025;
+  --cream:       #231535;
+  --blush:       #2d1f48;
+  --text:        #e8e0f5;
+  --text-soft:   #b8acd4;
+  --muted:       #7a6e99;
+}
+.dark-mode aside,
+.dark-mode #sidebar {
+  background: #2D1B4E !important;
+}
+.dark-mode .msg-ai .bubble,
+.dark-mode .modal { background: #231535; }
+.dark-mode .modal { border: 1px solid rgba(255,255,255,.08); }
+.dark-mode #uah-mobile-drawer { background: #1a1025; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --plum:        #C4B5E8;
+    --plum-mid:    #9B8BC9;
+    --plum-light:  #b8acd4;
+    --warm-white:  #1a1025;
+    --bg:          #1a1025;
+    --cream:       #231535;
+    --blush:       #2d1f48;
+    --text:        #e8e0f5;
+    --text-soft:   #b8acd4;
+    --muted:       #7a6e99;
+  }
+  aside, #sidebar { background: #2D1B4E !important; }
+  .msg-ai .bubble, .modal { background: #231535; }
+  .modal { border: 1px solid rgba(255,255,255,.08); }
+  #uah-mobile-drawer { background: #1a1025; }
+}
+
+/* ── Dark mode toggle button ───────────────────────────────── */
+.dark-mode-btn {
+  display: block; width: 100%; text-align: left;
+  padding: .45rem .9rem; font-family: 'DM Sans', sans-serif;
+  font-size: .7rem; letter-spacing: .07em; text-transform: uppercase;
+  color: rgba(250,247,242,.28); background: none; border: none;
+  cursor: pointer; border-radius: 8px; transition: color .2s, background .2s;
+  margin-bottom: .1rem;
+}
+.dark-mode-btn:hover { color: rgba(250,247,242,.6); background: rgba(255,255,255,.06); }
+
 body {
   font-family: 'DM Sans', sans-serif;
   background: var(--warm-white);

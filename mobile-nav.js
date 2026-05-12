@@ -212,13 +212,36 @@
     }).join('');
 
     var divider  = '<div class="drawer-divider"></div>';
+    var darkToggle = '<button class="drawer-signout" id="drawer-dark-btn">' +
+      '<div class="drawer-item-icon" style="font-size:1rem" id="drawer-dark-icon">◑</div>' +
+      '<span id="drawer-dark-label">Dark mode</span>' +
+      '</button>';
     var signout  = '<button class="drawer-signout" id="drawer-signout-btn">' +
       '<div class="drawer-item-icon" style="font-size:1rem">↩</div>' +
       '<span>Sign out</span>' +
       '</button>';
 
-    drawer.innerHTML = handle + title + items + divider + signout;
+    drawer.innerHTML = handle + title + items + divider + darkToggle + divider + signout;
     document.body.appendChild(drawer);
+
+    // Dark mode toggle
+    var darkBtn = drawer.querySelector('#drawer-dark-btn');
+    if (darkBtn) {
+      var isDark = document.body.classList.contains('dark-mode');
+      var darkLabel = drawer.querySelector('#drawer-dark-label');
+      var darkIcon  = drawer.querySelector('#drawer-dark-icon');
+      if (darkLabel) darkLabel.textContent = isDark ? 'Light mode' : 'Dark mode';
+      if (darkIcon)  darkIcon.textContent  = isDark ? '☀' : '◑';
+      darkBtn.addEventListener('click', function () {
+        var nowDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('uah_dark_mode', nowDark ? '1' : '0');
+        if (darkLabel) darkLabel.textContent = nowDark ? 'Light mode' : 'Dark mode';
+        if (darkIcon)  darkIcon.textContent  = nowDark ? '☀' : '◑';
+        var sidebarBtn = document.getElementById('dark-mode-toggle');
+        if (sidebarBtn) sidebarBtn.textContent = nowDark ? '☀ Light mode' : '◑ Dark mode';
+        closeDrawer();
+      });
+    }
 
     // Sign out
     var soBtn = drawer.querySelector('#drawer-signout-btn');

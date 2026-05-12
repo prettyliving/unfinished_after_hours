@@ -38,6 +38,30 @@
   var convoId = sessionStorage.getItem('uah_active_convo_id') || ('convo_' + Date.now());
   sessionStorage.setItem('uah_active_convo_id', convoId);
 
+  // ── Export (Plus only) ────────────────────────────────────────
+  if (isPlusMember(u)) {
+    var exportSection = document.getElementById('export-section');
+    if (exportSection) exportSection.style.display = 'block';
+    var exportBtn = document.getElementById('export-convo-btn');
+    if (exportBtn) exportBtn.addEventListener('click', exportConversation);
+  }
+
+  function exportConversation() {
+    var lines = ['Unfinished, After Hours — Conversation Export',
+      'Date: ' + new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }),
+      '---', ''];
+    history.forEach(function(m) {
+      var label = m.role === 'user' ? 'You' : 'Guide';
+      lines.push(label + ': ' + m.content, '');
+    });
+    var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'conversation-' + new Date().toISOString().slice(0,10) + '.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
   // ── DOM refs ──────────────────────────────────────────────────
   var inputEl  = document.getElementById('chatInput');
   var sendBtn  = document.getElementById('sendBtn');

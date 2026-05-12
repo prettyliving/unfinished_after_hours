@@ -141,6 +141,34 @@ function applyTheme(u, sidebarEl) {
   if (sidebarEl) sidebarEl.style.background = rgbStr.apply(null,dp);
 }
 
+// ── Dark mode ───────────────────────────────────────────────
+function initDarkMode() {
+  var stored = localStorage.getItem('uah_dark_mode');
+  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var isDark = stored !== null ? stored === '1' : prefersDark;
+  if (isDark) document.body.classList.add('dark-mode');
+
+  var btn = document.getElementById('dark-mode-toggle');
+  if (btn) {
+    btn.textContent = isDark ? '☀ Light mode' : '◑ Dark mode';
+    btn.addEventListener('click', function() {
+      var nowDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('uah_dark_mode', nowDark ? '1' : '0');
+      btn.textContent = nowDark ? '☀ Light mode' : '◑ Dark mode';
+    });
+  }
+
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      if (localStorage.getItem('uah_dark_mode') === null) {
+        document.body.classList.toggle('dark-mode', e.matches);
+        var b = document.getElementById('dark-mode-toggle');
+        if (b) b.textContent = e.matches ? '☀ Light mode' : '◑ Dark mode';
+      }
+    });
+  }
+}
+
 // ── Sidebar init ────────────────────────────────────────────
 function initSidebar() {
   var u  = getUser();
@@ -169,6 +197,19 @@ function initSidebar() {
   // Show upgrade link for free users (not guests)
   var ul = document.getElementById('upgrade-nav-link');
   if (ul) ul.style.display = isPlusMember(u) ? 'none' : 'flex';
+
+  // Inject dark mode toggle into sidebar bottom
+  var bottom = document.querySelector('#sidebar .aside-bottom');
+  if (bottom && !document.getElementById('dark-mode-toggle')) {
+    var dmBtn = document.createElement('button');
+    dmBtn.id = 'dark-mode-toggle';
+    dmBtn.className = 'dark-mode-btn';
+    dmBtn.setAttribute('aria-label', 'Toggle dark mode');
+    bottom.insertBefore(dmBtn, bottom.firstChild);
+    initDarkMode();
+  } else {
+    initDarkMode();
+  }
 }
 
 // ── Toast ───────────────────────────────────────────────────
@@ -274,5 +315,9 @@ function requireAuth() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  if (document.getElementById('sidebar')) initSidebar();
+  if (document.getElementById('sidebar')) {
+    initSidebar();
+  } else {
+    initDarkMode();
+  }
 });
