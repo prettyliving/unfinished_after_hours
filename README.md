@@ -18,19 +18,14 @@ All features below are fully implemented and live.
 
 - **Onboarding Quiz** — Multi-step intake flow that assigns users one of four burnout profiles and personalizes the entire experience (colors, prompts, tone) based on their answers
 - **Dashboard** — Personalized home screen with profile-aware greeting, journal prompt widget, and upgrade banner for free users
-- **Have a Conversation** — 
-    Page setup just have to implement AI
+- **Have a Conversation** — CBT-informed AI chat powered by Claude (Anthropic API). Validates emotions, follows natural conversation phases, detects crisis language, and organically routes users to relevant tools. Free tier limited to 3 conversations per session
+- **Crisis Detection** — Conversation feature detects self-harm language and responds with warmth plus 988 Lifeline and Crisis Text Line (text HOME to 741741)
 - **Resets** — Library of 9 guided micro-resets (2–5 min) across four categories: Body, Mind, Guilt Disruptors, and Movement. Includes in-page modal with step-by-step instructions and a live countdown timer. Free tier limited to 3 resets per session
 - **Journal Space** — Rotating profile-personalized journal prompts with a writing area, word counter, and saved entry history. Free tier limited to 1 save per session
 - **Unsent Letters** — Private writing space with 8 recipient archetypes (e.g. "My burnout," "My inner critic"). Saves letters to an in-session vault. No audience, no send button
 - **Soft To-Do** — Two-column task list (Must Do / Could Do) with a single-use "That's Enough" button that marks one task as sufficient for the day
 - **Adaptive Theming** — Color palette dynamically adjusts across all pages based on the user's quiz-selected color swatches, with contrast-safe accent generation
 - **Freemium / Upgrade Flow** — Upgrade page with monthly ($5) and yearly ($45) After Hours+ plans plus three à-la-carte tool kits. Stripe Checkout integration scaffolded and ready for live keys
-
-Still trying to fix
-
-- **Crisis Detection** — Conversation feature detects self-harm language and responds with warmth plus 988 Lifeline and Crisis Text Line (text HOME to 741741)
-- **Have a Conversation** — CBT-informed AI chat powered by Claude (Anthropic API). Validates emotions, follows natural conversation phases, detects crisis language, and organically routes users to relevant tools. Free tier limited to 3 conversations per session
 
 
 ---
@@ -137,6 +132,7 @@ Design principle: every visual choice is made with psychological intent for user
 | Onboarding Quiz | ✅ Complete |
 | Dashboard | ✅ Complete |
 | Have a Conversation (AI) | ✅ Complete |
+| Crisis Detection | ✅ Complete |
 | Resets Library | ✅ Complete |
 | Journal Space | ✅ Complete |
 | Unsent Letters | ✅ Complete |

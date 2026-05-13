@@ -636,6 +636,53 @@
       section { padding: 4rem 5vw !important; }
     }
   
+    /* ── HAMBURGER / MOBILE MENU ── */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .35rem;
+      color: var(--plum);
+      line-height: 0;
+    }
+    @media (max-width: 640px) {
+      .nav-hamburger { display: flex; align-items: center; }
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(250,248,255,.97);
+      backdrop-filter: blur(16px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.2rem;
+      animation: fadeIn .18s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-close {
+      position: absolute;
+      top: 1.3rem; right: 5vw;
+      background: none; border: none;
+      cursor: pointer;
+      color: var(--plum);
+      font-size: 1.7rem;
+      line-height: 1;
+      padding: .3rem;
+    }
+    .mobile-menu a {
+      font-size: .85rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      text-decoration: none;
+    }
+    .mobile-menu a:hover { color: var(--plum); }
+
     /* ── HERO TAGS (blush pills) ── */
     .hero-tags {
       display: flex; flex-wrap: wrap; gap: .55rem; justify-content: center;
@@ -653,6 +700,26 @@
 </head>
 <body>
 
+<script>
+  // Redirect returning users straight to their dashboard
+  (function () {
+    try {
+      var u = JSON.parse(sessionStorage.getItem('uah_user') || '{}');
+      if (!u || !u.name) {
+        var email = localStorage.getItem('uah_last_email');
+        if (email) {
+          var acct = JSON.parse(localStorage.getItem('uah_profile_' + email.toLowerCase().trim()) || 'null');
+          if (acct && acct.name) { window.location.replace('dashboard.html'); return; }
+        }
+        var last = JSON.parse(localStorage.getItem('uah_last_profile') || 'null');
+        if (last && last.name) { window.location.replace('dashboard.html'); return; }
+      } else {
+        window.location.replace('dashboard.html');
+      }
+    } catch (e) {}
+  })();
+</script>
+
 <!-- ORBS -->
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
@@ -665,7 +732,19 @@
     <li><a href="#how">How it works</a></li>
     <li><a href="quiz.html" class="nav-cta">Sign in</a></li>
   </ul>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
 </nav>
+
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">×</button>
+  <a href="#how" id="mm-how">How it works</a>
+  <a href="quiz.html" class="btn-primary" style="font-size:.85rem; padding:.75rem 1.8rem;">Take the quiz</a>
+  <a href="quiz.html" style="font-size:.78rem; color:var(--muted); letter-spacing:.06em;">Sign in</a>
+</div>
 
 <!-- ── SECTION 1: HERO ── -->
 <section class="hero">
@@ -858,7 +937,7 @@
   <div class="footer-cta-inner reveal">
     <p class="section-label">Ready when you are</p>
     <h2 class="footer-cta-headline">Try it.<br>No account required.</h2>
-    <a href="quiz.html" class="btn-primary" style="font-size:.9rem; padding:.9rem 2.2rem;">Sign in</a>
+    <a href="quiz.html" class="btn-primary" style="font-size:.9rem; padding:.9rem 2.2rem;">Get started</a>
     <p class="footer-cta-fine">Always free. &nbsp;Upgrade only if it helps.</p>
   </div>
 </section>
@@ -877,6 +956,20 @@
     });
   }, { threshold: 0.1 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Hamburger menu
+  (function () {
+    var hamBtn   = document.getElementById('nav-hamburger');
+    var menu     = document.getElementById('mobile-menu');
+    var closeBtn = document.getElementById('mobile-menu-close');
+    var mmHow    = document.getElementById('mm-how');
+    function open()  { menu.classList.add('open'); menu.setAttribute('aria-hidden','false'); hamBtn.setAttribute('aria-expanded','true'); }
+    function close() { menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); hamBtn.setAttribute('aria-expanded','false'); }
+    if (hamBtn) hamBtn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (mmHow) mmHow.addEventListener('click', close);
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
+  })();
 </script>
 </body>
 </html>
