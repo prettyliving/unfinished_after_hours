@@ -8,7 +8,14 @@ var SUPABASE_URL  = 'https://aohagyyptppnoqnxujod.supabase.co';
 var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvaGFneXlwdHBwbm9xbnh1am9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzU5MTUsImV4cCI6MjA5NDgxMTkxNX0.q86wEdRSUqOn3OHHxcFRR0mLWUc_ebZJgTU5f63vv54';
 
 var db = window.supabase
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: {
+        storage:            window.sessionStorage,
+        persistSession:     true,
+        autoRefreshToken:   true,
+        detectSessionInUrl: true
+      }
+    })
   : null;
 
 if (!db) console.warn('[db] Supabase client not initialised — CDN may not have loaded yet.');

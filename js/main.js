@@ -44,82 +44,11 @@ function lum(rgb) {
 function contrast(a,b) { var l1=lum(a),l2=lum(b); return (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05); }
 
 // ── Session ─────────────────────────────────────────────────
+// Session lives in sessionStorage only — cleared when the browser closes,
+// so users always see the login screen on a fresh browser open.
 function getUser() {
   var u = {};
   try { u = JSON.parse(sessionStorage.getItem('uah_user') || '{}'); } catch(e) {}
-
-  // ── Session lost (new tab, mobile navigation, etc.) ──────────
-  // Try to restore from localStorage so users aren't forced to re-login
-  // every time they open a new tab or navigate back on mobile.
-  if (!u || !u.name) {
-    try {
-      // 1. Try account-keyed profile (most complete — has email + profile)
-      var lastEmail = localStorage.getItem('uah_last_email');
-      if (lastEmail) {
-        var acctKey  = 'uah_profile_' + lastEmail.toLowerCase().trim();
-        var acctData = JSON.parse(localStorage.getItem(acctKey) || 'null');
-        if (acctData && acctData.name) {
-          u = {
-            name:            acctData.name,
-            email:           lastEmail.toLowerCase().trim(),
-            profile:         acctData.profile  || null,
-            profileComplete: !!(acctData.profile),
-            swatches:        acctData.swatches  || null,
-            avoidColor:      acctData.avoidColor|| null
-          };
-        }
-      }
-    } catch(e) {}
-
-    // 2. Fall back to the no-email last_profile key (quiz-without-account path)
-    if (!u || !u.name) {
-      try {
-        var last = JSON.parse(localStorage.getItem('uah_last_profile') || 'null');
-        if (last && last.name) {
-          u = {
-            name:            last.name,
-            email:           last.email || null,
-            profile:         last.profile  || null,
-            profileComplete: !!(last.profile),
-            swatches:        last.swatches  || null,
-            avoidColor:      last.avoidColor|| null
-          };
-        }
-      } catch(e) {}
-    }
-
-    // Persist the restored session so subsequent calls are instant
-    if (u && u.name) {
-      try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {}
-    }
-  }
-
-  // ── Restore Plus status from localStorage ────────────────────
-  if (!u.plus) {
-    try {
-      // Email-keyed Plus (paying account)
-      if (u.email) {
-        var key = 'uah_plus_' + u.email.toLowerCase().trim();
-        var plusData = JSON.parse(localStorage.getItem(key) || '{}');
-        if (plusData && plusData.plus) {
-          u.plus = true;
-          u.plusActivatedAt = plusData.activatedAt;
-        }
-      }
-      // Fallback: anonymous Plus (no email — set after Stripe success)
-      if (!u.plus) {
-        var anonPlus = JSON.parse(localStorage.getItem('uah_plus_anon') || '{}');
-        if (anonPlus && anonPlus.plus) {
-          u.plus = true;
-          u.plusActivatedAt = anonPlus.activatedAt;
-        }
-      }
-      if (u.plus) {
-        try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {}
-      }
-    } catch(e) {}
-  }
-
   return u;
 }
 function setUser(u) { try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {} }
