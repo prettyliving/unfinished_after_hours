@@ -1039,41 +1039,15 @@ document.addEventListener('DOMContentLoaded', function() {
           } catch(e) {}
           showReturningGate({ name: displayName, profile: row.profile_type });
         } else {
-          // ── No Supabase profile — try localStorage fallback ───
-          // Happens for pre-migration accounts or if the initial upsert failed.
-          var saved = null;
-          try { saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null'); } catch(e) {}
-          if (saved && saved.profile) {
-            var displayName2 = saved.name || pendingName;
-            setSession({
-              name: displayName2, email: email, profile: saved.profile,
-              profileComplete: true, swatches: saved.swatches || null,
-              avoidColor: saved.avoidColor || null
-            });
-            // Backfill Supabase so future sign-ins work without localStorage
-            if (email && typeof dbUpsertProfile === 'function') {
-              dbUpsertProfile({
-                email: email, name: displayName2, profile: saved.profile,
-                swatches: saved.swatches || [], avoidColor: saved.avoidColor || null
-              }).catch(function(e) { console.warn('[quiz] Supabase profile backfill failed:', e); });
-            }
-            showReturningGate({ name: displayName2, profile: saved.profile });
-          } else {
-            launchOnboarding();
-          }
+          // No Supabase profile → new user, send to onboarding
+          launchOnboarding();
         }
       }).catch(function(err) {
-        console.warn('[quiz] Supabase profile fetch failed, using localStorage:', err);
-        var saved = null;
-        try { saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null'); } catch(e) {}
-        if (saved && saved.profile) { showReturningGate({ name: saved.name || pendingName, profile: saved.profile }); }
-        else { launchOnboarding(); }
+        console.warn('[quiz] Supabase profile fetch failed:', err);
+        launchOnboarding();
       });
     } else {
-      var saved = null;
-      try { saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null'); } catch(e) {}
-      if (saved && saved.profile) { showReturningGate({ name: saved.name || pendingName, profile: saved.profile }); }
-      else { launchOnboarding(); }
+      launchOnboarding();
     }
   }
 
@@ -1203,26 +1177,12 @@ document.addEventListener('DOMContentLoaded', function() {
           setSession({ name: row.name || name, email: normEmail, profile: row.profile_type, profileComplete: true, swatches: row.swatches || null, avoidColor: row.avoid_color || null, plus: row.plus || false });
           showReturningGate({ name: row.name || name, profile: row.profile_type });
         } else {
-          // No Supabase profile — try localStorage fallback and backfill
-          var saved = null;
-          try { saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null'); } catch(e) {}
-          if (saved && saved.profile) {
-            var displayName = saved.name || name;
-            setSession({ name: displayName, email: normEmail, profile: saved.profile, profileComplete: true, swatches: saved.swatches || null, avoidColor: saved.avoidColor || null });
-            if (typeof dbUpsertProfile === 'function') {
-              dbUpsertProfile({ email: normEmail, name: displayName, profile: saved.profile, swatches: saved.swatches || [], avoidColor: saved.avoidColor || null })
-                .catch(function(e) { console.warn('[quiz] afterAuth backfill failed:', e); });
-            }
-            showReturningGate({ name: displayName, profile: saved.profile });
-          } else {
-            launchOnboarding();
-          }
+          // No Supabase profile → new user, send to onboarding
+          launchOnboarding();
         }
-      }).catch(function() {
-        var saved = null;
-        try { saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null'); } catch(e) {}
-        if (saved && saved.profile) { showReturningGate({ name: saved.name || name, profile: saved.profile }); }
-        else { launchOnboarding(); }
+      }).catch(function(err) {
+        console.warn('[quiz] afterAuth profile fetch failed:', err);
+        launchOnboarding();
       });
     } else {
       launchOnboarding();

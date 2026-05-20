@@ -703,19 +703,11 @@
 <script>
   // Redirect returning users straight to their dashboard
   (function () {
+    // Only redirect to dashboard if there is an active session in this browser window.
+    // localStorage is intentionally ignored — users must log in on every fresh browser open.
     try {
       var u = JSON.parse(sessionStorage.getItem('uah_user') || '{}');
-      if (!u || !u.name) {
-        var email = localStorage.getItem('uah_last_email');
-        if (email) {
-          var acct = JSON.parse(localStorage.getItem('uah_profile_' + email.toLowerCase().trim()) || 'null');
-          if (acct && acct.name) { window.location.replace('dashboard.html'); return; }
-        }
-        var last = JSON.parse(localStorage.getItem('uah_last_profile') || 'null');
-        if (last && last.name) { window.location.replace('dashboard.html'); return; }
-      } else {
-        window.location.replace('dashboard.html');
-      }
+      if (u && u.name) { window.location.replace('dashboard.html'); }
     } catch (e) {}
   })();
 </script>
