@@ -22,8 +22,9 @@ if (!db) console.warn('[db] Supabase client not initialised — CDN may not have
 async function dbSendMagicLink(email) {
   if (!db) return { error: 'no db' };
   // Always redirect to the live site — localhost can't receive the callback
-  var host = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'https://unfinishedafter.com'
+  var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  var host = isLocal
+    ? 'https://unfinished-after-hours-abevecon2-prettylivings-projects.vercel.app'
     : window.location.origin;
   return db.auth.signInWithOtp({
     email: email.toLowerCase().trim(),
