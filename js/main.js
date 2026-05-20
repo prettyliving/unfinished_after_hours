@@ -7,8 +7,9 @@
 // ── One-time privacy wipe ────────────────────────────────────
 // Clears stored account records from old schema versions.
 // Runs once per browser, keyed by version flag.
-// NOTE: uah_last_email and uah_last_profile are intentionally NOT wiped —
-// they are needed to restore sessions across tabs and mobile navigations.
+// NOTE: uah_last_email and uah_last_profile are cleared on explicit sign-out
+// but preserved during the privacy wipe so session restore still works across
+// tabs and mobile navigations within an active session.
 (function () {
   var WIPE_KEY = 'uah_privacy_wipe_v1';
   if (localStorage.getItem(WIPE_KEY)) return;
@@ -167,7 +168,10 @@ function initSidebar() {
   if (soBtn) {
     soBtn.addEventListener('click', function() {
       sessionStorage.removeItem('uah_user');
-      try { localStorage.removeItem('uah_last_email'); } catch(e) {}
+      try {
+        localStorage.removeItem('uah_last_email');
+        localStorage.removeItem('uah_last_profile');
+      } catch(e) {}
       window.location.href = 'index.html';
     });
   }

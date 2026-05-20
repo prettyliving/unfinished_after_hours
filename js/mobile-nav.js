@@ -225,7 +225,10 @@
     if (soBtn) {
       soBtn.addEventListener('click', function () {
         sessionStorage.removeItem('uah_user');
-        try { localStorage.removeItem('uah_last_email'); } catch (e) {}
+        try {
+          localStorage.removeItem('uah_last_email');
+          localStorage.removeItem('uah_last_profile');
+        } catch (e) {}
         window.location.href = 'index.html';
       });
     }

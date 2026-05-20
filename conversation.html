@@ -195,6 +195,10 @@
   var sb = document.getElementById('signoutBtn');
   if (sb) sb.addEventListener('click', function () {
     sessionStorage.removeItem('uah_user');
+    try {
+      localStorage.removeItem('uah_last_email');
+      localStorage.removeItem('uah_last_profile');
+    } catch (e) {}
     window.location.href = 'index.html';
   });
 
