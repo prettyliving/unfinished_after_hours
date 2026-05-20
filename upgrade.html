@@ -344,6 +344,14 @@ document.addEventListener('DOMContentLoaded', function() {
   var params = new URLSearchParams(window.location.search);
   if (params.get('success') === '1') {
     activatePlusMembership();
+    // Extra fallback: persist Plus even for anonymous/no-email users
+    // so a hard refresh doesn't wipe the status
+    try {
+      var _u = getUser();
+      if (_u && !_u.email) {
+        localStorage.setItem('uah_plus_anon', JSON.stringify({ plus: true, activatedAt: Date.now() }));
+      }
+    } catch(e) {}
     document.getElementById('success-banner').classList.add('show');
     // Remove param from URL cleanly
     history.replaceState({}, '', 'upgrade.html');

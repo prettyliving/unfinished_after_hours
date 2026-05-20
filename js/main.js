@@ -94,13 +94,26 @@ function getUser() {
   }
 
   // ── Restore Plus status from localStorage ────────────────────
-  if (!u.plus && u.email) {
+  if (!u.plus) {
     try {
-      var key = 'uah_plus_' + u.email.toLowerCase().trim();
-      var plusData = JSON.parse(localStorage.getItem(key) || '{}');
-      if (plusData && plusData.plus) {
-        u.plus = true;
-        u.plusActivatedAt = plusData.activatedAt;
+      // Email-keyed Plus (paying account)
+      if (u.email) {
+        var key = 'uah_plus_' + u.email.toLowerCase().trim();
+        var plusData = JSON.parse(localStorage.getItem(key) || '{}');
+        if (plusData && plusData.plus) {
+          u.plus = true;
+          u.plusActivatedAt = plusData.activatedAt;
+        }
+      }
+      // Fallback: anonymous Plus (no email — set after Stripe success)
+      if (!u.plus) {
+        var anonPlus = JSON.parse(localStorage.getItem('uah_plus_anon') || '{}');
+        if (anonPlus && anonPlus.plus) {
+          u.plus = true;
+          u.plusActivatedAt = anonPlus.activatedAt;
+        }
+      }
+      if (u.plus) {
         try { sessionStorage.setItem('uah_user', JSON.stringify(u)); } catch(e) {}
       }
     } catch(e) {}
