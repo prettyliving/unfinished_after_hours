@@ -21,11 +21,15 @@ if (!db) console.warn('[db] Supabase client not initialised — CDN may not have
  */
 async function dbSendMagicLink(email) {
   if (!db) return { error: 'no db' };
+  // Always redirect to the live site — localhost can't receive the callback
+  var host = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'https://unfinishedafter.com'
+    : window.location.origin;
   return db.auth.signInWithOtp({
     email: email.toLowerCase().trim(),
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: window.location.origin + '/quiz.html'
+      emailRedirectTo: host + '/quiz.html'
     }
   });
 }
