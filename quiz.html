@@ -1010,7 +1010,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var email = session.user ? (session.user.email || '') : '';
     var pendingName = 'Friend';
     try {
-      pendingName = localStorage.getItem('uah_pending_name') || 'Friend';
+      // Priority: explicit pending name (set at sign-up) → Supabase user metadata → fallback
+      var metaName = session.user && session.user.user_metadata && session.user.user_metadata.name
+        ? session.user.user_metadata.name : '';
+      pendingName = localStorage.getItem('uah_pending_name') || metaName || 'Friend';
       localStorage.removeItem('uah_pending_name');
       localStorage.removeItem('uah_pending_email');
     } catch(e) {}
