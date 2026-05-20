@@ -47,6 +47,25 @@ async function dbGetUserId() {
   return res.data && res.data.session ? res.data.session.user.id : null;
 }
 
+/** Create a new account with email + password. */
+async function dbSignUpWithPassword(email, password, name) {
+  if (!db) return { error: 'no db' };
+  return db.auth.signUp({
+    email: email.toLowerCase().trim(),
+    password: password,
+    options: { data: { name: name || 'Friend' } }
+  });
+}
+
+/** Sign in with email + password. */
+async function dbSignInWithPassword(email, password) {
+  if (!db) return { error: 'no db' };
+  return db.auth.signInWithPassword({
+    email: email.toLowerCase().trim(),
+    password: password
+  });
+}
+
 /** Sign out from Supabase (clears the session cookie/token). */
 async function dbSignOut() {
   if (!db) return;

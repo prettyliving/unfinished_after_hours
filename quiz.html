@@ -562,10 +562,10 @@
       <button class="auth-tab" id="tab-signin">Sign in</button>
     </div>
 
-    <!-- SINGLE PANEL: email → magic link (new + returning users) -->
+    <!-- SIGN UP PANEL -->
     <div class="auth-panel active" id="panel-signup">
       <h2 class="auth-welcome">Welcome. <em>Let's make space.</em></h2>
-      <p class="auth-sub">Free to join. No password. Just your email and a one-click link.</p>
+      <p class="auth-sub">Free to join. Your space, saved securely.</p>
       <div class="auth-field">
         <label class="auth-label" for="signup-name">Name <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
         <input class="auth-input" type="text" id="signup-name" placeholder="Your name or a nickname" autocomplete="given-name" />
@@ -575,21 +575,26 @@
         <input class="auth-input" type="email" id="signup-email" placeholder="your@email.com" autocomplete="email" />
         <p class="auth-error-msg" id="signup-email-err">Please enter a valid email address.</p>
       </div>
-      <button class="auth-submit" id="signup-submit-btn">Send my link &rarr;</button>
-      <p class="auth-footer-note" style="color:var(--muted);font-size:.78rem;">We'll email you a one-click sign-in link. No password needed, ever.</p>
+      <div class="auth-field">
+        <label class="auth-label" for="signup-pass">Password</label>
+        <input class="auth-input" type="password" id="signup-pass" placeholder="At least 8 characters" autocomplete="new-password" />
+        <p class="auth-error-msg" id="signup-pass-err">Password must be at least 8 characters.</p>
+      </div>
+      <button class="auth-submit" id="signup-submit-btn">Create account &rarr;</button>
+      <p class="auth-footer-note">Already have an account? <a href="#" id="go-to-signin" style="color:var(--coral);text-decoration:none;">Sign in</a></p>
     </div>
 
-    <!-- CHECK EMAIL STATE (shown after magic link sent) -->
+    <!-- CONFIRM EMAIL STATE (shown after sign-up) -->
     <div class="auth-panel" id="panel-check-email">
       <div style="text-align:center;padding:1rem 0 .5rem;">
         <div style="font-size:2.2rem;margin-bottom:1.2rem;">✉</div>
         <h2 class="auth-welcome" style="font-size:1.6rem;">Check your email.</h2>
-        <p class="auth-sub" style="margin-top:.6rem;">We sent a sign-in link to <strong id="sent-to-email"></strong>. Click it and you'll land right back here.</p>
-        <p style="margin-top:2rem;font-size:.78rem;color:var(--muted);">Didn't get it? Check your spam folder, or <a href="#" id="resend-link" style="color:var(--coral);text-decoration:none;">send a new link</a>.</p>
+        <p class="auth-sub" style="margin-top:.6rem;">We sent a confirmation link to <strong id="sent-to-email"></strong>. Click it to activate your account.</p>
+        <p style="margin-top:2rem;font-size:.78rem;color:var(--muted);">Didn't get it? Check your spam, or <a href="#" id="resend-link" style="color:var(--coral);text-decoration:none;">resend</a>.</p>
       </div>
     </div>
 
-    <!-- SIGN IN PANEL (kept for tab switching, same as signup) -->
+    <!-- SIGN IN PANEL -->
     <div class="auth-panel" id="panel-signin">
       <h2 class="auth-welcome"><em>Welcome back.</em></h2>
       <p class="auth-sub">Your space has been here, waiting.</p>
@@ -598,8 +603,13 @@
         <input class="auth-input" type="email" id="signin-email" placeholder="your@email.com" autocomplete="email" />
         <p class="auth-error-msg" id="signin-email-err">Please enter a valid email address.</p>
       </div>
-      <button class="auth-submit" id="signin-submit-btn">Send my link &rarr;</button>
-      <p class="auth-footer-note" style="color:var(--muted);font-size:.78rem;">We'll email you a one-click sign-in link. No password needed, ever.</p>
+      <div class="auth-field">
+        <label class="auth-label" for="signin-pass">Password</label>
+        <input class="auth-input" type="password" id="signin-pass" placeholder="Your password" autocomplete="current-password" />
+        <p class="auth-error-msg" id="signin-pass-err">Incorrect email or password.</p>
+      </div>
+      <button class="auth-submit" id="signin-submit-btn">Sign in &rarr;</button>
+      <p class="auth-footer-note">New here? <a href="#" id="go-to-signup" style="color:var(--coral);text-decoration:none;">Create an account</a></p>
     </div>
   </div>
 
@@ -1148,6 +1158,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   el('tab-signup').addEventListener('click', function() { switchTab('signup'); });
   el('tab-signin').addEventListener('click', function() { switchTab('signin'); });
+  var gts = el('go-to-signin'); if (gts) gts.addEventListener('click', function(e) { e.preventDefault(); switchTab('signin'); });
+  var gtu = el('go-to-signup'); if (gtu) gtu.addEventListener('click', function(e) { e.preventDefault(); switchTab('signup'); });
 
   // ══════════════════════════════════════════════════════
   // ROUTING AFTER SOCIAL OVERLAY (email collected manually)
@@ -1174,77 +1186,83 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // ══════════════════════════════════════════════════════
-  // MAGIC LINK SENDER (shared by sign-up + sign-in tabs)
-  // ══════════════════════════════════════════════════════
-  var _lastEmailSent = '';
-
-  function sendMagicLink(email, name, btnId, errInputId, errMsgId) {
-    clearErrors();
-    if (!EMAIL_RE.test(email)) { showErr(errInputId, errMsgId); return; }
-    var btn = el(btnId);
-    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
-
-    dbSendMagicLink(email).then(function(res) {
-      if (res.error) {
-        showErr(errInputId, errMsgId, res.error.message || 'Something went wrong. Try again.');
-        if (btn) { btn.disabled = false; btn.textContent = 'Send my link →'; }
-        return;
-      }
-      _lastEmailSent = email;
-      try {
-        if (name) localStorage.setItem('uah_pending_name', name);
-        localStorage.setItem('uah_pending_email', email.toLowerCase().trim());
-      } catch(e) {}
-      el('sent-to-email').textContent = email;
-      // Hide whichever panel is active, show the check-email state
-      el('panel-signup').classList.remove('active');
-      el('panel-signin').classList.remove('active');
-      el('panel-check-email').classList.add('active');
-      if (btn) { btn.disabled = false; btn.textContent = 'Send my link →'; }
-    }).catch(function(err) {
-      showErr(errInputId, errMsgId, 'Something went wrong. Try again.');
-      if (btn) { btn.disabled = false; btn.textContent = 'Send my link →'; }
-    });
-  }
-
-  // ── Resend link ──────────────────────────────────────
-  var resendLink = el('resend-link');
-  if (resendLink) {
-    resendLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      if (!_lastEmailSent) return;
-      resendLink.textContent = 'Sending…';
-      dbSendMagicLink(_lastEmailSent).then(function() {
-        resendLink.textContent = 'sent!';
-        setTimeout(function() { resendLink.textContent = 'send a new link'; }, 3000);
-      }).catch(function() { resendLink.textContent = 'send a new link'; });
-    });
-  }
-
-  // ══════════════════════════════════════════════════════
-  // SIGN UP
+  // SIGN UP (password-based)
   // ══════════════════════════════════════════════════════
   function handleSignUp() {
-    sendMagicLink(val('signup-email'), val('signup-name') || 'Friend',
-      'signup-submit-btn', 'signup-email', 'signup-email-err');
+    clearErrors();
+    var email = val('signup-email');
+    var pass  = el('signup-pass').value;
+    var name  = val('signup-name') || 'Friend';
+
+    if (!EMAIL_RE.test(email)) { showErr('signup-email', 'signup-email-err'); return; }
+    if (pass.length < 8)       { showErr('signup-pass',  'signup-pass-err');  return; }
+
+    var btn = el('signup-submit-btn');
+    btn.disabled = true; btn.textContent = 'Creating account…';
+
+    dbSignUpWithPassword(email, pass, name).then(function(res) {
+      btn.disabled = false; btn.textContent = 'Create account →';
+      if (res.error) {
+        var msg = res.error.message || 'Something went wrong.';
+        if (msg.toLowerCase().includes('already')) msg = 'An account with this email already exists. Sign in instead.';
+        showErr('signup-email', 'signup-email-err', msg);
+        return;
+      }
+      // If session returned immediately (email confirmation disabled) → go straight in
+      if (res.data && res.data.session) {
+        try { localStorage.setItem('uah_pending_name', name); } catch(e) {}
+        handleSupabaseSession(res.data.session);
+        return;
+      }
+      // Otherwise show "check your email" confirmation panel
+      el('sent-to-email').textContent = email;
+      el('panel-signup').classList.remove('active');
+      el('panel-check-email').classList.add('active');
+      logSignup('signup', email, name);
+    }).catch(function() {
+      btn.disabled = false; btn.textContent = 'Create account →';
+      showErr('signup-email', 'signup-email-err', 'Something went wrong. Try again.');
+    });
   }
 
   el('signup-submit-btn').addEventListener('click', handleSignUp);
-  ['signup-name','signup-email'].forEach(function(id) {
+  ['signup-name','signup-email','signup-pass'].forEach(function(id) {
     var e = el(id); if (e) e.addEventListener('keydown', function(ev) { if (ev.key === 'Enter') handleSignUp(); });
   });
 
   // ══════════════════════════════════════════════════════
-  // SIGN IN
+  // SIGN IN (password-based)
   // ══════════════════════════════════════════════════════
   function handleSignIn() {
-    sendMagicLink(val('signin-email'), null,
-      'signin-submit-btn', 'signin-email', 'signin-email-err');
+    clearErrors();
+    var email = val('signin-email');
+    var pass  = el('signin-pass').value;
+
+    if (!EMAIL_RE.test(email)) { showErr('signin-email', 'signin-email-err'); return; }
+    if (!pass)                 { showErr('signin-pass',  'signin-pass-err', 'Please enter your password.'); return; }
+
+    var btn = el('signin-submit-btn');
+    btn.disabled = true; btn.textContent = 'Signing in…';
+
+    dbSignInWithPassword(email, pass).then(function(res) {
+      btn.disabled = false; btn.textContent = 'Sign in →';
+      if (res.error) {
+        showErr('signin-pass', 'signin-pass-err', 'Incorrect email or password.');
+        return;
+      }
+      if (res.data && res.data.session) {
+        handleSupabaseSession(res.data.session);
+      }
+    }).catch(function() {
+      btn.disabled = false; btn.textContent = 'Sign in →';
+      showErr('signin-pass', 'signin-pass-err', 'Something went wrong. Try again.');
+    });
   }
 
   el('signin-submit-btn').addEventListener('click', handleSignIn);
-  var siEmailEl = el('signin-email');
-  if (siEmailEl) siEmailEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSignIn(); });
+  ['signin-email','signin-pass'].forEach(function(id) {
+    var e = el(id); if (e) e.addEventListener('keydown', function(ev) { if (ev.key === 'Enter') handleSignIn(); });
+  });
 
   // ══════════════════════════════════════════════════════
   // SOCIAL AUTH (Google / Apple)
