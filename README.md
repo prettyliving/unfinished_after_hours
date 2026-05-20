@@ -33,25 +33,46 @@ All features below are fully implemented and live.
 ## File Structure
 
 ```
-├── index.html            # Landing / sign-in page
-├── quiz.html             # Onboarding quiz (profile assignment)
-├── quiz_copy.html        # Quiz variant / backup
-├── dashboard.html        # Main home screen post-login
-├── conversation.html     # AI chat feature
-├── resets.html           # Micro-reset library
-├── journal.html          # Journal space
-├── letters.html          # Unsent letters
-├── todo.html             # Soft to-do list
-├── upgrade.html          # Upgrade / pricing page
-├── base.css              # Shared design system (colors, layout, components)
-├── main.js               # Shared utilities: session, theme engine, auth guard, toast
-├── stripe.js             # Stripe Checkout integration (configure keys to activate)
-├── page-conversation.js  # Conversation feature logic + Anthropic API calls
-├── page-dashboard.js     # Dashboard personalization
-├── page-journal.js       # Journal prompts + entry saving
-├── page-letters.js       # Unsent letters logic
-├── page-resets.js        # Reset library, modal, and countdown timer
-└── page-todo.js          # Soft to-do list logic
+├── index.html              # Landing page (auto-redirects returning users to dashboard)
+├── quiz.html               # Onboarding quiz — profile assignment + account creation
+├── dashboard.html          # Main home screen post-login
+├── conversation.html       # AI chat feature (inline logic, no external page script)
+├── resets.html             # Micro-reset library
+├── journal.html            # Journal space
+├── letters.html            # Unsent letters
+├── todo.html               # Soft to-do list
+├── upgrade.html            # Upgrade / pricing page
+├── contact.html            # Contact page
+├── profile.html            # User profile
+├── privacy.html            # Privacy policy
+├── kit-bundle.html         # Bundle kit product page
+├── kit-deadline.html       # Deadline kit product page
+├── kit-guilt.html          # Guilt kit product page
+├── kit-plateau.html        # Plateau kit product page
+├── pack-audio.html         # Audio pack product page
+├── pack-theme.html         # Theme pack product page
+├── css/
+│   └── base.css            # Shared design system (colors, layout, components)
+├── js/
+│   ├── main.js             # Shared utilities: session, theme engine, auth guard, toast
+│   ├── mobile-nav.js       # Mobile bottom nav bar (injected on authenticated pages)
+│   ├── stripe.js           # Stripe Checkout integration
+│   ├── page-conversation.js# Conversation logic (alt external version — inline is active)
+│   ├── page-dashboard.js   # Dashboard personalization
+│   ├── page-journal.js     # Journal prompts + entry saving
+│   ├── page-letters.js     # Unsent letters logic
+│   ├── page-resets.js      # Reset library, modal, and countdown timer
+│   ├── page-todo.js        # Soft to-do list logic
+│   └── server.js           # Local dev server
+├── api/
+│   ├── chat.js             # Vercel serverless: Anthropic Claude proxy
+│   ├── checkout.js         # Vercel serverless: Stripe Checkout session creator
+│   └── signup.js           # Vercel serverless: account signup
+└── samples/
+    ├── kit-deadline-sample.pdf
+    ├── kit-guilt-sample.pdf
+    ├── kit-plateau-sample.pdf
+    └── theme-test.html
 ```
 ---
 
