@@ -155,6 +155,56 @@ function applyTheme(u, sidebarEl) {
   if (sidebarEl) sidebarEl.style.background = rgbStr.apply(null,dp);
 }
 
+// ── Email verification banner ────────────────────────────────
+function showVerificationBanner(email) {
+  if (document.getElementById('verify-banner')) return; // already shown
+  var banner = document.createElement('div');
+  banner.id = 'verify-banner';
+  banner.style.cssText = [
+    'position:fixed;top:0;left:0;right:0;z-index:9999',
+    'background:#f0a500;color:#fff;font-family:"DM Sans",sans-serif',
+    'font-size:.82rem;padding:.65rem 1.2rem',
+    'display:flex;align-items:center;justify-content:center;gap:.8rem',
+    'box-shadow:0 2px 8px rgba(0,0,0,.15)'
+  ].join(';');
+  banner.innerHTML =
+    '<span>&#128274; Please verify your email address to keep your account secure.</span>' +
+    '<button id="resend-verify-btn" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.5);' +
+    'color:#fff;padding:.3rem .8rem;border-radius:100px;font-size:.78rem;cursor:pointer;font-family:inherit;">Resend email</button>' +
+    '<button id="dismiss-verify-btn" style="background:none;border:none;color:#fff;font-size:1.1rem;cursor:pointer;line-height:1;margin-left:.2rem;">&times;</button>';
+  document.body.insertBefore(banner, document.body.firstChild);
+
+  document.getElementById('dismiss-verify-btn').addEventListener('click', function() {
+    banner.remove();
+  });
+
+  document.getElementById('resend-verify-btn').addEventListener('click', function() {
+    var btn = this;
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    if (typeof dbResendVerification === 'function') {
+      dbResendVerification(email).then(function() {
+        btn.textContent = 'Sent!';
+        setTimeout(function() { btn.textContent = 'Resend email'; btn.disabled = false; }, 3000);
+      }).catch(function() {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      });
+    }
+  });
+}
+
+function checkEmailVerification() {
+  if (typeof dbGetSession !== 'function') return;
+  dbGetSession().then(function(res) {
+    if (!res.data || !res.data.session) return;
+    var user = res.data.session.user;
+    if (user && !user.email_confirmed_at) {
+      showVerificationBanner(user.email);
+    }
+  }).catch(function() {});
+}
+
 // ── Sidebar init ────────────────────────────────────────────
 function initSidebar() {
   var u  = getUser();
@@ -170,14 +220,19 @@ function initSidebar() {
       sessionStorage.removeItem('uah_user');
       try {
         localStorage.removeItem('uah_last_email');
-        localStorage.removeItem('uah_last_profile');
+        // uah_last_profile kept intentionally — used to restore returning-user
+        // gate if Supabase has no profile row (e.g. pre-migration accounts).
       } catch(e) {}
+      if (typeof dbSignOut === 'function') dbSignOut().catch(function(){});
       window.location.href = 'index.html';
     });
   }
   // Show upgrade link for free users
   var ul = document.getElementById('upgrade-nav-link');
   if (ul) ul.style.display = isPlusMember(u) ? 'none' : 'flex';
+
+  // Show email verification banner if email not yet confirmed
+  if (u.email) checkEmailVerification();
 }
 
 // ── Toast ───────────────────────────────────────────────────

@@ -72,6 +72,15 @@ async function dbSignOut() {
   return db.auth.signOut();
 }
 
+/** Resend the email verification / signup confirmation email. */
+async function dbResendVerification(email) {
+  if (!db) return { error: 'no db' };
+  return db.auth.resend({
+    type: 'signup',
+    email: email.toLowerCase().trim()
+  });
+}
+
 /** Listen for auth state changes (SIGNED_IN, SIGNED_OUT, etc.). */
 function dbOnAuthChange(callback) {
   if (!db) return;
