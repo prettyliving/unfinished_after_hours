@@ -336,6 +336,8 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script src="js/stripe.js"></script>
 <script>
@@ -345,15 +347,18 @@ document.addEventListener('DOMContentLoaded', function() {
   if (params.get('success') === '1') {
     activatePlusMembership();
     // Extra fallback: persist Plus even for anonymous/no-email users
-    // so a hard refresh doesn't wipe the status
     try {
       var _u = getUser();
       if (_u && !_u.email) {
         localStorage.setItem('uah_plus_anon', JSON.stringify({ plus: true, activatedAt: Date.now() }));
       }
+      // Persist Plus to Supabase so it survives across devices
+      if (_u && _u.email && typeof dbActivatePlus === 'function') {
+        dbActivatePlus(_u.email)
+          .catch(function(e) { console.warn('[db] activatePlus failed:', e); });
+      }
     } catch(e) {}
     document.getElementById('success-banner').classList.add('show');
-    // Remove param from URL cleanly
     history.replaceState({}, '', 'upgrade.html');
   }
   if (params.get('cancelled') === '1') {

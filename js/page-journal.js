@@ -1,5 +1,6 @@
 /* ============================================================
    Unfinished, After Hours — page-journal.js
+   Loads / saves via Supabase; falls back to localStorage.
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
   if (!requireAuth()) return;
@@ -30,49 +31,112 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = document.getElementById('promptText');
     var counter = document.getElementById('promptCounter');
     if (el) el.textContent = prompts[currentPrompt];
-    if (counter) counter.textContent = (currentPrompt+1)+' / '+prompts.length;
+    if (counter) counter.textContent = (currentPrompt + 1) + ' / ' + prompts.length;
     var pd = document.getElementById('promptDisplay');
     if (pd) { pd.classList.remove('fade-in'); void pd.offsetWidth; pd.classList.add('fade-in'); }
   }
-  window.nextPrompt = function() { currentPrompt=(currentPrompt+1)%prompts.length; renderPrompt(); };
-  window.prevPrompt = function() { currentPrompt=(currentPrompt-1+prompts.length)%prompts.length; renderPrompt(); };
+  window.nextPrompt = function() { currentPrompt = (currentPrompt + 1) % prompts.length; renderPrompt(); };
+  window.prevPrompt = function() { currentPrompt = (currentPrompt - 1 + prompts.length) % prompts.length; renderPrompt(); };
 
-  var hints = ['Nothing to fix. Just write.','You don\'t have to make sense.','This is just for you.','No right way to do this.','Write badly. That\'s allowed.'];
+  var hints = ['Nothing to fix. Just write.', 'You don\'t have to make sense.', 'This is just for you.', 'No right way to do this.', 'Write badly. That\'s allowed.'];
   window.updateCount = function() {
     var text = document.getElementById('journalText').value;
     var words = text.trim() ? text.trim().split(/\s+/).length : 0;
     var wc = document.getElementById('wordCount');
-    if (wc) wc.textContent = words+' word'+(words!==1?'s':'');
-    if (words>0&&words%20===0) { var h=document.getElementById('writeHint'); if(h) h.textContent=hints[Math.floor(Math.random()*hints.length)]; }
+    if (wc) wc.textContent = words + ' word' + (words !== 1 ? 's' : '');
+    if (words > 0 && words % 20 === 0) {
+      var h = document.getElementById('writeHint');
+      if (h) h.textContent = hints[Math.floor(Math.random() * hints.length)];
+    }
   };
 
+  // ── Entry storage ─────────────────────────────────────────
   var JOURNAL_KEY = 'uah_journal_' + (u.email || 'guest');
   var entries = [];
-  try { entries = JSON.parse(localStorage.getItem(JOURNAL_KEY)||'[]'); } catch(e) {}
 
-  // Free tier: 1 prompt per day = 1 save per session for demo
-  window.saveEntry = function() {
-    if (!checkFreeLimit('journal_saves', 1, 'journal-paywall')) return;
-    var text = document.getElementById('journalText').value.trim();
-    if (!text) return;
-    entries.unshift({ prompt: prompts[currentPrompt], date: 'Just now', preview: text.slice(0,160)+(text.length>160?'...':'') });
-    try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries)); } catch(e) {}
-    document.getElementById('journalText').value = '';
-    var wc = document.getElementById('wordCount'); if(wc) wc.textContent='0 words';
-    renderEntries();
-    showToast('Entry saved ✓');
-  };
-  window.discardEntry = function() { document.getElementById('journalText').value=''; var wc=document.getElementById('wordCount'); if(wc) wc.textContent='0 words'; };
+  function formatDate(isoStr) {
+    try {
+      return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch(e) { return 'Saved'; }
+  }
 
   function renderEntries() {
     var list = document.getElementById('entriesList');
     if (!list) return;
-    if (!entries.length) { list.innerHTML='<p style="font-size:.88rem;color:var(--muted);font-style:italic;text-align:center;padding:2rem 0;">No entries yet. Write something — even one line.</p>'; return; }
-    list.innerHTML = entries.map(function(e){ return '<div class="entry-card"><div class="entry-meta"><span class="entry-prompt-ref">'+e.prompt+'</span><span class="entry-date">'+e.date+'</span></div><p class="entry-preview">'+e.preview+'</p></div>'; }).join('');
+    if (!entries.length) {
+      list.innerHTML = '<p style="font-size:.88rem;color:var(--muted);font-style:italic;text-align:center;padding:2rem 0;">No entries yet. Write something — even one line.</p>';
+      return;
+    }
+    list.innerHTML = entries.map(function(e) {
+      return '<div class="entry-card">' +
+        '<div class="entry-meta">' +
+          '<span class="entry-prompt-ref">' + (e.prompt || '') + '</span>' +
+          '<span class="entry-date">' + (e.date || '') + '</span>' +
+        '</div>' +
+        '<p class="entry-preview">' + (e.preview || '') + '</p>' +
+      '</div>';
+    }).join('');
   }
 
+  // Load from Supabase first; fall back to localStorage
+  function loadEntries() {
+    if (u.email && typeof dbGetJournalEntries === 'function') {
+      dbGetJournalEntries(20).then(function(res) {
+        if (res.data && res.data.length) {
+          entries = res.data.map(function(row) {
+            return {
+              id:      row.id,
+              prompt:  row.prompt || '',
+              date:    formatDate(row.created_at),
+              preview: (row.content || '').slice(0, 160) + ((row.content || '').length > 160 ? '...' : '')
+            };
+          });
+          // Mirror to localStorage as offline cache
+          try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries)); } catch(e) {}
+          renderEntries();
+        }
+      }).catch(function(err) {
+        console.warn('[journal] Supabase load failed, using localStorage:', err);
+      });
+    }
+    // Load localStorage immediately (shows instantly while Supabase fetches)
+    try { entries = JSON.parse(localStorage.getItem(JOURNAL_KEY) || '[]'); } catch(e) {}
+    renderEntries();
+  }
+
+  window.saveEntry = function() {
+    if (!checkFreeLimit('journal_saves', 1, 'journal-paywall')) return;
+    var text = document.getElementById('journalText').value.trim();
+    if (!text) return;
+
+    var promptText = prompts[currentPrompt];
+
+    // Optimistic local update
+    entries.unshift({
+      prompt:  promptText,
+      date:    'Just now',
+      preview: text.slice(0, 160) + (text.length > 160 ? '...' : '')
+    });
+    try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries)); } catch(e) {}
+    document.getElementById('journalText').value = '';
+    var wc = document.getElementById('wordCount'); if (wc) wc.textContent = '0 words';
+    renderEntries();
+    showToast('Entry saved ✓');
+
+    // Persist to Supabase
+    if (u.email && typeof dbSaveJournalEntry === 'function') {
+      dbSaveJournalEntry(promptText, text)
+        .catch(function(err) { console.warn('[journal] Supabase save failed:', err); });
+    }
+  };
+
+  window.discardEntry = function() {
+    document.getElementById('journalText').value = '';
+    var wc = document.getElementById('wordCount'); if (wc) wc.textContent = '0 words';
+  };
+
   renderPrompt();
-  renderEntries();
+  loadEntries();
 
   // Show export button for Plus members
   var exportBtn = document.getElementById('exportBtn');

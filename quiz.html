@@ -562,73 +562,44 @@
       <button class="auth-tab" id="tab-signin">Sign in</button>
     </div>
 
-    <!-- SIGN UP PANEL -->
+    <!-- SINGLE PANEL: email → magic link (new + returning users) -->
     <div class="auth-panel active" id="panel-signup">
       <h2 class="auth-welcome">Welcome. <em>Let's make space.</em></h2>
-      <p class="auth-sub">Free to join. No spam, no streaks, no pressure.</p>
-      <div class="social-btns">
-        <button class="social-btn" id="google-signup-btn">
-          <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
-        </button>
-        <button class="social-btn" id="apple-signup-btn">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.15-2.19 1.28-2.17 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.77M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-          Continue with Apple
-        </button>
-      </div>
-      <div class="auth-divider">
-        <div class="auth-divider-line"></div><span class="auth-divider-text">or</span><div class="auth-divider-line"></div>
-      </div>
+      <p class="auth-sub">Free to join. No password. Just your email and a one-click link.</p>
       <div class="auth-field">
         <label class="auth-label" for="signup-name">Name <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
-        <input class="auth-input" type="text" id="signup-name" placeholder="Your name" autocomplete="given-name" />
+        <input class="auth-input" type="text" id="signup-name" placeholder="Your name or a nickname" autocomplete="given-name" />
       </div>
       <div class="auth-field">
         <label class="auth-label" for="signup-email">Email</label>
         <input class="auth-input" type="email" id="signup-email" placeholder="your@email.com" autocomplete="email" />
         <p class="auth-error-msg" id="signup-email-err">Please enter a valid email address.</p>
       </div>
-      <div class="auth-field">
-        <label class="auth-label" for="signup-pass">Password</label>
-        <input class="auth-input" type="password" id="signup-pass" placeholder="At least 8 characters" autocomplete="new-password" />
-        <p class="auth-error-msg" id="signup-pass-err">Password must be at least 8 characters.</p>
-      </div>
-      <button class="auth-submit" id="signup-submit-btn">Create my space &rarr;</button>
-      <p class="auth-footer-note">Already have an account? <a href="#" id="go-to-signin">Sign in</a></p>
+      <button class="auth-submit" id="signup-submit-btn">Send my link &rarr;</button>
+      <p class="auth-footer-note" style="color:var(--muted);font-size:.78rem;">We'll email you a one-click sign-in link. No password needed, ever.</p>
     </div>
 
-    <!-- SIGN IN PANEL -->
+    <!-- CHECK EMAIL STATE (shown after magic link sent) -->
+    <div class="auth-panel" id="panel-check-email">
+      <div style="text-align:center;padding:1rem 0 .5rem;">
+        <div style="font-size:2.2rem;margin-bottom:1.2rem;">✉</div>
+        <h2 class="auth-welcome" style="font-size:1.6rem;">Check your email.</h2>
+        <p class="auth-sub" style="margin-top:.6rem;">We sent a sign-in link to <strong id="sent-to-email"></strong>. Click it and you'll land right back here.</p>
+        <p style="margin-top:2rem;font-size:.78rem;color:var(--muted);">Didn't get it? Check your spam folder, or <a href="#" id="resend-link" style="color:var(--coral);text-decoration:none;">send a new link</a>.</p>
+      </div>
+    </div>
+
+    <!-- SIGN IN PANEL (kept for tab switching, same as signup) -->
     <div class="auth-panel" id="panel-signin">
       <h2 class="auth-welcome"><em>Welcome back.</em></h2>
       <p class="auth-sub">Your space has been here, waiting.</p>
-      <div class="social-btns">
-        <button class="social-btn" id="google-signin-btn">
-          <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
-        </button>
-        <button class="social-btn" id="apple-signin-btn">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.15-2.19 1.28-2.17 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.77M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-          Continue with Apple
-        </button>
-      </div>
-      <div class="auth-divider">
-        <div class="auth-divider-line"></div><span class="auth-divider-text">or</span><div class="auth-divider-line"></div>
-      </div>
       <div class="auth-field">
         <label class="auth-label" for="signin-email">Email</label>
         <input class="auth-input" type="email" id="signin-email" placeholder="your@email.com" autocomplete="email" />
         <p class="auth-error-msg" id="signin-email-err">Please enter a valid email address.</p>
       </div>
-      <div class="auth-field">
-        <label class="auth-label" for="signin-pass">Password</label>
-        <input class="auth-input" type="password" id="signin-pass" placeholder="Your password" autocomplete="current-password" />
-        <p class="auth-error-msg" id="signin-pass-err">Incorrect email or password.</p>
-      </div>
-      <p style="text-align:right;margin-bottom:.8rem;">
-        <a href="#" style="font-size:.75rem;color:var(--coral);text-decoration:none;">Forgot password?</a>
-      </p>
-      <button class="auth-submit" id="signin-submit-btn">Sign in &rarr;</button>
-      <p class="auth-footer-note">New here? <a href="#" id="go-to-signup">Create a free account</a></p>
+      <button class="auth-submit" id="signin-submit-btn">Send my link &rarr;</button>
+      <p class="auth-footer-note" style="color:var(--muted);font-size:.78rem;">We'll email you a one-click sign-in link. No password needed, ever.</p>
     </div>
   </div>
 
@@ -1007,20 +978,84 @@
 
 </div><!-- /checkinShell -->
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/db.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-  // ══════════════════════════════════════════════════════
-  // ONE-TIME DATA WIPE
-  // Clears old-schema account records on first visit.
-  // Does NOT clear uah_last_email — needed for session restore.
-  // ══════════════════════════════════════════════════════
+  // Clear any leftover account data from the old password-based auth system
   try {
-    if (!localStorage.getItem('uah_wiped_v1')) {
-      localStorage.removeItem('uah_accounts');
-      localStorage.setItem('uah_wiped_v1', '1');
-    }
+    ['uah_accounts','uah_wiped_v1'].forEach(function(k) { localStorage.removeItem(k); });
+    Object.keys(localStorage).forEach(function(k) {
+      if (k.startsWith('uah_creds_') || k.startsWith('uah_profile_')) localStorage.removeItem(k);
+    });
   } catch(e) {}
+
+  // ══════════════════════════════════════════════════════
+  // SUPABASE SESSION CHECK
+  // Handles magic-link callbacks + returning authenticated users.
+  // Runs async immediately — auth screen stays visible until we know.
+  // ══════════════════════════════════════════════════════
+  function handleSupabaseSession(session) {
+    var email = session.user ? (session.user.email || '') : '';
+    var pendingName = 'Friend';
+    try {
+      pendingName = localStorage.getItem('uah_pending_name') || 'Friend';
+      localStorage.removeItem('uah_pending_name');
+      localStorage.removeItem('uah_pending_email');
+    } catch(e) {}
+
+    setSession({ name: pendingName, email: email, profile: null, profileComplete: false });
+    try { localStorage.setItem('uah_last_email', email.toLowerCase().trim()); } catch(e) {}
+
+    if (typeof dbGetProfile === 'function') {
+      dbGetProfile().then(function(res) {
+        if (res.data && res.data.profile_type) {
+          var row = res.data;
+          var displayName = row.name || pendingName;
+          setSession({
+            name: displayName, email: email, profile: row.profile_type,
+            profileComplete: true, swatches: row.swatches || null,
+            avoidColor: row.avoid_color || null, plus: row.plus || false
+          });
+          try {
+            localStorage.setItem('uah_last_profile', JSON.stringify({
+              profile: row.profile_type, name: displayName, savedAt: Date.now()
+            }));
+          } catch(e) {}
+          showReturningGate({ name: displayName, profile: row.profile_type });
+        } else {
+          launchOnboarding();
+        }
+      }).catch(function(err) {
+        console.warn('[quiz] Supabase profile fetch failed, using localStorage:', err);
+        var saved = null;
+        try { saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null'); } catch(e) {}
+        if (saved && saved.profile) { showReturningGate({ name: saved.name || pendingName, profile: saved.profile }); }
+        else { launchOnboarding(); }
+      });
+    } else {
+      var saved = null;
+      try { saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null'); } catch(e) {}
+      if (saved && saved.profile) { showReturningGate({ name: saved.name || pendingName, profile: saved.profile }); }
+      else { launchOnboarding(); }
+    }
+  }
+
+  // Check for active session on every page load (handles magic-link redirect + returning users)
+  if (typeof dbGetSession === 'function') {
+    dbGetSession().then(function(res) {
+      if (res.data && res.data.session) {
+        var authScreen = el('authScreen');
+        authScreen.style.transition = 'opacity .3s ease';
+        authScreen.style.opacity = '0';
+        setTimeout(function() {
+          authScreen.style.display = 'none';
+          handleSupabaseSession(res.data.session);
+        }, 320);
+      }
+    }).catch(function(err) { console.warn('[quiz] session check failed:', err); });
+  }
 
   // ══════════════════════════════════════════════════════
   // LOG SIGNUPS TO VERCEL (visible in your Vercel dashboard
@@ -1034,77 +1069,6 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify({ type: type, email: email, name: name || '' })
       });
       // fire-and-forget — don't await, don't block the user
-    } catch(e) {}
-  }
-
-  // ══════════════════════════════════════════════════════
-  // ACCOUNT STORE  (localStorage — persists across tabs)
-  // ══════════════════════════════════════════════════════
-  function getAccounts() {
-    try { return JSON.parse(localStorage.getItem('uah_accounts') || '{}'); } catch(e) { return {}; }
-  }
-  function saveAccounts(a) {
-    try { localStorage.setItem('uah_accounts', JSON.stringify(a)); } catch(e) {}
-  }
-  function getAccount(email) {
-    var key = email.toLowerCase().trim();
-    // Try uah_accounts first (in-session, full record)
-    var acct = getAccounts()[key] || null;
-    if (acct) return acct;
-    // Fall back to wipe-safe credential key — survives the uah_accounts wipe
-    try {
-      var credKey = 'uah_creds_' + key;
-      var creds = JSON.parse(localStorage.getItem(credKey) || 'null');
-      if (creds) {
-        // Restore into uah_accounts so subsequent calls are fast
-        var a = getAccounts();
-        a[key] = { name: creds.name || 'Friend', password: creds.password || null, profile: creds.profile || null, createdAt: creds.createdAt || Date.now() };
-        saveAccounts(a);
-        return a[key];
-      }
-    } catch(e) {}
-    return null;
-  }
-  function createAccount(email, password, name) {
-    var a = getAccounts();
-    a[email.toLowerCase()] = { name: name || 'Friend', password: password || null, profile: null, createdAt: Date.now() };
-    saveAccounts(a);
-    // Also save credentials to a wipe-safe key so sign-in survives the uah_accounts wipe
-    try {
-      var credKey = 'uah_creds_' + email.toLowerCase().trim();
-      localStorage.setItem(credKey, JSON.stringify({ password: password || null, name: name || 'Friend', createdAt: Date.now() }));
-    } catch(e) {}
-    return a[email.toLowerCase()];
-  }
-  function touchLastSeen(email) {
-    var a = getAccounts();
-    if (!a[email.toLowerCase()]) return;
-    a[email.toLowerCase()].lastSeen = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    saveAccounts(a);
-  }
-  function persistProfile(email, profileName) {
-    var a = getAccounts();
-    if (!a[email.toLowerCase()]) return;
-    a[email.toLowerCase()].profile = profileName;
-    saveAccounts(a);
-    touchLastSeen(email);
-    // Keep the wipe-safe credential key in sync with profile
-    try {
-      var credKey = 'uah_creds_' + email.toLowerCase().trim();
-      var creds = JSON.parse(localStorage.getItem(credKey) || '{}');
-      creds.profile = profileName;
-      creds.name    = a[email.toLowerCase()].name || creds.name || 'Friend';
-      localStorage.setItem(credKey, JSON.stringify(creds));
-    } catch(e) {}
-    // Also save to uah_profile_ key so the returning gate survives the privacy wipe
-    try {
-      var safeKey = 'uah_profile_' + email.toLowerCase().trim();
-      var existing = {};
-      try { existing = JSON.parse(localStorage.getItem(safeKey) || '{}'); } catch(e) {}
-      existing.profile  = profileName;
-      existing.name     = a[email.toLowerCase()].name || '';
-      existing.savedAt  = Date.now();
-      localStorage.setItem(safeKey, JSON.stringify(existing));
     } catch(e) {}
   }
 
@@ -1184,120 +1148,103 @@ document.addEventListener('DOMContentLoaded', function() {
 
   el('tab-signup').addEventListener('click', function() { switchTab('signup'); });
   el('tab-signin').addEventListener('click', function() { switchTab('signin'); });
-  el('go-to-signin').addEventListener('click', function(e) { e.preventDefault(); switchTab('signin'); });
-  el('go-to-signup').addEventListener('click', function(e) { e.preventDefault(); switchTab('signup'); });
-
-  // Email auto-fill removed for privacy
-  try {
-    if (false) {
-    }
-  } catch(e) {}
 
   // ══════════════════════════════════════════════════════
-  // ROUTING AFTER AUTH
+  // ROUTING AFTER SOCIAL OVERLAY (email collected manually)
   // ══════════════════════════════════════════════════════
   function afterAuth(account, email) {
-    touchLastSeen(email);
-    var fresh = getAccount(email);
-
-    // If the account has no profile (e.g. after a privacy wipe),
-    // check wipe-safe keys before assuming they are new user
-    if (fresh && !fresh.profile) {
-      try {
-        // 1. Check email-keyed profile
-        var safeKey = 'uah_profile_' + email.toLowerCase().trim();
-        var saved = JSON.parse(localStorage.getItem(safeKey) || 'null');
-        // 2. Fallback: last-saved profile (no-email path)
-        if (!saved || !saved.profile) {
-          saved = JSON.parse(localStorage.getItem('uah_last_profile') || 'null');
-        }
-        if (saved && saved.profile) {
-          fresh.profile    = saved.profile;
-          fresh.swatches   = saved.swatches   || fresh.swatches;
-          fresh.avoidColor = saved.avoidColor  || fresh.avoidColor;
-          if (saved.name && !fresh.name) fresh.name = saved.name;
-          // Write back to accounts so future reads skip this fallback
-          var a = getAccounts();
-          if (a[email.toLowerCase()]) {
-            a[email.toLowerCase()].profile    = fresh.profile;
-            a[email.toLowerCase()].swatches   = fresh.swatches;
-            a[email.toLowerCase()].avoidColor = fresh.avoidColor;
-            saveAccounts(a);
-          }
-        }
-      } catch(e) { console.error('Profile restore error:', e); }
-    }
-
-    setSession({
-      name:            fresh ? fresh.name              : '',
-      email:           email.toLowerCase().trim(),      // needed so persistProfile works after quiz
-      profile:         fresh ? (fresh.profile || null)  : null,
-      profileComplete: !!(fresh && fresh.profile),
-      swatches:        fresh ? (fresh.swatches || null)  : null,
-      avoidColor:      fresh ? (fresh.avoidColor || null): null
-    });
-
-    // Save last-used email so getUser() can restore sessions across tabs / mobile
+    var name = (account && account.name) ? account.name : 'Friend';
+    setSession({ name: name, email: email.toLowerCase().trim(), profile: null, profileComplete: false });
     try { localStorage.setItem('uah_last_email', email.toLowerCase().trim()); } catch(e) {}
 
-    if (fresh && fresh.profile) {
-      showReturningGate(fresh);
+    // Check Supabase for an existing profile
+    if (typeof dbGetProfile === 'function') {
+      dbGetProfile().then(function(res) {
+        if (res.data && res.data.profile_type) {
+          var row = res.data;
+          setSession({ name: row.name || name, email: email.toLowerCase().trim(), profile: row.profile_type, profileComplete: true, swatches: row.swatches || null, avoidColor: row.avoid_color || null, plus: row.plus || false });
+          showReturningGate({ name: row.name || name, profile: row.profile_type });
+        } else {
+          launchOnboarding();
+        }
+      }).catch(function() { launchOnboarding(); });
     } else {
       launchOnboarding();
     }
   }
 
   // ══════════════════════════════════════════════════════
+  // MAGIC LINK SENDER (shared by sign-up + sign-in tabs)
+  // ══════════════════════════════════════════════════════
+  var _lastEmailSent = '';
+
+  function sendMagicLink(email, name, btnId, errInputId, errMsgId) {
+    clearErrors();
+    if (!EMAIL_RE.test(email)) { showErr(errInputId, errMsgId); return; }
+    var btn = el(btnId);
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+    dbSendMagicLink(email).then(function(res) {
+      if (res.error) {
+        showErr(errInputId, errMsgId, res.error.message || 'Something went wrong. Try again.');
+        if (btn) { btn.disabled = false; btn.textContent = 'Send my link →'; }
+        return;
+      }
+      _lastEmailSent = email;
+      try {
+        if (name) localStorage.setItem('uah_pending_name', name);
+        localStorage.setItem('uah_pending_email', email.toLowerCase().trim());
+      } catch(e) {}
+      el('sent-to-email').textContent = email;
+      // Hide whichever panel is active, show the check-email state
+      el('panel-signup').classList.remove('active');
+      el('panel-signin').classList.remove('active');
+      el('panel-check-email').classList.add('active');
+      if (btn) { btn.disabled = false; btn.textContent = 'Send my link →'; }
+    }).catch(function(err) {
+      showErr(errInputId, errMsgId, 'Something went wrong. Try again.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Send my link →'; }
+    });
+  }
+
+  // ── Resend link ──────────────────────────────────────
+  var resendLink = el('resend-link');
+  if (resendLink) {
+    resendLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (!_lastEmailSent) return;
+      resendLink.textContent = 'Sending…';
+      dbSendMagicLink(_lastEmailSent).then(function() {
+        resendLink.textContent = 'sent!';
+        setTimeout(function() { resendLink.textContent = 'send a new link'; }, 3000);
+      }).catch(function() { resendLink.textContent = 'send a new link'; });
+    });
+  }
+
+  // ══════════════════════════════════════════════════════
   // SIGN UP
   // ══════════════════════════════════════════════════════
   function handleSignUp() {
-    clearErrors();
-    var email = val('signup-email');
-    var pass  = val('signup-pass');  // note: val() trims but password shouldn't be trimmed
-    pass = el('signup-pass').value; // get raw value
-    var name  = val('signup-name') || 'Friend';
-
-    if (!EMAIL_RE.test(email)) { showErr('signup-email','signup-email-err'); return; }
-    if (pass.length < 8)       { showErr('signup-pass','signup-pass-err'); return; }
-    if (getAccount(email)) {
-      showErr('signup-email','signup-email-err','An account with this email already exists. Sign in instead.');
-      return;
-    }
-
-    var acct = createAccount(email, pass, name);
-    logSignup('signup', email, name);
-    afterAuth(acct, email);
+    sendMagicLink(val('signup-email'), val('signup-name') || 'Friend',
+      'signup-submit-btn', 'signup-email', 'signup-email-err');
   }
 
   el('signup-submit-btn').addEventListener('click', handleSignUp);
-  ['signup-name','signup-email','signup-pass'].forEach(function(id) {
-    el(id).addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSignUp(); });
+  ['signup-name','signup-email'].forEach(function(id) {
+    var e = el(id); if (e) e.addEventListener('keydown', function(ev) { if (ev.key === 'Enter') handleSignUp(); });
   });
 
   // ══════════════════════════════════════════════════════
   // SIGN IN
   // ══════════════════════════════════════════════════════
   function handleSignIn() {
-    clearErrors();
-    var email = val('signin-email');
-    var pass  = el('signin-pass').value; // raw, no trim
-
-    if (!EMAIL_RE.test(email)) { showErr('signin-email','signin-email-err'); return; }
-
-    var acct = getAccount(email);
-    if (!acct || acct.password !== pass) {
-      showErr('signin-pass','signin-pass-err','Incorrect email or password.');
-      return;
-    }
-
-    logSignup('signin', email, '');
-    afterAuth(acct, email);
+    sendMagicLink(val('signin-email'), null,
+      'signin-submit-btn', 'signin-email', 'signin-email-err');
   }
 
   el('signin-submit-btn').addEventListener('click', handleSignIn);
-  ['signin-email','signin-pass'].forEach(function(id) {
-    el(id).addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSignIn(); });
-  });
+  var siEmailEl = el('signin-email');
+  if (siEmailEl) siEmailEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSignIn(); });
 
   // ══════════════════════════════════════════════════════
   // SOCIAL AUTH (Google / Apple)
@@ -1337,14 +1284,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 260);
   }
 
-  ['google-signup-btn','google-signin-btn'].forEach(function(id) {
-    el(id).addEventListener('click', function() { openSocialOverlay('Google'); });
-  });
-  ['apple-signup-btn','apple-signin-btn'].forEach(function(id) {
-    el(id).addEventListener('click', function() { openSocialOverlay('Apple'); });
-  });
-
-  el('social-cancel-btn').addEventListener('click', function() { closeSocialOverlay(); });
+  var socialCancelBtn = el('social-cancel-btn');
+  if (socialCancelBtn) socialCancelBtn.addEventListener('click', function() { closeSocialOverlay(); });
 
   function handleSocialContinue() {
     var name  = val('social-name-input') || 'Friend';
@@ -1356,20 +1297,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     closeSocialOverlay(function() {
-      var existing = getAccount(email);
-      if (existing) {
-        afterAuth(existing, email);
-      } else {
-        var acct = createAccount(email, null, name);
-        logSignup('signup', email, name);
-        afterAuth(acct, email);
-      }
+      logSignup('signup', email, name);
+      afterAuth({ name: name }, email);
     });
   }
 
-  el('social-continue-btn').addEventListener('click', handleSocialContinue);
-  el('social-name-input').addEventListener('keydown',  function(e) { if (e.key === 'Enter') handleSocialContinue(); });
-  el('social-email-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSocialContinue(); });
+  var socialContinueBtn = el('social-continue-btn');
+  if (socialContinueBtn) socialContinueBtn.addEventListener('click', handleSocialContinue);
+  var socialNameInput  = el('social-name-input');
+  var socialEmailInput = el('social-email-input');
+  if (socialNameInput)  socialNameInput.addEventListener('keydown',  function(e) { if (e.key === 'Enter') handleSocialContinue(); });
+  if (socialEmailInput) socialEmailInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSocialContinue(); });
 
   // ══════════════════════════════════════════════════════
   // RETURNING GATE
@@ -1391,6 +1329,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function signOut() {
     sessionStorage.removeItem('uah_user');
+    try {
+      localStorage.removeItem('uah_last_email');
+      localStorage.removeItem('uah_last_profile');
+    } catch(e) {}
+    if (typeof dbSignOut === 'function') {
+      dbSignOut().catch(function(e) { console.warn('[quiz] sign out failed:', e); });
+    }
     el('returningGate').classList.remove('active');
     var card = el('authCard');
     card.style.display  = '';
@@ -1569,30 +1514,21 @@ document.addEventListener('DOMContentLoaded', function() {
       u.avoidColor      = avoidHex;
       setSession(u);
 
-      // Save profile directly to uah_accounts by email
-      var allAccts = getAccounts();
-      var emailKey = u.email ? u.email.toLowerCase().trim() : null;
-      if (emailKey && allAccts[emailKey]) {
-        allAccts[emailKey].profile    = p.name;
-        allAccts[emailKey].swatches   = swatches;
-        allAccts[emailKey].avoidColor = avoidHex;
-        saveAccounts(allAccts);
-      }
-
-      // Also save to wipe-safe key — keyed by email
-      if (emailKey) {
-        localStorage.setItem('uah_profile_' + emailKey, JSON.stringify({
+      // Cache profile locally for instant restore on next visit
+      try {
+        localStorage.setItem('uah_last_profile', JSON.stringify({
           profile: p.name, name: u.name || '', swatches: swatches,
           avoidColor: avoidHex, savedAt: Date.now()
         }));
-      }
+      } catch(e) {}
 
-      // Fallback: save to a no-email key so even quiz-without-account users
-      // get the returning gate on next visit
-      localStorage.setItem('uah_last_profile', JSON.stringify({
-        profile: p.name, name: u.name || '', swatches: swatches,
-        avoidColor: avoidHex, savedAt: Date.now()
-      }));
+      // Persist to Supabase (non-blocking)
+      if (u.email && typeof dbUpsertProfile === 'function') {
+        dbUpsertProfile({
+          email: u.email, name: u.name || 'Friend',
+          profile: p.name, swatches: swatches, avoidColor: avoidHex
+        }).catch(function(e) { console.warn('[db] profile upsert failed:', e); });
+      }
 
     } catch(e) { console.error('Profile save error:', e); }
   }
